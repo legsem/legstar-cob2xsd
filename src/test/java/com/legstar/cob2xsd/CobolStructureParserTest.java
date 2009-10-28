@@ -4,7 +4,7 @@ package com.legstar.cob2xsd;
  * Test the cob2xsd parser.
  *
  */
-public class Cob2XsdParserTest extends AbstractCob2XsdTester {
+public class CobolStructureParserTest extends AbstractCob2XsdTester {
     
     /**
      * Just a simple level.
@@ -126,7 +126,7 @@ public class Cob2XsdParserTest extends AbstractCob2XsdTester {
                 + "            05 DN-1." + LS
                 + "            05 DN-2." + LS
                 + "            05 DN-3." + LS
-                + "       66 DN-6 RENAMES DN-1 THROUGH DN-3." + LS
+                + "       66 DN-6 RENAMES DN-1 THRU DN-3." + LS
                 + "       01 RECORD-II." + LS
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME RECORD-I)"
@@ -423,4 +423,288 @@ public class Cob2XsdParserTest extends AbstractCob2XsdTester {
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE $B*,***,***.**BBDB))");
    }
+    
+    /**
+     * Test the SIGN clause.
+     */
+    public void testSignClause() {
+        parseAndCheck(
+                "01 myName PIC 9 SIGN IS LEADING SEPARATE CHARACTER."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SIGN (LEADING SEPARATE)))");
+
+        parseAndCheck(
+                "01 myName PIC 9 SIGN IS TRAILING SEPARATE."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SIGN (TRAILING SEPARATE)))");
+
+        parseAndCheck(
+                "01 myName PIC 9 SIGN IS LEADING."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SIGN LEADING))");
+
+        parseAndCheck(
+                "01 myName PIC 9 SIGN TRAILING."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SIGN TRAILING))");
+
+        parseAndCheck(
+                "01 myName PIC 9 LEADING."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SIGN LEADING))");
+    }
+
+    /**
+     * Test the SYNCHRONIZED clause.
+     */
+    public void testSynchronizedClause() {
+        parseAndCheck(
+                "01 myName PIC 9 SYNCHRONIZED."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) SYNCHRONIZED)");
+
+        parseAndCheck(
+                "01 myName PIC 9 SYNC RIGHT."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SYNCHRONIZED RIGHT))");
+
+        parseAndCheck(
+                "01 myName PIC 9 SYNCHRONIZED LEFT."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SYNCHRONIZED LEFT))");
+    }
+
+    /**
+     * Test usage binary clause recognition.
+     */
+    public void testUsageBinaryClause() {
+        parseAndCheck(
+                "01 hisName USAGE BINARY."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE BINARY))");
+
+        parseAndCheck(
+                "01 hisName COMPUTATIONAL."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE BINARY))");
+
+        parseAndCheck(
+                "01 hisName USAGE COMP."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE BINARY))");
+    }
+
+    /**
+     * Test usage single float clause recognition.
+     */
+    public void testUsageSingleFloatClause() {
+        parseAndCheck(
+                "01 hisName USAGE COMPUTATIONAL-1."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE SINGLEFLOAT))");
+
+        parseAndCheck(
+                "01 hisName COMP-1."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE SINGLEFLOAT))");
+
+    }
+
+    /**
+     * Test usage double float clause recognition.
+     */
+    public void testUsageDoubleFloatClause() {
+        parseAndCheck(
+                "01 hisName USAGE COMPUTATIONAL-2."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE DOUBLEFLOAT))");
+
+        parseAndCheck(
+                "01 hisName COMP-2."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE DOUBLEFLOAT))");
+
+    }
+
+    /**
+     * Test usage packed decimal clause recognition.
+     */
+    public void testUsagePackedDecimalClause() {
+        parseAndCheck(
+                "01 hisName USAGE PACKED-DECIMAL."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE PACKEDDECIMAL))");
+
+        parseAndCheck(
+                "01 hisName USAGE COMPUTATIONAL-3."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE PACKEDDECIMAL))");
+
+        parseAndCheck(
+                "01 hisName COMP-3."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE PACKEDDECIMAL))");
+
+    }
+
+    /**
+     * Test usage native binary clause recognition.
+     */
+    public void testUsageNativeBinaryClause() {
+        parseAndCheck(
+                "01 hisName USAGE COMPUTATIONAL-5."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE NATIVEBINARY))");
+
+        parseAndCheck(
+                "01 hisName COMP-5."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE NATIVEBINARY))");
+
+
+    }
+
+    /**
+     * Test usage display clause recognition.
+     */
+    public void testUsageDisplayClause() {
+        parseAndCheck(
+                "01 hisName USAGE DISPLAY."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE DISPLAY))");
+
+        parseAndCheck(
+                "01 hisName DISPLAY-1."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE DISPLAY1))");
+
+
+    }
+
+    /**
+     * Test miscellaneous usage clause recognition.
+     */
+    public void testUsageMiscClause() {
+        parseAndCheck(
+                "01 hisName USAGE INDEX."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE INDEX))");
+
+        parseAndCheck(
+                "01 hisName POINTER."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE POINTER))");
+
+        parseAndCheck(
+                "01 hisName USAGE PROCEDURE-POINTER."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE PROCEDUREPOINTER))");
+
+        parseAndCheck(
+                "01 hisName FUNCTION-POINTER."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE FUNCTIONPOINTER))");
+
+    }
+
+    /**
+     * Test a value clause with alphanumeric literals.
+     */
+    public void testValueClauseAlphanum() {
+        parseAndCheck(
+                "01 A VALUE 'ab'."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE 'ab'))");
+
+        parseAndCheck(
+                "01 A VALUE \"99\"."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE \"99\"))");
+
+        /* TODO shift-in/shif-out for DBCS needs more testing */
+        parseAndCheck(
+                "01 A VALUE 'a" + 0x0e + 0x0f + "b'."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE 'a1415b'))");
+
+        parseAndCheck(
+                "01 A VALUE X'ab'."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE X'ab'))");
+
+        parseAndCheck(
+                "01 A VALUE Z'ab'."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE Z'ab'))");
+
+        parseAndCheck(
+                "01 A VALUE G'ab'."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE G'ab'))");
+
+        parseAndCheck(
+                "01 A VALUE N'ab'."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE N'ab'))");
+
+        parseAndCheck(
+                "01 A VALUE NX'F5F6'."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE NX'F5F6'))");
+    }
+    
+    /**
+     * Test a value clause with numeric literals.
+     */
+    public void testValueClauseNumeric() {
+        parseAndCheck(
+                "01 A VALUE 99."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE 99))");
+
+        parseAndCheck(
+                "01 A VALUE -99."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE -99))");
+
+        parseAndCheck(
+                "01 A VALUE +99."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE +99))");
+
+        parseAndCheck(
+                "01 A VALUE 99.9."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE 99.9))");
+
+        parseAndCheck(
+                "01 A VALUE -99.9."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE -99.9))");
+
+        parseAndCheck(
+                "01 A VALUE IS -0.9."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE -0.9))");
+
+        parseAndCheck(
+                "01 A VALUE IS 0.78E23."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE 0.78E23))");
+
+        parseAndCheck(
+                "01 A VALUE IS -0.78E+23."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE -0.78E+23))");
+    }
+    
+    /**
+     * Test a value clause with numeric literals.
+     */
+    public void testDateFormatClauseNumeric() {
+        parseAndCheck(
+                "01 A DATE FORMAT YYXXXX."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (DATEFORMAT YYXXXX))");
+    }
 }

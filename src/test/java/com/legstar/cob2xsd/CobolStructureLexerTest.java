@@ -5,7 +5,7 @@ package com.legstar.cob2xsd;
  * Test cases for the cob2xsd Lexer.
  *
  */
-public class Cob2XsdLexerTest extends AbstractCob2XsdTester {
+public class CobolStructureLexerTest extends AbstractCob2XsdTester {
 
     /**
      * Comments should be skipped from the token stream. Starting white
@@ -40,7 +40,7 @@ public class Cob2XsdLexerTest extends AbstractCob2XsdTester {
                 "value \"\"" + LS
                 , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
                 + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:7='\"\"',<LITERAL_STRING>,1:6]"
+                + "[@2,6:7='\"\"',<ALPHANUM_LITERAL_STRING>,1:6]"
                 + "[@3,8:9='\\r\\n',<NEWLINE>,channel=99,1:8]");
     }
 
@@ -52,7 +52,7 @@ public class Cob2XsdLexerTest extends AbstractCob2XsdTester {
                 "value \" a literal \"" + LS
                 , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
                 + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:18='\" a literal \"',<LITERAL_STRING>,1:6]"
+                + "[@2,6:18='\" a literal \"',<ALPHANUM_LITERAL_STRING>,1:6]"
                 + "[@3,19:20='\\r\\n',<NEWLINE>,channel=99,1:19]");
     }
 
@@ -66,7 +66,7 @@ public class Cob2XsdLexerTest extends AbstractCob2XsdTester {
                 "value \" a li\"\"teral \"" + LS
                 , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
                 + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:20='\" a li\"\"teral \"',<LITERAL_STRING>,1:6]"
+                + "[@2,6:20='\" a li\"\"teral \"',<ALPHANUM_LITERAL_STRING>,1:6]"
                 + "[@3,21:22='\\r\\n',<NEWLINE>,channel=99,1:21]");
     }
 
@@ -79,9 +79,9 @@ public class Cob2XsdLexerTest extends AbstractCob2XsdTester {
                 "value \" a li\" \"teral \"" + LS
                 , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
                 + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:12='\" a li\"',<LITERAL_STRING>,1:6]"
+                + "[@2,6:12='\" a li\"',<ALPHANUM_LITERAL_STRING>,1:6]"
                 + "[@3,13:13=' ',<WHITESPACE>,channel=99,1:13]"
-                + "[@4,14:21='\"teral \"',<LITERAL_STRING>,1:14]"
+                + "[@4,14:21='\"teral \"',<ALPHANUM_LITERAL_STRING>,1:14]"
                 + "[@5,22:23='\\r\\n',<NEWLINE>,channel=99,1:22]");
     }
 
@@ -98,7 +98,7 @@ public class Cob2XsdLexerTest extends AbstractCob2XsdTester {
                 , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
                 + "[@1,5:26='                      ',<WHITESPACE>,channel=99,1:5]"
                 + "[@2,27:198='\"AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEGGGGGGGGGGHHHHHHHHHHIIIIIIIIII"
-                + "JJJJJJJJJJKKKKKKKKKKLLLLLLLLLLMMMMMMMMMM\"',<LITERAL_STRING>,1:27]");
+                + "JJJJJJJJJJKKKKKKKKKKLLLLLLLLLLMMMMMMMMMM\"',<ALPHANUM_LITERAL_STRING>,1:27]");
     }
 
     /**
@@ -112,7 +112,7 @@ public class Cob2XsdLexerTest extends AbstractCob2XsdTester {
                 , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
                 + "[@1,5:26='                      ',<WHITESPACE>,channel=99,1:5]"
                 + "[@2,27:123=''AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEELLLLLLLLLLMMMMMMMMMM'',"
-                + "<LITERAL_STRING>,1:27]");
+                + "<ALPHANUM_LITERAL_STRING>,1:27]");
     }
 
 
@@ -362,6 +362,113 @@ public class Cob2XsdLexerTest extends AbstractCob2XsdTester {
                 + "[@15,66:66='.',<DECIMAL_POINT>,3:27]"
                 + "[@16,67:67='9',<PICTURE_PART>,3:28]"
                 + "[@17,68:68='.',<PERIOD>,3:29]");
+    }
+
+    /**
+     * An hex string literal.
+     */
+    public void testHexLiteralString() {
+        lexAndCheck(
+                "value X\"FB\"" + LS
+                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
+                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
+                + "[@2,6:10='X\"FB\"',<HEX_LITERAL_STRING>,1:6]"
+                + "[@3,11:12='\\r\\n',<NEWLINE>,channel=99,1:11]");
+    }
+
+    /**
+     * An zero terminated string literal.
+     */
+    public void testZeroLiteralString() {
+        lexAndCheck(
+                "value Z'q'"
+                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
+                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
+                + "[@2,6:9='Z'q'',<ZERO_LITERAL_STRING>,1:6]");
+    }
+
+    /**
+     * An DBCS string literal.
+     */
+    public void testDBCSLiteralString() {
+        lexAndCheck(
+                "value G'q'"
+                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
+                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
+                + "[@2,6:9='G'q'',<DBCS_LITERAL_STRING>,1:6]");
+    }
+
+    /**
+     * An National string literal.
+     */
+    public void testNationalLiteralString() {
+        lexAndCheck(
+                "value N'q'"
+                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
+                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
+                + "[@2,6:9='N'q'',<NATIONAL_LITERAL_STRING>,1:6]");
+    }
+
+    /**
+     * An Hex National string literal.
+     */
+    public void testHexNationalLiteralString() {
+        lexAndCheck(
+                "value NX'F5F7'"
+                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
+                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
+                + "[@2,6:13='NX'F5F7'',<NATIONAL_HEX_LITERAL_STRING>,1:6]");
+    }
+
+
+    /**
+     * An Decimal numeric literal.
+     */
+    public void testDecimalNumericLiteral() {
+        lexAndCheck(
+                "01 A VALUE 99.9."
+                , "[@0,0:1='01',<INT>,1:0]"
+                + "[@1,2:2=' ',<WHITESPACE>,channel=99,1:2]"
+                + "[@2,3:3='A',<DATA_NAME>,1:3]"
+                + "[@3,4:4=' ',<WHITESPACE>,channel=99,1:4]"
+                + "[@4,5:9='VALUE',<VALUE_KEYWORD>,1:5]"
+                + "[@5,10:10=' ',<WHITESPACE>,channel=99,1:10]"
+                + "[@6,11:12='99',<INT>,1:11]"
+                + "[@7,13:13='.',<DECIMAL_POINT>,1:13]"
+                + "[@8,14:14='9',<INT>,1:14]"
+                + "[@9,15:15='.',<PERIOD>,1:15]");
+    }
+
+    /**
+     * An Float numeric literal.
+     */
+    public void testFloatNumericLiteral() {
+        lexAndCheck(
+                "01 A VALUE 99.9E56."
+                , "[@0,0:1='01',<INT>,1:0]"
+                + "[@1,2:2=' ',<WHITESPACE>,channel=99,1:2]"
+                + "[@2,3:3='A',<DATA_NAME>,1:3]"
+                + "[@3,4:4=' ',<WHITESPACE>,channel=99,1:4]"
+                + "[@4,5:9='VALUE',<VALUE_KEYWORD>,1:5]"
+                + "[@5,10:10=' ',<WHITESPACE>,channel=99,1:10]"
+                + "[@6,11:12='99',<INT>,1:11]"
+                + "[@7,13:13='.',<DECIMAL_POINT>,1:13]"
+                + "[@8,14:17='9E56',<FLOAT_PART2>,1:14]"
+                + "[@9,18:18='.',<PERIOD>,1:18]");
+
+        lexAndCheck(
+                "01 A VALUE IS -0.78E+23."
+                , "[@0,0:1='01',<INT>,1:0]"
+                + "[@1,2:2=' ',<WHITESPACE>,channel=99,1:2]"
+                + "[@2,3:3='A',<DATA_NAME>,1:3]"
+                + "[@3,4:4=' ',<WHITESPACE>,channel=99,1:4]"
+                + "[@4,5:9='VALUE',<VALUE_KEYWORD>,1:5]"
+                + "[@5,10:10=' ',<WHITESPACE>,channel=99,1:10]"
+                + "[@6,13:13=' ',<WHITESPACE>,channel=99,1:13]"
+                + "[@7,14:15='-0',<SIGNED_INT>,1:14]"
+                + "[@8,16:16='.',<DECIMAL_POINT>,1:16]"
+                + "[@9,17:22='78E+23',<FLOAT_PART2>,1:17]"
+                + "[@10,23:23='.',<PERIOD>,1:23]");
     }
 
     /**
