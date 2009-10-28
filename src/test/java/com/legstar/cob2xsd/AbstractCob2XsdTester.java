@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.legstar.antlr.ANTLRNoCaseReaderStream;
 import com.legstar.antlr.AbstractAntlrTester;
-import com.legstar.cob2xsd.cobsParser.cobdata_return;
+import com.legstar.cob2xsd.CobolStructureParser.cobdata_return;
 
 /**
  * Generic test code for ANTLR based lexers parsers and tree walkers.
@@ -27,7 +27,7 @@ public abstract class AbstractCob2XsdTester extends AbstractAntlrTester {
      */
     public CommonTokenStream lex(final String source) {
         try {
-            cobsLexer lex = new cobsLexer(
+            CobolStructureLexer lex = new CobolStructureLexer(
                     new ANTLRNoCaseReaderStream(new StringReader(source)));
             CommonTokenStream tokens = new CommonTokenStream(lex);
             assertEquals(0, lex.getNumberOfSyntaxErrors());
@@ -48,7 +48,7 @@ public abstract class AbstractCob2XsdTester extends AbstractAntlrTester {
     public CommonTree parse(final String source) {
         try {
             CommonTokenStream tokens = lex(source);
-            cobsParser parser = new cobsParser(tokens);
+            CobolStructureParser parser = new CobolStructureParser(tokens);
             cobdata_return parserResult = parser.cobdata();
             assertEquals(0, parser.getNumberOfSyntaxErrors());
             assertTrue(parserResult != null);
@@ -64,7 +64,7 @@ public abstract class AbstractCob2XsdTester extends AbstractAntlrTester {
      * {@inheritDoc}
      */
     public String[] getTokenNames() {
-        return cobsParser.tokenNames;
+        return CobolStructureParser.tokenNames;
     }
 
 }

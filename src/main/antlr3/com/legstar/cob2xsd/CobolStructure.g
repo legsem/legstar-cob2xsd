@@ -1,4 +1,4 @@
-grammar cobs;
+grammar CobolStructure;
 /*------------------------------------------------------------------
  * Built from IBM Entreprise COBOL V3R4
  * Parses COBOL WORKING-STORAGE or LINKAGE-SECTION statements only.

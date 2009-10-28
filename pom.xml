@@ -4,8 +4,77 @@
     <artifactId>legstar-cob2xsd</artifactId>
     <packaging>jar</packaging>
     <version>0.0.1-SNAPSHOT</version>
-    <name>LegStar test for legstar-cob2xsd</name>
-    <description>LegStar test for legstar-cob2xsd</description>
+    <name>LegStar COBOL to XSD translator</name>
+    <description>Translates COBOL structures to XML schema</description>
+
+    <issueManagement>
+        <system>Google Code Issue Tracking</system>
+        <url>http://code.google.com/p/legstar-cob2xsd/issues/list</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:svn:http://legstar-cob2xsd.googlecode.com/svn/trunk/</connection>
+        <developerConnection>scm:svn:https://legstar-cob2xsd.googlecode.com/svn/trunk/</developerConnection>
+        <url>http://legstar-cob2xsd.googlecode.com/svn/trunk/</url>
+    </scm>
+
+    <mailingLists>
+        <mailingList>
+            <name>LegStar users mailing list</name>
+            <subscribe>http://groups.google.com/group/legstar-user/subscribe</subscribe>
+            <unsubscribe>http://groups.google.com/group/legstar-user/subscribe</unsubscribe>
+            <post>legstar-user@googlegroups.com</post>
+            <archive>http://groups.google.com/group/legstar-user/topics</archive>
+        </mailingList>
+    </mailingLists>
+
+    <developers>
+        <developer>
+            <id>fady</id>
+            <name>Fady Moussallam</name>
+            <email>fady@NOSPAMlegsem.com</email>
+            <organization>Legsem.com</organization>
+            <roles>
+                <role>Project Manager</role>
+                <role>Architect</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>LegSem</name>
+        <url>http://www.legsem.com/</url>
+    </organization>
+
+    <distributionManagement>
+        <downloadUrl>http://www.legsem.com/legstar/mavenrepo</downloadUrl>
+        <site>
+            <id>local.website</id>
+            <name>Local Website</name>
+            <url>file:///${legstar-dev-website-local-dir}/cob2xsd</url>
+        </site>
+        <repository>
+            <id>ftp-release-repository</id>
+            <name>LEGSTAR Distributions Repository</name>
+            <url>ftp://ftp.legsem.com/public_html/legstar/maven/repo</url>
+        </repository>
+        <snapshotRepository>
+            <id>ftp-snapshots-repository</id>
+            <name>LEGSTAR Distributions Snapshot Repository</name>
+            <url>ftp://ftp.legsem.com/public_html/legstar/maven/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -29,12 +98,28 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr</artifactId>
-            <version>3.1.3</version>
+            <version>3.2</version>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr-runtime</artifactId>
-            <version>3.1.3</version>
+            <version>3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.6.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -43,7 +128,36 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ftp</artifactId>
+                <version>1.0-beta-2</version>
+            </extension>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav</artifactId>
+                <version>1.0-beta-2</version>
+            </extension>
+        </extensions>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId> 
+                    <artifactId>maven-assembly-plugin</artifactId> 
+                    <version>2.2-beta-2</version> 
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId> 
+                    <artifactId>maven-site-plugin</artifactId> 
+                    <version>2.0-beta-7</version> 
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -52,6 +166,20 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <inherited>true</inherited>
+                <executions>
+                    <execution>
+                        <id>project-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr3-maven-plugin</artifactId>
@@ -59,7 +187,7 @@
                 <configuration>
                     <verbose>true</verbose>
                     <report>false</report>
-                    <dfa>true</dfa>
+                    <dfa>false</dfa>
                     <libDirectory>target/generated-sources/antlr3/com/legstar/cob2xsd</libDirectory>
                 </configuration>
                 <executions>

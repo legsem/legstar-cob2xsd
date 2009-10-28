@@ -97,7 +97,8 @@ public class Cob2XsdLexerTest extends AbstractCob2XsdTester {
                 + "      -               \"LLLLLLLLLLMMMMMMMMMM\""
                 , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
                 + "[@1,5:26='                      ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,27:198='\"AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEGGGGGGGGGGHHHHHHHHHHIIIIIIIIIIJJJJJJJJJJKKKKKKKKKKLLLLLLLLLLMMMMMMMMMM\"',<LITERAL_STRING>,1:27]");
+                + "[@2,27:198='\"AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEGGGGGGGGGGHHHHHHHHHHIIIIIIIIII"
+                + "JJJJJJJJJJKKKKKKKKKKLLLLLLLLLLMMMMMMMMMM\"',<LITERAL_STRING>,1:27]");
     }
 
     /**
@@ -110,7 +111,8 @@ public class Cob2XsdLexerTest extends AbstractCob2XsdTester {
                 + "      -               \'LLLLLLLLLLMMMMMMMMMM\'"
                 , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
                 + "[@1,5:26='                      ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,27:123=''AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEELLLLLLLLLLMMMMMMMMMM'',<LITERAL_STRING>,1:27]");
+                + "[@2,27:123=''AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEELLLLLLLLLLMMMMMMMMMM'',"
+                + "<LITERAL_STRING>,1:27]");
     }
 
 

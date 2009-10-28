@@ -298,7 +298,8 @@ public class Cob2XsdParserTest extends AbstractCob2XsdTester {
         parseAndCheck(
                 "01 myName OCCURS 3 DESCENDING myKey1 myKey2."
                 ,
-                "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3) (KEY DESCENDING myKey1) (KEY DESCENDING myKey2)))");
+                "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3) (KEY DESCENDING myKey1)"
+                + " (KEY DESCENDING myKey2)))");
     }
 
     /**
@@ -343,12 +344,14 @@ public class Cob2XsdParserTest extends AbstractCob2XsdTester {
         parseAndCheck(
                 "01 myName OCCURS 0 TO 3 DEPENDING myDep ASCENDING myKey."
                 ,
-                "(DATA_ITEM (LEVEL 01) (NAME myName) (VARARRAY (LBOUND 0) (HBOUND 3 (DEPENDINGON myDep)) (KEY ASCENDING myKey)))");
+                "(DATA_ITEM (LEVEL 01) (NAME myName) (VARARRAY (LBOUND 0) (HBOUND 3 (DEPENDINGON myDep))"
+                + " (KEY ASCENDING myKey)))");
 
         parseAndCheck(
                 "01 myName OCCURS 1 TO 3 DEPENDING ON myDep INDEXED myIndex."
                 ,
-                "(DATA_ITEM (LEVEL 01) (NAME myName) (VARARRAY (LBOUND 1) (HBOUND 3 (DEPENDINGON myDep)) (INDEX myIndex)))");
+                "(DATA_ITEM (LEVEL 01) (NAME myName) (VARARRAY (LBOUND 1) (HBOUND 3 (DEPENDINGON myDep))"
+                + " (INDEX myIndex)))");
     }
 
     /**

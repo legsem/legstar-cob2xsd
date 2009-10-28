@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fileset-config file-format-version="1.2.0" simple-config="false">
+    <fileset name="tous" enabled="true" check-config-name="LegStar checkstyle" local="false">
+        <file-match-pattern match-pattern="." include-pattern="true"/>
+        <file-match-pattern match-pattern="antlr3" include-pattern="false"/>
+        <file-match-pattern match-pattern=".svn" include-pattern="false"/>
+        <file-match-pattern match-pattern="target" include-pattern="false"/>
+    </fileset>
+</fileset-config>
