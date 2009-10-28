@@ -1,0 +1,605 @@
+grammar cobs;
+/*------------------------------------------------------------------
+ * Built from IBM Entreprise COBOL V3R4
+ * Parses COBOL WORKING-STORAGE or LINKAGE-SECTION statements only.
+ * TODO
+ * Delimiters such as ', ' or '; ' should be accepted in many places
+ * Handle Decimal point is comma
+ * Renames should follow the structure they rename
+ *------------------------------------------------------------------*/
+/*------------------------------------------------------------------
+ * Produces an Abstract Syntax Tree
+ *------------------------------------------------------------------*/
+options {
+  output = AST;
+}
+
+/*------------------------------------------------------------------
+ * Imaginary nodes
+ *------------------------------------------------------------------*/
+tokens {
+    DATA_ITEM;
+    LEVEL;
+    NAME;
+    RENAME;
+    RANGE;
+    LITERAL;
+    CONDITION;
+    REDEFINES;
+    BLANKWHENZERO;
+    EXTERNAL;
+    GLOBAL;
+    GROUPUSAGENATIONAL;
+    JUSTIFIEDRIGHT;
+    INDEX;
+    KEY;
+    FIXEDARRAY;
+    VARARRAY;
+    HBOUND;
+    LBOUND;
+    DEPENDINGON;
+    PICTURE;
+    PICTURESTRING;
+    SIGNLEADING;
+    SIGNTRAILING;
+    SEPARATE;
+}
+
+/*------------------------------------------------------------------
+ * Java overrides
+ *------------------------------------------------------------------*/
+@lexer::header {
+package com.legstar.cob2xsd;
+import java.util.Hashtable;
+import java.util.Map;
+}
+@header {
+package com.legstar.cob2xsd;
+}
+
+@lexer::members {
+    /** Keeps track of the last COBOL keyword recognized. This helps
+        disambiguate lexing rules. */
+    private int lastKeyword = PERIOD;
+}
+@members {
+    
+    /**
+     * Checks if a string contains numerics which fall in a given range.
+     * @param str the string holding a numeric value
+     * @param lower the lower bound
+     * @param higher the upper bound
+     * @return true if the string holds a numeric in the range
+     */
+    public boolean inRange(final String str, final int lower, final int higher) {
+        if (str != null && str.length() > 0) {
+            try {
+                int v = Integer.parseInt(str);
+                if (v >= lower && v <= higher) {
+                    return true;
+                }
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /** The AST built by custom actions is a hierarchy of DATA_ITEM based on their LEVEL. */
+    private Object hTree ;
+    
+    /** The last subtree built from a DATA_ITEM. */
+    private Object hLast;
+    
+    /**
+     * Get the LEVEL for a DATA_ITEM subtree.
+     * @param tree the DATA_ITEM subtree
+     * @return the DATA_ITEM level
+     */
+    public int getLevel(final Object tree) {
+        Tree level = ((CommonTree) tree).getFirstChildWithType(LEVEL);
+        return Integer.parseInt(level.getChild(0).getText());
+    }
+    
+    /**
+     * Search the tree hierarchy for the first node with a lower level than the one received.
+     * Level 66 renames are a special case where we look for a level 01 to hook them to.
+     * @param tree the DATA_ITEM subtree to start from (moving up)
+     * @param level the level for which we are looking for a suitable parent
+     * @return the DATA_ITEM which can be used as a parent or the Nil node
+     */
+    public Object getParent(final Object tree, final int level) {
+        if (getTreeAdaptor().isNil(tree)) {
+            return tree;
+        } else {
+            int targetLevel = (level == 66 ) ? 02 : level; 
+            if (getLevel(tree) < targetLevel) {
+                return tree;
+            } else {
+                return getParent(getTreeAdaptor().getParent(tree), level);
+            }
+        }
+    }
+
+}
+
+/*------------------------------------------------------------------
+ * Parser grammar
+ * Data items are manually added to a hierarchical AST to reproduce
+ * the COBOL level hierarchy.
+ *------------------------------------------------------------------*/
+cobdata
+@init {
+    /* Initialize the hierarchical AST which will replace the standard one. */
+    hTree = getTreeAdaptor().nil();
+    hLast = hTree;
+
+}
+     :  (data_items)*
+     ->{hTree}
+     ;
+    
+/* 
+   The AST built from this rule is manually added to the hierarchical AST.
+   We override the normal tree rewriting mechanism because it would create
+   a flat list of data items, disregarding their level.
+*/
+data_items
+    :   data_entry
+        {
+            Object parent = getParent(hLast, getLevel($data_entry.tree));
+            getTreeAdaptor().addChild(parent, $data_entry.tree);
+            hLast = $data_entry.tree;
+        }
+        ->
+    ;
+
+data_entry
+    :   data_description_entry
+    |   rename_description_entry
+    |   condition_description_entry
+    ;
+
+/*------------------------------------------------------------------
+ * Regular data item entries such as 01 A PIC X.
+ *------------------------------------------------------------------*/
+data_description_entry returns[int level] 
+    :   data_item_level DATA_NAME? clauses* PERIOD
+        {$level = Integer.parseInt($data_item_level.text);}
+    ->^(DATA_ITEM data_item_level ^(NAME DATA_NAME)? clauses*)
+    ;
+  
+/* 
+ * Levels are not always followed by a name.
+ */
+data_item_level
+    :   {inRange(input.LT(1).getText(), 1, 50) || inRange(input.LT(1).getText(), 77, 77)}?=> INT
+    ->^(LEVEL INT)
+    ;
+
+/*------------------------------------------------------------------
+ * A rename expression such as: 66 NEWN RENAMES OLD.
+ *------------------------------------------------------------------*/
+rename_description_entry
+    :   rename_level v=DATA_NAME RENAMES_KEYWORD w=DATA_NAME THROUGH_KEYWORD x=DATA_NAME PERIOD
+    ->^(RENAME rename_level ^(NAME $v) ^(RANGE $w $x))
+    |   rename_level v=DATA_NAME RENAMES_KEYWORD w=DATA_NAME PERIOD
+    ->^(RENAME rename_level ^(NAME $v) ^(LITERAL $w))
+    ; 
+
+rename_level
+    :   {inRange(input.LT(1).getText(), 66, 66)}?=> INT
+    ->^(LEVEL INT)
+    ;
+
+/*------------------------------------------------------------------
+ * A condition such as: 88 TRUE VALUE 1.
+ *------------------------------------------------------------------*/
+condition_description_entry
+    :   condition_level DATA_NAME condition_name_values PERIOD
+    ->^(CONDITION condition_level ^(NAME DATA_NAME) condition_name_values)
+    ; 
+
+condition_level
+    :   {inRange(input.LT(1).getText(), 88, 88)}?=> INT
+    ->^(LEVEL INT)
+    ;
+
+condition_name_values
+    :   VALUE_KEYWORD (IS_KEYWORD | ARE_KEYWORD)? (v+=condition_name_value)+
+    ->^($v)+
+    ;
+    
+condition_name_value
+    :   v=condition_name_literal THROUGH_KEYWORD w=condition_name_literal
+    ->^(RANGE $v $w?)
+    |   v=condition_name_literal
+    ->^(LITERAL $v)
+    ;
+
+condition_name_literal
+    :   (v=INT | v=LITERAL_STRING)
+    ;
+
+/*------------------------------------------------------------------
+ * Regular data description entry clauses.
+ *------------------------------------------------------------------*/
+clauses 
+    :   redefines_clause
+    |   blank_when_zero_clause
+    |   external_clause
+    |   global_clause
+    |   group_usage_clause
+    |   justified_clause
+    |   occurs_clause
+    |   picture_clause
+    |   sign_clause
+    |   synchronized_clause
+    |   usage_clause
+    |   value_clause
+    |   date_format_clause
+    ; 
+
+redefines_clause
+    :   REDEFINES_KEYWORD DATA_NAME
+    ->^(REDEFINES DATA_NAME)
+    ;
+
+blank_when_zero_clause
+    :   BLANK_KEYWORD WHEN_KEYWORD? ZERO_KEYWORD
+    ->^(BLANKWHENZERO)
+    ;
+
+external_clause
+    :   EXTERNAL_KEYWORD
+    ->^(EXTERNAL)
+    ;
+
+global_clause
+    :   GLOBAL_KEYWORD
+    ->^(GLOBAL)
+    ;
+
+group_usage_clause
+    :   GROUP_USAGE_KEYWORD IS_KEYWORD? NATIONAL_KEYWORD
+    ->^(GROUPUSAGENATIONAL)
+    ;
+
+justified_clause
+    :   JUSTIFIED_KEYWORD RIGHT_KEYWORD?
+    ->^(JUSTIFIEDRIGHT)
+    ;
+
+occurs_clause
+    :   fixed_length_table
+    |   variable_length_table
+    ;
+
+picture_clause
+    :   PICTURE_KEYWORD IS_KEYWORD? picture_string
+    ->^(PICTURE picture_string)
+    ;
+
+sign_clause
+    :   (SIGN_KEYWORD IS_KEYWORD?)?
+        (
+            SIGN_LEADING_KEYWORD
+            ->^(SIGNLEADING)
+            | SIGN_TRAILING_KEYWORD
+            ->^(SIGNTRAILING)
+        )
+        (SEPARATE_KEYWORD CHARACTER_KEYWORD? ->^(SEPARATE))?
+         
+    ;
+
+synchronized_clause
+    :   SYNCHRONIZED_KEYWORD (LEFT_KEYWORD | RIGHT_KEYWORD)?
+    ;
+
+usage_clause
+    :   (USAGE_KEYWORD)?
+        (
+          BINARY_KEYWORD
+        | SINGLE_FLOAT_KEYWORD
+        | DOUBLE_FLOAT_KEYWORD
+        | PACKED_DECIMAL_KEYWORD
+        | NATIVE_BINARY_KEYWORD
+        | DISPLAY_KEYWORD
+        | DISPLAY_1_KEYWORD
+        | INDEX_KEYWORD
+        | NATIONAL_KEYWORD
+        | POINTER_KEYWORD
+        | PROCEDURE_POINTER
+        | FUNCTION_POINTER
+        )
+    ;
+
+value_clause
+    : VALUE_KEYWORD IS_KEYWORD? (INT | LITERAL_STRING)
+    ;
+
+date_format_clause
+    : DATE_KEYWORD IS_KEYWORD? DATE_PATTERN
+    ;
+  
+/*------------------------------------------------------------------
+ * Arrays
+ *------------------------------------------------------------------*/
+fixed_length_table
+    : OCCURS_KEYWORD INT TIMES_KEYWORD? (key_clause)* (index_clause)*
+    ->^(FIXEDARRAY ^(HBOUND INT) key_clause* index_clause*)
+    ;               
+
+variable_length_table
+    : (OCCURS_KEYWORD low_bound)=>OCCURS_KEYWORD low_bound hb=INT TIMES_KEYWORD? DEPENDING_KEYWORD ON_KEYWORD? DATA_NAME (key_clause)* (index_clause)*
+    ->^(VARARRAY low_bound ^(HBOUND $hb ^(DEPENDINGON DATA_NAME)) key_clause* index_clause*)
+    | OCCURS_KEYWORD hb=INT TIMES_KEYWORD? DEPENDING_KEYWORD ON_KEYWORD? DATA_NAME (key_clause)* (index_clause)*
+    ->^(VARARRAY ^(HBOUND $hb ^(DEPENDINGON DATA_NAME)) key_clause* index_clause*)
+    ;
+    
+low_bound
+    :   INT TO_KEYWORD 
+    ->^(LBOUND INT)
+    ;         
+
+key_clause
+    : (v=ASCENDING_KEYWORD | v=DESCENDING_KEYWORD) KEY_KEYWORD? IS_KEYWORD? DATA_NAME+
+    ->^(KEY $v DATA_NAME)+
+    ;
+  
+index_clause
+    : INDEXED_KEYWORD BY_KEYWORD? DATA_NAME+
+    ->^(INDEX DATA_NAME)+
+    ; 
+  
+/*------------------------------------------------------------------
+ * Picture strings are a special case that is handled as a parser
+ * rule when it belongs to the lexer really.
+ * The problem is that picture values might contain decimal points
+ * that the lexer normally recognizes as sentence delimiters.
+ * What we do is emitting a DECIMAL_POINT imaginary token when we
+ * encounter this situation instead of a PERIOD. Because DECIMAL_POINT
+ * is an imaginary token, only parser rules can handle it. 
+ * At tree construction we concatenate the various parts of the
+ * picture string which might have been split by the decimal point.
+ *------------------------------------------------------------------*/
+picture_string
+@init {
+    StringBuilder sb = new StringBuilder();
+}
+    :   (v+=PICTURE_PART | v+=DECIMAL_POINT)+
+    {
+            for (Object o : $v) {
+                sb.append(((Token) o).getText());
+            }
+    }
+    ->
+    {
+        
+        new CommonTree(new CommonToken(PICTURESTRING,sb.toString()))
+        
+    }
+    ;
+
+/*------------------------------------------------------------------
+ * Lexer grammar
+ *------------------------------------------------------------------*/
+/*------------------------------------------------------------------
+ * Keywords
+ *------------------------------------------------------------------*/
+REDEFINES_KEYWORD       : 'REDEFINES' {lastKeyword = $type;};  
+BLANK_KEYWORD           : 'BLANK' {lastKeyword = $type;};
+WHEN_KEYWORD            : 'WHEN' {skip();};
+ZERO_KEYWORD            : 'ZERO' ('S' | 'ES')? {lastKeyword = $type;};
+EXTERNAL_KEYWORD        : 'EXTERNAL' {lastKeyword = $type;};
+GLOBAL_KEYWORD          : 'GLOBAL' {lastKeyword = $type;};
+GROUP_USAGE_KEYWORD     : 'GROUP-USAGE' {lastKeyword = $type;};
+IS_KEYWORD              : 'IS' {skip();};
+ARE_KEYWORD             : 'ARE' {skip();};
+NATIONAL_KEYWORD        : 'NATIONAL' {lastKeyword = $type;};
+JUSTIFIED_KEYWORD       : 'JUSTIFIED' | 'JUST' {lastKeyword = $type;};
+RIGHT_KEYWORD           : 'RIGHT' {lastKeyword = $type;};
+OCCURS_KEYWORD          : 'OCCURS' {lastKeyword = $type;};
+TIMES_KEYWORD           : 'TIMES' {skip();};
+TO_KEYWORD              : 'TO' {lastKeyword = $type;};
+ASCENDING_KEYWORD       : 'ASCENDING' {lastKeyword = $type;};
+DESCENDING_KEYWORD      : 'DESCENDING' {lastKeyword = $type;};
+KEY_KEYWORD             : 'KEY' {lastKeyword = $type;};
+INDEXED_KEYWORD         : 'INDEXED' {lastKeyword = $type;};
+BY_KEYWORD              : 'BY' {skip();};
+PICTURE_KEYWORD         : 'PIC' ('TURE')? {lastKeyword = $type;};
+DEPENDING_KEYWORD       : 'DEPENDING' {lastKeyword = $type;};
+ON_KEYWORD              : 'ON' {skip();};
+SIGN_KEYWORD            : 'SIGN' {skip();};
+SIGN_LEADING_KEYWORD    : 'LEADING' {lastKeyword = $type;};
+SIGN_TRAILING_KEYWORD   : 'TRAILING' {lastKeyword = $type;};
+SEPARATE_KEYWORD        : 'SEPARATE' {lastKeyword = $type;};
+CHARACTER_KEYWORD       : 'CHARACTER' {skip();};
+SYNCHRONIZED_KEYWORD  : ('SYNCHRONIZED' | 'SYNC');
+LEFT_KEYWORD    :   'LEFT';
+USAGE_KEYWORD   :   'USAGE' ('IS')?;
+BINARY_KEYWORD    :     ('BINARY' | 'COMPUTATIONAL' | 'COMP');  
+SINGLE_FLOAT_KEYWORD  : ('COMPUTATIONAL-1' | 'COMP-1'); 
+DOUBLE_FLOAT_KEYWORD  : ('COMPUTATIONAL-2' | 'COMP-2');
+PACKED_DECIMAL_KEYWORD  : ('PACKED-DECIMAL' | 'COMPUTATIONAL-3' | 'COMP-3');
+NATIVE_BINARY_KEYWORD : ('COMPUTATIONAL-5' | 'COMP-5');
+DISPLAY_KEYWORD   : 'DISPLAY';
+DISPLAY_1_KEYWORD : 'DISPLAY-1';
+INDEX_KEYWORD   :   'INDEX';
+POINTER_KEYWORD   : 'POINTER';
+PROCEDURE_POINTER : 'PROCEDURE-POINTER';
+FUNCTION_POINTER  : 'FUNCTION-POINTER';
+VALUE_KEYWORD   :   ('VALUE' | 'VALUES');
+RENAMES_KEYWORD :   'RENAMES';
+DATE_KEYWORD    :   'DATE FORMAT' {lastKeyword = DATE_KEYWORD;};
+THROUGH_KEYWORD :   ('THROUGH' | 'THRU');
+  
+/*------------------------------------------------------------------
+ * Period is the data entry delimiter.
+ * It might also appear in a PICTURE clause, FLOAT or DECIMAL literal.
+ * Fortunately in these cases, it cannot appear as the last character
+ * The action here detects these cases and dynamically retype the
+ * token produced by the lexer.
+ *------------------------------------------------------------------*/
+PERIOD
+    :
+    {
+        /* If this period is not followed by a space or a newline, then we consider
+         * it is a decimal point and not to be used as a sentence delimiter.*/
+        if (input.LA(2) != ' ' && input.LA(2) != '\r' && input.LA(2) != '\n' && input.LA(2) != -1) {
+            $type = DECIMAL_POINT;
+        } else {
+            /* This will set the context as the end of a data entry */
+            lastKeyword = PERIOD;
+        }
+    } '.'
+    ;
+
+/*------------------------------------------------------------------
+ * Integer literals
+ * We may have to retype these tokens which have a broad pattern,
+ * depending on context.
+ *------------------------------------------------------------------*/
+INT :   '0'..'9'+
+    {
+        if (lastKeyword == PICTURE_KEYWORD) {
+            $type = PICTURE_PART;
+        }
+    }
+    ;
+
+SIGNED_INT
+    : ('+' | '-') '0'..'9'+
+    {
+        if (lastKeyword == PICTURE_KEYWORD) {
+            $type = PICTURE_PART;
+        }
+    }
+    ;
+
+/*------------------------------------------------------------------
+ * Date pattern
+ * A date pattern such as XX is ambiguous for the lexer because it
+ * can also be a DATA_NAME or a PICTURE_STRING. By declaring
+ * DATE_PATTERN first we hush the lexer complaining. But now, 
+ * everytime the lexer encounters XX it will assume a DATE_PATTERN
+ * The post action retypes the token according to context.
+ *------------------------------------------------------------------*/
+DATE_PATTERN
+    : ('X'|'Y')+
+    {
+        if (lastKeyword != DATE_KEYWORD) {
+            if (lastKeyword == PICTURE_KEYWORD) {
+                $type = PICTURE_PART;
+            } else {
+                $type = DATA_NAME;
+            }
+        }
+    }
+    ;
+
+/*------------------------------------------------------------------
+ * Data item names
+ * A data name such as ABE is ambiguous because it might as well be
+ * a PICTURE_STRING. We retype the token if that's the case.
+ *------------------------------------------------------------------*/
+DATA_NAME
+    : LETTER (LETTER|'0'..'9'|'-')*
+    {
+        if (lastKeyword == PICTURE_KEYWORD) {
+            $type = PICTURE_PART;
+        }
+    }
+    ;
+
+/*------------------------------------------------------------------
+ * Picture value
+ * This might be a part from a picture value in case a decimal point
+ * is detected. For a PICTURE such as 99.9 the lexer will recognize
+ * 3 tokens : PICTURE_STRING DECIMAL_POINT PICTURE_STRING.
+ * The complete picture string is reconstructed by a parser rule.
+ *------------------------------------------------------------------*/
+PICTURE_PART
+    : PICTURE_CHAR+
+    ;
+    
+/*------------------------------------------------------------------
+ * In addition to the characters listed here, a PICTURE can also
+ * contain a DECIMAL point. We can't list it here though because
+ * the lexer would get confused (period is also the sentence delimiter).
+ * TODO $ should not be the only currency sign supported
+ *------------------------------------------------------------------*/
+fragment
+PICTURE_CHAR
+    : ('A' | 'B' | 'E' | 'G' | 'N' | 'P' | 'S' | 'V' | 'X' | 'Z' | '9' | '0' | '/' | ',' | '+' | 'C' | 'R' | 'D' | '-' | '*' | '$' | '(' | ')' )
+    ;
+
+/*------------------------------------------------------------------
+ * String literals are delimited by QUOTE or APOST
+ * Escaping is done by duplicating the delimiter. For instance,
+ * "aaa""bbbb" is a vallid literal string.
+ * Strings can be continued on multiple lines in which case:
+ * - The continued line does not terminate with a delimiter
+ * - The continuation line has a '-' in column 7
+ * when we concatenate fragments from multiple lines, we end up
+ * things like "aaa\n  - "bbb" which should become "aaabbb"
+ *------------------------------------------------------------------*/
+LITERAL_STRING
+    :   LITERAL_FRAGMENT+
+    {setText(getText().replaceAll("(\\r)?\\n(\\s)*\\-(\\s)*(\"|\')",""));}
+    ;
+
+fragment
+LITERAL_FRAGMENT
+    :   QUOTE (options {greedy=false;} : .)* ( QUOTE | CONTINUED_LITERAL_FRAGMENT)
+    |   APOST (options {greedy=false;} : .)* ( APOST | CONTINUED_LITERAL_FRAGMENT)
+    ;
+
+fragment
+CONTINUED_LITERAL_FRAGMENT
+  :  NEWLINE WHITESPACE CONTINUATION_CHAR WHITESPACE? LITERAL_FRAGMENT+
+  ;
+
+fragment
+CONTINUATION_CHAR
+    :   {getCharPositionInLine() == 6}?=> '-'
+    ;
+
+/*------------------------------------------------------------------
+ * Comments start with '*' or '/' in column 7
+ *------------------------------------------------------------------*/
+COMMENT options { greedy = false; }
+    : {getCharPositionInLine() == 6}?=> (ASTERISK | FSLASH) .* NEWLINE
+    { skip(); }
+    ;
+
+/*------------------------------------------------------------------
+ * Whitespaces, newlines are kept but hidden
+ *------------------------------------------------------------------*/
+WHITESPACE
+    :   SPACE+ { $channel=HIDDEN; }
+    ;
+
+NEWLINE
+    :   ('\r'? '\n')+  { $channel=HIDDEN; }
+    ;
+
+/*------------------------------------------------------------------
+ * Fragments
+ *------------------------------------------------------------------*/
+fragment LETTER     : 'A'..'Z'| 'a'..'z';
+fragment SPACE      : ' ' | '\t';
+fragment QUOTE      : '"';
+fragment APOST      : '\'';
+fragment ASTERISK   : '*';
+fragment FSLASH     : '/';
+/*------------------------------------------------------------------
+ * DECIMAL_POINT is reported as a fragment so that the lexer code
+ * generator does not complain when it is referenced from other
+ * rules. In reality it is an imaginary token set in some cases
+ * when a PERIOD is recognized (see PERIOD rule).
+ *------------------------------------------------------------------*/
+fragment
+DECIMAL_POINT 
+    :  '.'
+    ;
