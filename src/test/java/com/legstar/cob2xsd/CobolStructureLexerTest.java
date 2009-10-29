@@ -13,11 +13,21 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testComments() {
         lexAndCheck(
-                "      * a comment" + LS
-                , "[@0,0:5='      ',<WHITESPACE>,channel=99,1:0]");
+                ""
+                + "       01 A" + LS
+                + "      * a comment" + LS
+                + "       ." + LS
+                , "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:10='A',<DATA_NAME>,1:10]"
+                + "[@2,39:39='.',<PERIOD>,3:7]");
         lexAndCheck(
-                "      * / comment" + LS
-                , "[@0,0:5='      ',<WHITESPACE>,channel=99,1:0]");
+                ""
+                + "       01 A" + LS
+                + "      / a comment" + LS
+                + "       ." + LS
+                , "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:10='A',<DATA_NAME>,1:10]"
+                + "[@2,39:39='.',<PERIOD>,3:7]");
     }
 
     /**
@@ -26,10 +36,8 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
     public void testLevelAlone() {
         lexAndCheck(
                 "       01." + LS
-                , "[@0,0:6='       ',<WHITESPACE>,channel=99,1:0]"
-                + "[@1,7:8='01',<INT>,1:7]"
-                + "[@2,9:9='.',<PERIOD>,1:9]"
-                + "[@3,10:11='\\r\\n',<NEWLINE>,channel=99,1:10]");
+                , "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,9:9='.',<PERIOD>,1:9]");
     }
 
     /**
@@ -37,11 +45,11 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testEmptyLiteralString() {
         lexAndCheck(
-                "value \"\"" + LS
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:7='\"\"',<ALPHANUM_LITERAL_STRING>,1:6]"
-                + "[@3,8:9='\\r\\n',<NEWLINE>,channel=99,1:8]");
+                "       1 A value \"\"" + LS
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:18='\"\"',<ALPHANUM_LITERAL_STRING>,1:17]");
     }
 
     /**
@@ -49,11 +57,11 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testSingleLineLiteralString() {
         lexAndCheck(
-                "value \" a literal \"" + LS
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:18='\" a literal \"',<ALPHANUM_LITERAL_STRING>,1:6]"
-                + "[@3,19:20='\\r\\n',<NEWLINE>,channel=99,1:19]");
+                "       1 A value \" a literal \"" + LS
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:29='\" a literal \"',<ALPHANUM_LITERAL_STRING>,1:17]");
     }
 
     /**
@@ -63,11 +71,11 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testSingleLineLiteralStringWithInnerDelimiter() {
         lexAndCheck(
-                "value \" a li\"\"teral \"" + LS
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:20='\" a li\"\"teral \"',<ALPHANUM_LITERAL_STRING>,1:6]"
-                + "[@3,21:22='\\r\\n',<NEWLINE>,channel=99,1:21]");
+                "       1 A value \" a li\"\"teral \"" + LS
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:31='\" a li\"\"teral \"',<ALPHANUM_LITERAL_STRING>,1:17]");
     }
 
     /**
@@ -76,13 +84,12 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testSingleLineDoubleString() {
         lexAndCheck(
-                "value \" a li\" \"teral \"" + LS
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:12='\" a li\"',<ALPHANUM_LITERAL_STRING>,1:6]"
-                + "[@3,13:13=' ',<WHITESPACE>,channel=99,1:13]"
-                + "[@4,14:21='\"teral \"',<ALPHANUM_LITERAL_STRING>,1:14]"
-                + "[@5,22:23='\\r\\n',<NEWLINE>,channel=99,1:22]");
+                "       1 A value \" a li\" \"teral \"" + LS
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:23='\" a li\"',<ALPHANUM_LITERAL_STRING>,1:17]"
+                + "[@4,25:32='\"teral \"',<ALPHANUM_LITERAL_STRING>,1:25]");
     }
 
     /**
@@ -91,14 +98,16 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testMultilineLiteralString() {
         lexAndCheck(
-                "value"
-                + "                      \"AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE" + LS
-                + "      -               \"GGGGGGGGGGHHHHHHHHHHIIIIIIIIIIJJJJJJJJJJKKKKKKKKKK" + LS
-                + "      -               \"LLLLLLLLLLMMMMMMMMMM\""
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:26='                      ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,27:198='\"AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEGGGGGGGGGGHHHHHHHHHHIIIIIIIIII"
-                + "JJJJJJJJJJKKKKKKKKKKLLLLLLLLLLMMMMMMMMMM\"',<ALPHANUM_LITERAL_STRING>,1:27]");
+                "       1 A value" + LS
+                + "                     \"AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE" + LS
+                + "      -              \"GGGGGGGGGGHHHHHHHHHHIIIIIIIIIIJJJJJJJJJJKKKKKKKKKK" + LS
+                + "      -              \"LLLLLLLLLLMMMMMMMMMM\"." + LS
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,39:208='\"AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEGGGGGGGGGGHHHHHHHHHH"
+                + "IIIIIIIIIIJJJJJJJJJJKKKKKKKKKKLLLLLLLLLLMMMMMMMMMM\"',<ALPHANUM_LITERAL_STRING>,2:21]"
+                + "[@4,209:209='.',<PERIOD>,4:43]");
     }
 
     /**
@@ -106,13 +115,15 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testMultilineLiteralStringApost() {
         lexAndCheck(
-                "value"
-                + "                      \'AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE" + LS
-                + "      -               \'LLLLLLLLLLMMMMMMMMMM\'"
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:26='                      ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,27:123=''AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEELLLLLLLLLLMMMMMMMMMM'',"
-                + "<ALPHANUM_LITERAL_STRING>,1:27]");
+                "       1 A value" + LS
+                + "                     \'AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE" + LS
+                + "      -              \'LLLLLLLLLLMMMMMMMMMM\'."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,39:134=''AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEELLLLLLLLLL"
+                + "MMMMMMMMMM'',<ALPHANUM_LITERAL_STRING>,2:21]"
+                + "[@4,135:135='.',<PERIOD>,3:43]");
     }
 
 
@@ -121,11 +132,12 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testIntegerLiteral() {
         lexAndCheck(
-                "value 99."
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:7='99',<INT>,1:6]"
-                + "[@3,8:8='.',<PERIOD>,1:8]");
+                "       1 A value 99."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:18='99',<INT>,1:17]"
+                + "[@4,19:19='.',<PERIOD>,1:19]");
     }
 
     /**
@@ -133,12 +145,12 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testIntegerLiteralWithIs() {
         lexAndCheck(
-                "value is 99."
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,8:8=' ',<WHITESPACE>,channel=99,1:8]"
-                + "[@3,9:10='99',<INT>,1:9]"
-                + "[@4,11:11='.',<PERIOD>,1:11]");
+                "       1 A value is 99."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,20:21='99',<INT>,1:20]"
+                + "[@4,22:22='.',<PERIOD>,1:22]");
     }
 
 
@@ -147,12 +159,12 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testIntegerLiteralSeparateFromPeriod() {
         lexAndCheck(
-                "value 99 ."
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:7='99',<INT>,1:6]"
-                + "[@3,8:8=' ',<WHITESPACE>,channel=99,1:8]"
-                + "[@4,9:9='.',<PERIOD>,1:9]");
+                "       1 A value 99 ."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:18='99',<INT>,1:17]"
+                + "[@4,20:20='.',<PERIOD>,1:20]");
     }
 
     /**
@@ -160,13 +172,14 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testDecimalLiteral() {
         lexAndCheck(
-                "value 99.9."
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:7='99',<INT>,1:6]"
-                + "[@3,8:8='.',<DECIMAL_POINT>,1:8]"
-                + "[@4,9:9='9',<INT>,1:9]"
-                + "[@5,10:10='.',<PERIOD>,1:10]");
+                "       1 A value 99.9."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:18='99',<INT>,1:17]"
+                + "[@4,19:19='.',<DECIMAL_POINT>,1:19]"
+                + "[@5,20:20='9',<INT>,1:20]"
+                + "[@6,21:21='.',<PERIOD>,1:21]");
     }
 
     /**
@@ -174,12 +187,13 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testNoIntegerPartDecimalLiteral() {
         lexAndCheck(
-                "value .99."
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:6='.',<DECIMAL_POINT>,1:6]"
-                + "[@3,7:8='99',<INT>,1:7]"
-                + "[@4,9:9='.',<PERIOD>,1:9]");
+                "       1 A value .99."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:17='.',<DECIMAL_POINT>,1:17]"
+                + "[@4,18:19='99',<INT>,1:18]"
+                + "[@5,20:20='.',<PERIOD>,1:20]");
     }
 
     /**
@@ -187,13 +201,14 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testSignedDecimalLiteral() {
         lexAndCheck(
-                "value -99.9."
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:8='-99',<SIGNED_INT>,1:6]"
-                + "[@3,9:9='.',<DECIMAL_POINT>,1:9]"
-                + "[@4,10:10='9',<INT>,1:10]"
-                + "[@5,11:11='.',<PERIOD>,1:11]");
+                "       1 A value -99.9."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:19='-99',<SIGNED_INT>,1:17]"
+                + "[@4,20:20='.',<DECIMAL_POINT>,1:20]"
+                + "[@5,21:21='9',<INT>,1:21]"
+                + "[@6,22:22='.',<PERIOD>,1:22]");
     }
 
     /**
@@ -201,58 +216,43 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      * be mixed case without impact on lexer grammar.
      */
     public void testCaseInsensitiveReader() {
-        lexAndCheck("  01 a REDEFINES b.",
-                "[@0,0:1='  ',<WHITESPACE>,channel=99,1:0]"
-                + "[@1,2:3='01',<INT>,1:2]"
-                + "[@2,4:4=' ',<WHITESPACE>,channel=99,1:4]"
-                + "[@3,5:5='a',<DATA_NAME>,1:5]"
-                + "[@4,6:6=' ',<WHITESPACE>,channel=99,1:6]"
-                + "[@5,7:15='REDEFINES',<REDEFINES_KEYWORD>,1:7]"
-                + "[@6,16:16=' ',<WHITESPACE>,channel=99,1:16]"
-                + "[@7,17:17='b',<DATA_NAME>,1:17]"
-                + "[@8,18:18='.',<PERIOD>,1:18]");
+        lexAndCheck("       1 A  REDEFINES b.",
+                "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:20='REDEFINES',<REDEFINES_KEYWORD>,1:12]"
+                + "[@3,22:22='b',<DATA_NAME>,1:22]"
+                + "[@4,23:23='.',<PERIOD>,1:23]");
 
-        lexAndCheck("  01 a redeFines b.",
-                "[@0,0:1='  ',<WHITESPACE>,channel=99,1:0]"
-                + "[@1,2:3='01',<INT>,1:2]"
-                + "[@2,4:4=' ',<WHITESPACE>,channel=99,1:4]"
-                + "[@3,5:5='a',<DATA_NAME>,1:5]"
-                + "[@4,6:6=' ',<WHITESPACE>,channel=99,1:6]"
-                + "[@5,7:15='redeFines',<REDEFINES_KEYWORD>,1:7]"
-                + "[@6,16:16=' ',<WHITESPACE>,channel=99,1:16]"
-                + "[@7,17:17='b',<DATA_NAME>,1:17]"
-                + "[@8,18:18='.',<PERIOD>,1:18]");
+        lexAndCheck("       1 A  redeFines b.",
+                "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:20='redeFines',<REDEFINES_KEYWORD>,1:12]"
+                + "[@3,22:22='b',<DATA_NAME>,1:22]"
+                + "[@4,23:23='.',<PERIOD>,1:23]");
     }
 
     /**
      * Date format case.
      */
     public void testDateFormat() {
-        lexAndCheck("  01 YY DATE FORMAT YY.",
-                "[@0,0:1='  ',<WHITESPACE>,channel=99,1:0]"
-                + "[@1,2:3='01',<INT>,1:2]"
-                + "[@2,4:4=' ',<WHITESPACE>,channel=99,1:4]"
-                + "[@3,5:6='YY',<DATA_NAME>,1:5]"
-                + "[@4,7:7=' ',<WHITESPACE>,channel=99,1:7]"
-                + "[@5,8:18='DATE FORMAT',<DATE_KEYWORD>,1:8]"
-                + "[@6,19:19=' ',<WHITESPACE>,channel=99,1:19]"
-                + "[@7,20:21='YY',<DATE_PATTERN>,1:20]"
-                + "[@8,22:22='.',<PERIOD>,1:22]");
+        lexAndCheck("       1 YY  DATE FORMAT YY.",
+                "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:10='YY',<DATA_NAME>,1:9]"
+                + "[@2,13:23='DATE FORMAT',<DATE_KEYWORD>,1:13]"
+                + "[@3,25:26='YY',<DATE_PATTERN>,1:25]"
+                + "[@4,27:27='.',<PERIOD>,1:27]");
     }
 
     /**
      * A picture case.
      */
     public void testPicture() {
-        lexAndCheck("  01 MYVAR PIC 99.",
-                "[@0,0:1='  ',<WHITESPACE>,channel=99,1:0]"
-                + "[@1,2:3='01',<INT>,1:2][@2,4:4=' ',<WHITESPACE>,channel=99,1:4]"
-                + "[@3,5:9='MYVAR',<DATA_NAME>,1:5]"
-                + "[@4,10:10=' ',<WHITESPACE>,channel=99,1:10]"
-                + "[@5,11:13='PIC',<PICTURE_KEYWORD>,1:11]"
-                + "[@6,14:14=' ',<WHITESPACE>,channel=99,1:14]"
-                + "[@7,15:16='99',<PICTURE_PART>,1:15]"
-                + "[@8,17:17='.',<PERIOD>,1:17]");
+        lexAndCheck("       01 MYVAR PIC 99.",
+                "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:14='MYVAR',<DATA_NAME>,1:10]"
+                + "[@2,16:18='PIC',<PICTURE_KEYWORD>,1:16]"
+                + "[@3,20:21='99',<PICTURE_PART>,1:20]"
+                + "[@4,22:22='.',<PERIOD>,1:22]");
     }
 
     /**
@@ -260,53 +260,40 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      * in lexer identifying the symbol string as an INT.
      */
     public void testPictureSeparateFromPeriod() {
-        lexAndCheck("  01 MYVAR PIC 99 .",
-                "[@0,0:1='  ',<WHITESPACE>,channel=99,1:0]"
-                + "[@1,2:3='01',<INT>,1:2]"
-                + "[@2,4:4=' ',<WHITESPACE>,channel=99,1:4]"
-                + "[@3,5:9='MYVAR',<DATA_NAME>,1:5]"
-                + "[@4,10:10=' ',<WHITESPACE>,channel=99,1:10]"
-                + "[@5,11:13='PIC',<PICTURE_KEYWORD>,1:11]"
-                + "[@6,14:14=' ',<WHITESPACE>,channel=99,1:14]"
-                + "[@7,15:16='99',<PICTURE_PART>,1:15]"
-                + "[@8,17:17=' ',<WHITESPACE>,channel=99,1:17]"
-                + "[@9,18:18='.',<PERIOD>,1:18]");
+        lexAndCheck("       01 MYVAR PIC 99 .",
+                "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:14='MYVAR',<DATA_NAME>,1:10]"
+                + "[@2,16:18='PIC',<PICTURE_KEYWORD>,1:16]"
+                + "[@3,20:21='99',<PICTURE_PART>,1:20]"
+                + "[@4,23:23='.',<PERIOD>,1:23]");
     }
 
     /**
      * A picture clause with a decimal point. 
      */
     public void testPictureWithPeriod() {
-        lexAndCheck("  01 MYVAR PIC 99.9.",
-                "[@0,0:1='  ',<WHITESPACE>,channel=99,1:0]"
-                + "[@1,2:3='01',<INT>,1:2]"
-                + "[@2,4:4=' ',<WHITESPACE>,channel=99,1:4]"
-                + "[@3,5:9='MYVAR',<DATA_NAME>,1:5]"
-                + "[@4,10:10=' ',<WHITESPACE>,channel=99,1:10]"
-                + "[@5,11:13='PIC',<PICTURE_KEYWORD>,1:11]"
-                + "[@6,14:14=' ',<WHITESPACE>,channel=99,1:14]"
-                + "[@7,15:16='99',<PICTURE_PART>,1:15]"
-                + "[@8,17:17='.',<DECIMAL_POINT>,1:17]"
-                + "[@9,18:18='9',<PICTURE_PART>,1:18]"
-                + "[@10,19:19='.',<PERIOD>,1:19]");
+        lexAndCheck("       01 MYVAR PIC 99.9.",
+                "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:14='MYVAR',<DATA_NAME>,1:10]"
+                + "[@2,16:18='PIC',<PICTURE_KEYWORD>,1:16]"
+                + "[@3,20:21='99',<PICTURE_PART>,1:20]"
+                + "[@4,22:22='.',<DECIMAL_POINT>,1:22]"
+                + "[@5,23:23='9',<PICTURE_PART>,1:23]"
+                + "[@6,24:24='.',<PERIOD>,1:24]");
     }
 
     /**
      * A picture clause with a CR or DB type of symbol. 
      */
     public void testPictureWithDoubleCharacters() {
-        lexAndCheck("  01 MYVAR PIC 99.9CR.",
-                "[@0,0:1='  ',<WHITESPACE>,channel=99,1:0]"
-                + "[@1,2:3='01',<INT>,1:2]"
-                + "[@2,4:4=' ',<WHITESPACE>,channel=99,1:4]"
-                + "[@3,5:9='MYVAR',<DATA_NAME>,1:5]"
-                + "[@4,10:10=' ',<WHITESPACE>,channel=99,1:10]"
-                + "[@5,11:13='PIC',<PICTURE_KEYWORD>,1:11]"
-                + "[@6,14:14=' ',<WHITESPACE>,channel=99,1:14]"
-                + "[@7,15:16='99',<PICTURE_PART>,1:15]"
-                + "[@8,17:17='.',<DECIMAL_POINT>,1:17]"
-                + "[@9,18:20='9CR',<PICTURE_PART>,1:18]"
-                + "[@10,21:21='.',<PERIOD>,1:21]");
+        lexAndCheck("       01 MYVAR PIC 99.9CR.",
+                "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:14='MYVAR',<DATA_NAME>,1:10]"
+                + "[@2,16:18='PIC',<PICTURE_KEYWORD>,1:16]"
+                + "[@3,20:21='99',<PICTURE_PART>,1:20]"
+                + "[@4,22:22='.',<DECIMAL_POINT>,1:22]"
+                + "[@5,23:25='9CR',<PICTURE_PART>,1:23]"
+                + "[@6,26:26='.',<PERIOD>,1:26]");
     }
 
     /**
@@ -314,24 +301,17 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testMultipleStatements() {
         lexAndCheck(
-                "  01 MYVAR1." + LS
-                + " 02 MYVAR2 PIC X."
+                "       01 MYVAR1." + LS
+                + "        02 MYVAR2 PIC X."
                 ,
-                "[@0,0:1='  ',<WHITESPACE>,channel=99,1:0]"
-                + "[@1,2:3='01',<INT>,1:2]"
-                + "[@2,4:4=' ',<WHITESPACE>,channel=99,1:4]"
-                + "[@3,5:10='MYVAR1',<DATA_NAME>,1:5]"
-                + "[@4,11:11='.',<PERIOD>,1:11]"
-                + "[@5,12:13='\\r\\n',<NEWLINE>,channel=99,1:12]"
-                + "[@6,14:14=' ',<WHITESPACE>,channel=99,2:0]"
-                + "[@7,15:16='02',<INT>,2:1]"
-                + "[@8,17:17=' ',<WHITESPACE>,channel=99,2:3]"
-                + "[@9,18:23='MYVAR2',<DATA_NAME>,2:4]"
-                + "[@10,24:24=' ',<WHITESPACE>,channel=99,2:10]"
-                + "[@11,25:27='PIC',<PICTURE_KEYWORD>,2:11]"
-                + "[@12,28:28=' ',<WHITESPACE>,channel=99,2:14]"
-                + "[@13,29:29='X',<PICTURE_PART>,2:15]"
-                + "[@14,30:30='.',<PERIOD>,2:16]");
+                "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:15='MYVAR1',<DATA_NAME>,1:10]"
+                + "[@2,16:16='.',<PERIOD>,1:16]"
+                + "[@3,27:28='02',<INT>,2:8]"
+                + "[@4,30:35='MYVAR2',<DATA_NAME>,2:11]"
+                + "[@5,37:39='PIC',<PICTURE_KEYWORD>,2:18]"
+                + "[@6,41:41='X',<PICTURE_PART>,2:22]"
+                + "[@7,42:42='.',<PERIOD>,2:23]");
     }
 
     /**
@@ -340,28 +320,20 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
     public void testMultipleStatementsAndComments() {
         lexAndCheck(
                 ""
-                + "      * A comment." + LS
                 + "       01 MYVAR1." + LS
+                + "      * A comment." + LS
                 + "           02 MYVAR2 PIC 99.9."
                 ,
-                "[@0,0:5='      ',<WHITESPACE>,channel=99,1:0]"
-                + "[@1,20:26='       ',<WHITESPACE>,channel=99,2:0]"
-                + "[@2,27:28='01',<INT>,2:7]"
-                + "[@3,29:29=' ',<WHITESPACE>,channel=99,2:9]"
-                + "[@4,30:35='MYVAR1',<DATA_NAME>,2:10]"
-                + "[@5,36:36='.',<PERIOD>,2:16]"
-                + "[@6,37:38='\\r\\n',<NEWLINE>,channel=99,2:17]"
-                + "[@7,39:49='           ',<WHITESPACE>,channel=99,3:0]"
-                + "[@8,50:51='02',<INT>,3:11]"
-                + "[@9,52:52=' ',<WHITESPACE>,channel=99,3:13]"
-                + "[@10,53:58='MYVAR2',<DATA_NAME>,3:14]"
-                + "[@11,59:59=' ',<WHITESPACE>,channel=99,3:20]"
-                + "[@12,60:62='PIC',<PICTURE_KEYWORD>,3:21]"
-                + "[@13,63:63=' ',<WHITESPACE>,channel=99,3:24]"
-                + "[@14,64:65='99',<PICTURE_PART>,3:25]"
-                + "[@15,66:66='.',<DECIMAL_POINT>,3:27]"
-                + "[@16,67:67='9',<PICTURE_PART>,3:28]"
-                + "[@17,68:68='.',<PERIOD>,3:29]");
+                "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:15='MYVAR1',<DATA_NAME>,1:10]"
+                + "[@2,16:16='.',<PERIOD>,1:16]"
+                + "[@3,32:33='02',<INT>,3:11]"
+                + "[@4,35:40='MYVAR2',<DATA_NAME>,3:14]"
+                + "[@5,42:44='PIC',<PICTURE_KEYWORD>,3:21]"
+                + "[@6,46:47='99',<PICTURE_PART>,3:25]"
+                + "[@7,48:48='.',<DECIMAL_POINT>,3:27]"
+                + "[@8,49:49='9',<PICTURE_PART>,3:28]"
+                + "[@9,50:50='.',<PERIOD>,3:29]");
     }
 
     /**
@@ -369,11 +341,11 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testHexLiteralString() {
         lexAndCheck(
-                "value X\"FB\"" + LS
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:10='X\"FB\"',<HEX_LITERAL_STRING>,1:6]"
-                + "[@3,11:12='\\r\\n',<NEWLINE>,channel=99,1:11]");
+                "       1 A value X\"FB\"" + LS
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:21='X\"FB\"',<HEX_LITERAL_STRING>,1:17]");
     }
 
     /**
@@ -381,10 +353,11 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testZeroLiteralString() {
         lexAndCheck(
-                "value Z'q'"
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:9='Z'q'',<ZERO_LITERAL_STRING>,1:6]");
+                "       1 A value Z'q'"
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:20='Z'q'',<ZERO_LITERAL_STRING>,1:17]");
     }
 
     /**
@@ -392,10 +365,11 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testDBCSLiteralString() {
         lexAndCheck(
-                "value G'q'"
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:9='G'q'',<DBCS_LITERAL_STRING>,1:6]");
+                "       1 A value G'q'"
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:20='G'q'',<DBCS_LITERAL_STRING>,1:17]");
     }
 
     /**
@@ -403,10 +377,11 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testNationalLiteralString() {
         lexAndCheck(
-                "value N'q'"
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:9='N'q'',<NATIONAL_LITERAL_STRING>,1:6]");
+                "       1 A value N'q'"
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:20='N'q'',<NATIONAL_LITERAL_STRING>,1:17]");
     }
 
     /**
@@ -414,10 +389,11 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testHexNationalLiteralString() {
         lexAndCheck(
-                "value NX'F5F7'"
-                , "[@0,0:4='value',<VALUE_KEYWORD>,1:0]"
-                + "[@1,5:5=' ',<WHITESPACE>,channel=99,1:5]"
-                + "[@2,6:13='NX'F5F7'',<NATIONAL_HEX_LITERAL_STRING>,1:6]");
+                "       1 A value NX'F5F7'"
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:24='NX'F5F7'',<NATIONAL_HEX_LITERAL_STRING>,1:17]");
     }
 
 
@@ -426,17 +402,14 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testDecimalNumericLiteral() {
         lexAndCheck(
-                "01 A VALUE 99.9."
-                , "[@0,0:1='01',<INT>,1:0]"
-                + "[@1,2:2=' ',<WHITESPACE>,channel=99,1:2]"
-                + "[@2,3:3='A',<DATA_NAME>,1:3]"
-                + "[@3,4:4=' ',<WHITESPACE>,channel=99,1:4]"
-                + "[@4,5:9='VALUE',<VALUE_KEYWORD>,1:5]"
-                + "[@5,10:10=' ',<WHITESPACE>,channel=99,1:10]"
-                + "[@6,11:12='99',<INT>,1:11]"
-                + "[@7,13:13='.',<DECIMAL_POINT>,1:13]"
-                + "[@8,14:14='9',<INT>,1:14]"
-                + "[@9,15:15='.',<PERIOD>,1:15]");
+                "       1 A  VALUE 99.9."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:19='99',<INT>,1:18]"
+                + "[@4,20:20='.',<DECIMAL_POINT>,1:20]"
+                + "[@5,21:21='9',<INT>,1:21]"
+                + "[@6,22:22='.',<PERIOD>,1:22]");
     }
 
     /**
@@ -444,33 +417,147 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
      */
     public void testFloatNumericLiteral() {
         lexAndCheck(
-                "01 A VALUE 99.9E56."
-                , "[@0,0:1='01',<INT>,1:0]"
-                + "[@1,2:2=' ',<WHITESPACE>,channel=99,1:2]"
-                + "[@2,3:3='A',<DATA_NAME>,1:3]"
-                + "[@3,4:4=' ',<WHITESPACE>,channel=99,1:4]"
-                + "[@4,5:9='VALUE',<VALUE_KEYWORD>,1:5]"
-                + "[@5,10:10=' ',<WHITESPACE>,channel=99,1:10]"
-                + "[@6,11:12='99',<INT>,1:11]"
-                + "[@7,13:13='.',<DECIMAL_POINT>,1:13]"
-                + "[@8,14:17='9E56',<FLOAT_PART2>,1:14]"
-                + "[@9,18:18='.',<PERIOD>,1:18]");
+                "       1 A  VALUE 99.9E56."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:19='99',<INT>,1:18]"
+                + "[@4,20:20='.',<DECIMAL_POINT>,1:20]"
+                + "[@5,21:24='9E56',<FLOAT_PART2>,1:21]"
+                + "[@6,25:25='.',<PERIOD>,1:25]");
 
         lexAndCheck(
-                "01 A VALUE IS -0.78E+23."
-                , "[@0,0:1='01',<INT>,1:0]"
-                + "[@1,2:2=' ',<WHITESPACE>,channel=99,1:2]"
-                + "[@2,3:3='A',<DATA_NAME>,1:3]"
-                + "[@3,4:4=' ',<WHITESPACE>,channel=99,1:4]"
-                + "[@4,5:9='VALUE',<VALUE_KEYWORD>,1:5]"
-                + "[@5,10:10=' ',<WHITESPACE>,channel=99,1:10]"
-                + "[@6,13:13=' ',<WHITESPACE>,channel=99,1:13]"
-                + "[@7,14:15='-0',<SIGNED_INT>,1:14]"
-                + "[@8,16:16='.',<DECIMAL_POINT>,1:16]"
-                + "[@9,17:22='78E+23',<FLOAT_PART2>,1:17]"
-                + "[@10,23:23='.',<PERIOD>,1:23]");
+                "       1 A  VALUE IS -0.78E+23."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,21:22='-0',<SIGNED_INT>,1:21]"
+                + "[@4,23:23='.',<DECIMAL_POINT>,1:23]"
+                + "[@5,24:29='78E+23',<FLOAT_PART2>,1:24]"
+                + "[@6,30:30='.',<PERIOD>,1:30]");
     }
 
+    /**
+     * Test figurative constants recognition.
+     */
+    public void testFigurativeConstants() {
+        lexAndCheck(
+                "       1 A VALUE ZERO."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='VALUE',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:20='ZERO',<ZERO_CONSTANT>,1:17]"
+                + "[@4,21:21='.',<PERIOD>,1:21]"
+        );
+        lexAndCheck(
+                "       1 A VALUE ZEROS."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='VALUE',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:21='ZEROS',<ZERO_CONSTANT>,1:17]"
+                + "[@4,22:22='.',<PERIOD>,1:22]"
+        );
+        lexAndCheck(
+                "       1 A VALUE ZEROES."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='VALUE',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:22='ZEROES',<ZERO_CONSTANT>,1:17]"
+                + "[@4,23:23='.',<PERIOD>,1:23]"
+        );
+        lexAndCheck(
+                "       1 A  VALUE SPACE."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:22='SPACE',<SPACE_CONSTANT>,1:18]"
+                + "[@4,23:23='.',<PERIOD>,1:23]"
+        );
+        lexAndCheck(
+                "       1 A  VALUE SPACES."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:23='SPACES',<SPACE_CONSTANT>,1:18]"
+                + "[@4,24:24='.',<PERIOD>,1:24]"
+        );
+        lexAndCheck(
+                "       1 A  VALUE HIGH-VALUE."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:27='HIGH-VALUE',<HIGH_VALUE_CONSTANT>,1:18]"
+                + "[@4,28:28='.',<PERIOD>,1:28]"
+        );
+        lexAndCheck(
+                "       1 A  VALUE HIGH-VALUES."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:28='HIGH-VALUES',<HIGH_VALUE_CONSTANT>,1:18]"
+                + "[@4,29:29='.',<PERIOD>,1:29]"
+        );
+        lexAndCheck(
+                "       1 A  VALUE LOW-VALUE."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:26='LOW-VALUE',<LOW_VALUE_CONSTANT>,1:18]"
+                + "[@4,27:27='.',<PERIOD>,1:27]"
+        );
+        lexAndCheck(
+                "       1 A  VALUE LOW-VALUES."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:27='LOW-VALUES',<LOW_VALUE_CONSTANT>,1:18]"
+                + "[@4,28:28='.',<PERIOD>,1:28]"
+        );
+        lexAndCheck(
+                "       1 A  VALUE QUOTE."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:22='QUOTE',<QUOTE_CONSTANT>,1:18]"
+                + "[@4,23:23='.',<PERIOD>,1:23]"
+        );
+        lexAndCheck(
+                "       1 A  VALUE QUOTES."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:23='QUOTES',<QUOTE_CONSTANT>,1:18]"
+                + "[@4,24:24='.',<PERIOD>,1:24]"
+        );
+        lexAndCheck(
+                "       1 A VALUE ALL 'A'."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='VALUE',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:19='ALL',<ALL_CONSTANT>,1:17]"
+                + "[@4,21:23=''A'',<ALPHANUM_LITERAL_STRING>,1:21]"
+                + "[@5,24:24='.',<PERIOD>,1:24]"
+        );
+
+        lexAndCheck(
+                "       1 A  VALUE NULL."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:21='NULL',<NULL_CONSTANT>,1:18]"
+                + "[@4,22:22='.',<PERIOD>,1:22]"
+        );
+
+        lexAndCheck(
+                "       1 A  VALUE NULLS."
+                , "[@0,7:7='1',<INT>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,12:16='VALUE',<VALUE_KEYWORD>,1:12]"
+                + "[@3,18:22='NULLS',<NULL_CONSTANT>,1:18]"
+                + "[@4,23:23='.',<PERIOD>,1:23]"
+        );
+    }
+    
     /**
      * Helper to test string fragments assembly using a regular expression. 
      */

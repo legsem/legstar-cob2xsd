@@ -11,7 +11,7 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testLevel() {
         parseAndCheck(
-                "01."
+                "       01."
                 ,
                 "(DATA_ITEM (LEVEL 01))");
     }
@@ -21,7 +21,7 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testLevelAndName() {
         parseAndCheck(
-                "01 MYNAME."
+                "       01 MYNAME."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME MYNAME))");
     }
@@ -31,7 +31,7 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testLevelAndLowercaseName() {
         parseAndCheck(
-                "01 myName."
+                "       01 myName."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName))");
     }
@@ -101,7 +101,7 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testRename() {
         parseAndCheck(
-                "66 NEWNAME RENAMES OLDNAME."
+                "       66 NEWNAME RENAMES OLDNAME."
                 ,
                 "(RENAME (LEVEL 66) (NAME NEWNAME) (LITERAL OLDNAME))");
     }
@@ -111,7 +111,7 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testRenameThrough() {
         parseAndCheck(
-                "66 NEWNAME RENAMES OLDSTART THROUGH OLDEND."
+                "       66 NEWNAME RENAMES OLDSTART THROUGH OLDEND."
                 ,
                 "(RENAME (LEVEL 66) (NAME NEWNAME) (RANGE OLDSTART OLDEND))");
     }
@@ -142,7 +142,7 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testConditionOneValue() {
         parseAndCheck(
-                "88 CONDITION VALUE 99."
+                "       88 CONDITION VALUE 99."
                 ,
                 "(CONDITION (LEVEL 88) (NAME CONDITION) (LITERAL 99))");
     }
@@ -152,7 +152,7 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testConditionMultipleValues() {
         parseAndCheck(
-                "88 A VALUES ARE \"1\" \"2\"."
+                "       88 A VALUES ARE \"1\" \"2\"."
                 ,
                 "(CONDITION (LEVEL 88) (NAME A) (LITERAL \"1\") (LITERAL \"2\"))");
     }
@@ -162,7 +162,7 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testConditionRangeValues() {
         parseAndCheck(
-                "88 Q VALUE 13 THRU 19."
+                "       88 Q VALUE 13 THRU 19."
                 ,
                 "(CONDITION (LEVEL 88) (NAME Q) (RANGE 13 19))");
     }
@@ -201,15 +201,15 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testBlankWhenZero() {
         parseAndCheck(
-                "01 myName BLANK WHEN ZERO."
+                "       01 myName BLANK WHEN ZERO."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) BLANKWHENZERO)");
         parseAndCheck(
-                "01 myName BLANK WHEN zeros."
+                "       01 myName BLANK WHEN zeros."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) BLANKWHENZERO)");
         parseAndCheck(
-                "01 myName BLANK WHEN zeroes."
+                "       01 myName BLANK WHEN zeroes."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) BLANKWHENZERO)");
    }
@@ -219,7 +219,7 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testExternal() {
         parseAndCheck(
-                "01 myName external."
+                "       01 myName external."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) EXTERNAL)");
     }
@@ -229,7 +229,7 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testGlobal() {
         parseAndCheck(
-                "01 myName global."
+                "       01 myName global."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) GLOBAL)");
     }
@@ -239,11 +239,11 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testGroupUsageNational() {
         parseAndCheck(
-                "01 myName GROUP-USAGE IS NATIONAL."
+                "       01 myName GROUP-USAGE IS NATIONAL."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) GROUPUSAGENATIONAL)");
         parseAndCheck(
-                "01 myName GROUP-USAGE NATIONAL."
+                "       01 myName GROUP-USAGE NATIONAL."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) GROUPUSAGENATIONAL)");
     }
@@ -253,11 +253,11 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testJustifiedRight() {
         parseAndCheck(
-                "01 myName just."
+                "       01 myName just."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) JUSTIFIEDRIGHT)");
         parseAndCheck(
-                "01 myName justified right."
+                "       01 myName justified right."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) JUSTIFIEDRIGHT)");
     }
@@ -267,11 +267,11 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testFixedOccurs() {
         parseAndCheck(
-                "01 myName OCCURS 3."
+                "       01 myName OCCURS 3."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3)))");
         parseAndCheck(
-                "01 myName OCCURS 3 TIMES."
+                "       01 myName OCCURS 3 TIMES."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3)))");
     }
@@ -281,22 +281,22 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testFixedOccursWithKeys() {
         parseAndCheck(
-                "01 myName OCCURS 3 ASCENDING myKey."
+                "       01 myName OCCURS 3 ASCENDING myKey."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3) (KEY ASCENDING myKey)))");
 
         parseAndCheck(
-                "01 myName OCCURS 3 ASCENDING KEY myKey."
+                "       01 myName OCCURS 3 ASCENDING KEY myKey."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3) (KEY ASCENDING myKey)))");
 
         parseAndCheck(
-                "01 myName OCCURS 3 ASCENDING KEY IS myKey."
+                "       01 myName OCCURS 3 ASCENDING KEY IS myKey."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3) (KEY ASCENDING myKey)))");
 
         parseAndCheck(
-                "01 myName OCCURS 3 DESCENDING myKey1 myKey2."
+                "       01 myName OCCURS 3 DESCENDING myKey1 myKey2."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3) (KEY DESCENDING myKey1)"
                 + " (KEY DESCENDING myKey2)))");
@@ -307,17 +307,17 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testFixedOccursWithIndexes() {
         parseAndCheck(
-                "01 myName OCCURS 3 INDEXED myIndex."
+                "       01 myName OCCURS 3 INDEXED myIndex."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3) (INDEX myIndex)))");
 
         parseAndCheck(
-                "01 myName OCCURS 3 INDEXED BY myIndex."
+                "       01 myName OCCURS 3 INDEXED BY myIndex."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3) (INDEX myIndex)))");
 
         parseAndCheck(
-                "01 myName OCCURS 3 INDEXED myIndex1 myIndex2."
+                "       01 myName OCCURS 3 INDEXED myIndex1 myIndex2."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3) (INDEX myIndex1) (INDEX myIndex2)))");
     }
@@ -327,12 +327,12 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testVariableOccurs() {
         parseAndCheck(
-                "01 myName OCCURS 3 DEPENDING myDep."
+                "       01 myName OCCURS 3 DEPENDING myDep."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (VARARRAY (HBOUND 3 (DEPENDINGON myDep))))");
 
         parseAndCheck(
-                "01 myName OCCURS 3 DEPENDING ON myDep."
+                "       01 myName OCCURS 3 DEPENDING ON myDep."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (VARARRAY (HBOUND 3 (DEPENDINGON myDep))))");
     }
@@ -342,13 +342,13 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testVariableOccursWithLowerBound() {
         parseAndCheck(
-                "01 myName OCCURS 0 TO 3 DEPENDING myDep ASCENDING myKey."
+                "       01 myName OCCURS 0 TO 3 DEPENDING myDep ASCENDING myKey."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (VARARRAY (LBOUND 0) (HBOUND 3 (DEPENDINGON myDep))"
                 + " (KEY ASCENDING myKey)))");
 
         parseAndCheck(
-                "01 myName OCCURS 1 TO 3 DEPENDING ON myDep INDEXED myIndex."
+                "       01 myName OCCURS 1 TO 3 DEPENDING ON myDep INDEXED myIndex."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (VARARRAY (LBOUND 1) (HBOUND 3 (DEPENDINGON myDep))"
                 + " (INDEX myIndex)))");
@@ -359,17 +359,17 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testPictureClause() {
         parseAndCheck(
-                "01 myName PIC X."
+                "       01 myName PIC X."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE X))");
 
         parseAndCheck(
-                "01 m99 PIC 9.9."
+                "       01 m99 PIC 9.9."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME m99) (PICTURE 9.9))");
 
         parseAndCheck(
-                "01 myName PIC 99."
+                "       01 myName PIC 99."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 99))");
     }
@@ -379,47 +379,47 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testComplexPictureClause() {
         parseAndCheck(
-                "01 myName PIC $99999.99CR."
+                "       01 myName PIC $99999.99CR."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE $99999.99CR))");
 
         parseAndCheck(
-                "01 myName PIC $9(5).9(2)CR."
+                "       01 myName PIC $9(5).9(2)CR."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE $9(5).9(2)CR))");
 
         parseAndCheck(
-                "01 myName PIC X(10)/XX ."
+                "       01 myName PIC X(10)/XX ."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE X(10)/XX))");
 
         parseAndCheck(
-                "01 myName PIC X(5)BX(7)."
+                "       01 myName PIC X(5)BX(7)."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE X(5)BX(7)))");
 
         parseAndCheck(
-                "01 myName PIC GGBBGG."
+                "       01 myName PIC GGBBGG."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE GGBBGG))");
 
         parseAndCheck(
-                "01 myName PIC +999.99E+99."
+                "       01 myName PIC +999.99E+99."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE +999.99E+99))");
 
         parseAndCheck(
-                "01 myName PIC -$$,$$$,$$$.99CR."
+                "       01 myName PIC -$$,$$$,$$$.99CR."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE -$$,$$$,$$$.99CR))");
 
         parseAndCheck(
-                "01 myName PIC Z,ZZZ.ZZ+."
+                "       01 myName PIC Z,ZZZ.ZZ+."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE Z,ZZZ.ZZ+))");
 
         parseAndCheck(
-                "01 myName PIC $B*,***,***.**BBDB."
+                "       01 myName PIC $B*,***,***.**BBDB."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE $B*,***,***.**BBDB))");
    }
@@ -429,27 +429,27 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testSignClause() {
         parseAndCheck(
-                "01 myName PIC 9 SIGN IS LEADING SEPARATE CHARACTER."
+                "       01 myName PIC 9 SIGN IS LEADING SEPARATE CHARACTER."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SIGN (LEADING SEPARATE)))");
 
         parseAndCheck(
-                "01 myName PIC 9 SIGN IS TRAILING SEPARATE."
+                "       01 myName PIC 9 SIGN IS TRAILING SEPARATE."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SIGN (TRAILING SEPARATE)))");
 
         parseAndCheck(
-                "01 myName PIC 9 SIGN IS LEADING."
+                "       01 myName PIC 9 SIGN IS LEADING."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SIGN LEADING))");
 
         parseAndCheck(
-                "01 myName PIC 9 SIGN TRAILING."
+                "       01 myName PIC 9 SIGN TRAILING."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SIGN TRAILING))");
 
         parseAndCheck(
-                "01 myName PIC 9 LEADING."
+                "       01 myName PIC 9 LEADING."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SIGN LEADING))");
     }
@@ -459,17 +459,17 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testSynchronizedClause() {
         parseAndCheck(
-                "01 myName PIC 9 SYNCHRONIZED."
+                "       01 myName PIC 9 SYNCHRONIZED."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) SYNCHRONIZED)");
 
         parseAndCheck(
-                "01 myName PIC 9 SYNC RIGHT."
+                "       01 myName PIC 9 SYNC RIGHT."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SYNCHRONIZED RIGHT))");
 
         parseAndCheck(
-                "01 myName PIC 9 SYNCHRONIZED LEFT."
+                "       01 myName PIC 9 SYNCHRONIZED LEFT."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (PICTURE 9) (SYNCHRONIZED LEFT))");
     }
@@ -479,17 +479,17 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testUsageBinaryClause() {
         parseAndCheck(
-                "01 hisName USAGE BINARY."
+                "       01 hisName USAGE BINARY."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE BINARY))");
 
         parseAndCheck(
-                "01 hisName COMPUTATIONAL."
+                "       01 hisName COMPUTATIONAL."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE BINARY))");
 
         parseAndCheck(
-                "01 hisName USAGE COMP."
+                "       01 hisName USAGE COMP."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE BINARY))");
     }
@@ -499,12 +499,12 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testUsageSingleFloatClause() {
         parseAndCheck(
-                "01 hisName USAGE COMPUTATIONAL-1."
+                "       01 hisName USAGE COMPUTATIONAL-1."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE SINGLEFLOAT))");
 
         parseAndCheck(
-                "01 hisName COMP-1."
+                "       01 hisName COMP-1."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE SINGLEFLOAT))");
 
@@ -515,12 +515,12 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testUsageDoubleFloatClause() {
         parseAndCheck(
-                "01 hisName USAGE COMPUTATIONAL-2."
+                "       01 hisName USAGE COMPUTATIONAL-2."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE DOUBLEFLOAT))");
 
         parseAndCheck(
-                "01 hisName COMP-2."
+                "       01 hisName COMP-2."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE DOUBLEFLOAT))");
 
@@ -531,17 +531,17 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testUsagePackedDecimalClause() {
         parseAndCheck(
-                "01 hisName USAGE PACKED-DECIMAL."
+                "       01 hisName USAGE PACKED-DECIMAL."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE PACKEDDECIMAL))");
 
         parseAndCheck(
-                "01 hisName USAGE COMPUTATIONAL-3."
+                "       01 hisName USAGE COMPUTATIONAL-3."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE PACKEDDECIMAL))");
 
         parseAndCheck(
-                "01 hisName COMP-3."
+                "       01 hisName COMP-3."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE PACKEDDECIMAL))");
 
@@ -552,12 +552,12 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testUsageNativeBinaryClause() {
         parseAndCheck(
-                "01 hisName USAGE COMPUTATIONAL-5."
+                "       01 hisName USAGE COMPUTATIONAL-5."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE NATIVEBINARY))");
 
         parseAndCheck(
-                "01 hisName COMP-5."
+                "       01 hisName COMP-5."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE NATIVEBINARY))");
 
@@ -569,12 +569,12 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testUsageDisplayClause() {
         parseAndCheck(
-                "01 hisName USAGE DISPLAY."
+                "       01 hisName USAGE DISPLAY."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE DISPLAY))");
 
         parseAndCheck(
-                "01 hisName DISPLAY-1."
+                "       01 hisName DISPLAY-1."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE DISPLAY1))");
 
@@ -586,22 +586,22 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testUsageMiscClause() {
         parseAndCheck(
-                "01 hisName USAGE INDEX."
+                "       01 hisName USAGE INDEX."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE INDEX))");
 
         parseAndCheck(
-                "01 hisName POINTER."
+                "       01 hisName POINTER."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE POINTER))");
 
         parseAndCheck(
-                "01 hisName USAGE PROCEDURE-POINTER."
+                "       01 hisName USAGE PROCEDURE-POINTER."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE PROCEDUREPOINTER))");
 
         parseAndCheck(
-                "01 hisName FUNCTION-POINTER."
+                "       01 hisName FUNCTION-POINTER."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE FUNCTIONPOINTER))");
 
@@ -612,43 +612,43 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testValueClauseAlphanum() {
         parseAndCheck(
-                "01 A VALUE 'ab'."
+                "       01 A VALUE 'ab'."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE 'ab'))");
 
         parseAndCheck(
-                "01 A VALUE \"99\"."
+                "       01 A VALUE \"99\"."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE \"99\"))");
 
         /* TODO shift-in/shif-out for DBCS needs more testing */
         parseAndCheck(
-                "01 A VALUE 'a" + 0x0e + 0x0f + "b'."
+                "       01 A VALUE 'a" + 0x0e + 0x0f + "b'."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE 'a1415b'))");
 
         parseAndCheck(
-                "01 A VALUE X'ab'."
+                "       01 A VALUE X'ab'."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE X'ab'))");
 
         parseAndCheck(
-                "01 A VALUE Z'ab'."
+                "       01 A VALUE Z'ab'."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE Z'ab'))");
 
         parseAndCheck(
-                "01 A VALUE G'ab'."
+                "       01 A VALUE G'ab'."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE G'ab'))");
 
         parseAndCheck(
-                "01 A VALUE N'ab'."
+                "       01 A VALUE N'ab'."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE N'ab'))");
 
         parseAndCheck(
-                "01 A VALUE NX'F5F6'."
+                "       01 A VALUE NX'F5F6'."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE NX'F5F6'))");
     }
@@ -658,52 +658,117 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
      */
     public void testValueClauseNumeric() {
         parseAndCheck(
-                "01 A VALUE 99."
+                "       01 A VALUE 99."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE 99))");
 
         parseAndCheck(
-                "01 A VALUE -99."
+                "       01 A VALUE -99."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE -99))");
 
         parseAndCheck(
-                "01 A VALUE +99."
+                "       01 A VALUE +99."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE +99))");
 
         parseAndCheck(
-                "01 A VALUE 99.9."
+                "       01 A VALUE 99.9."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE 99.9))");
 
         parseAndCheck(
-                "01 A VALUE -99.9."
+                "       01 A VALUE -99.9."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE -99.9))");
 
         parseAndCheck(
-                "01 A VALUE IS -0.9."
+                "       01 A VALUE IS -0.9."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE -0.9))");
 
         parseAndCheck(
-                "01 A VALUE IS 0.78E23."
+                "       01 A VALUE IS 0.78E23."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE 0.78E23))");
 
         parseAndCheck(
-                "01 A VALUE IS -0.78E+23."
+                "       01 A VALUE IS -0.78E+23."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE -0.78E+23))");
     }
     
     /**
+     * Test a value clause with figurative constant.
+     */
+    public void testValueClauseFigurativeConstant() {
+        parseAndCheck(
+                "       01 A VALUE ZEROS."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE ZEROS))");
+
+        parseAndCheck(
+                "       01 A VALUE SPACE."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE SPACE))");
+
+        parseAndCheck(
+                "       01 A VALUE HIGH-VALUES."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE HIGH-VALUES))");
+
+        parseAndCheck(
+                "       01 A VALUE LOW-VALUE."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE LOW-VALUE))");
+
+        parseAndCheck(
+                "       01 A VALUE QUOTES."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE QUOTES))");
+
+        parseAndCheck(
+                "       01 A VALUE ALL '*'."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE ALL '*'))");
+
+        parseAndCheck(
+                "       01 A VALUE NULLS."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE NULLS))");
+    }
+
+    /**
+     * Test a value clause containing a reserved word.
+     */
+    public void testValueClauseWithReservedWord() {
+        parseAndCheck(
+                "       01 A VALUE 'REDEFINES'."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (VALUE 'REDEFINES'))");
+    }
+
+    /**
+     * Test a statement that extends on multiple lines.
+     */
+    public void testMultilineStatement() {
+        parseAndCheck(
+                "       01 A" + LS
+                + "           PIC" + LS
+                + "           X" + LS
+                + "           VALUE" + LS
+                + "           SPACES" + LS
+                + "           ."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (PICTURE X) (VALUE SPACES))");
+    }
+
+    /**
      * Test a value clause with numeric literals.
      */
     public void testDateFormatClauseNumeric() {
         parseAndCheck(
-                "01 A DATE FORMAT YYXXXX."
+                "       01 A DATE FORMAT YYXXXX."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (DATEFORMAT YYXXXX))");
     }

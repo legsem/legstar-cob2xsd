@@ -187,7 +187,7 @@
                 <configuration>
                     <verbose>true</verbose>
                     <report>false</report>
-                    <dfa>false</dfa>
+                    <dfa>true</dfa>
                     <libDirectory>target/generated-sources/antlr3/com/legstar/cob2xsd</libDirectory>
                 </configuration>
                 <executions>

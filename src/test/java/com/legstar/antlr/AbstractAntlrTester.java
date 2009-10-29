@@ -22,6 +22,16 @@ public abstract class AbstractAntlrTester extends TestCase {
 
     /** Line separator (OS specific).*/
     public static final String LS = System.getProperty("line.separator");
+    
+    /**
+     * Cleanup source an compare to expected.
+     * @param source original source
+     * @param expected expected result
+     */
+    public void cleanAndCheck(final String source, final String expected) {
+        assertEquals(expected, clean(source));
+        
+    }
 
     /**
      * Apply a lexer to a source and check that the token stream produced
@@ -70,6 +80,13 @@ public abstract class AbstractAntlrTester extends TestCase {
         StringTemplate st = gen.toDOT(ast);
         return st.toString();
     }
+
+    /**
+     * Perform initial source cleanup to keep ANLR grammar simple.
+     * @param source original source code
+     * @return cleaned up source code
+     */
+    public abstract String clean(final String source);
 
     /**
      * Apply the lexer to produce a token stream from source.

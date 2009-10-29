@@ -158,7 +158,7 @@ cobdata
     hLast = hTree;
 
 }
-     :  (data_items)*
+     :  (data_items)* EOF
      ->{hTree}
      ;
     
@@ -175,23 +175,12 @@ data_items
             hLast = $data_entry.tree;
         }
         ->
-        | non_data_entry!
     ;
 
 data_entry
     :   data_description_entry
     |   rename_description_entry
     |   condition_description_entry
-    ;
-
-/* 
-   Non data entry statements may contain any character but must end
-   with a PERIOD. Note that this will not filter out compiler
-   directive statements such as EJECT because PERIOD is not a
-   mandatory delimiter (they end on column 72).
-*/
-non_data_entry options {greedy=false;}
-    :  .* PERIOD
     ;
 
 /*------------------------------------------------------------------
@@ -273,7 +262,7 @@ redefines_clause
     ;
 
 blank_when_zero_clause
-    :   BLANK_KEYWORD WHEN_KEYWORD? ZERO_KEYWORD
+    :   BLANK_KEYWORD WHEN_KEYWORD? ZERO_CONSTANT
     ->^(BLANKWHENZERO)
     ;
 
@@ -354,8 +343,8 @@ usage_clause
     ;
 
 value_clause
-    : VALUE_KEYWORD IS_KEYWORD? literal
-    ->^(VALUE literal)
+    : VALUE_KEYWORD IS_KEYWORD? literal+
+    ->^(VALUE literal+)
     ;
     
 literal
@@ -369,6 +358,13 @@ literal
     | DBCS_LITERAL_STRING
     | NATIONAL_LITERAL_STRING
     | NATIONAL_HEX_LITERAL_STRING
+    | ZERO_CONSTANT
+    | SPACE_CONSTANT
+    | HIGH_VALUE_CONSTANT
+    | LOW_VALUE_CONSTANT
+    | QUOTE_CONSTANT
+    | ALL_CONSTANT
+    | NULL_CONSTANT
     ;
 
 date_format_clause

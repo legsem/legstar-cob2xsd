@@ -11,6 +11,7 @@ lexer grammar CobolStructureLexer;
  * Separators such as ', ' or '; ' should be allowed wherever space is a separator
  * Handle Currency signs other than $
  * Handle Decimal point is comma
+ * Figurative constant symbolic-character
  * Renames should follow the structure they rename
  * Handle NSYMBOL(DBCS) versus NSYMBOL(NATIONAL)
  *------------------------------------------------------------------*/
@@ -41,7 +42,6 @@ THROUGH_KEYWORD           : ('THROUGH' | 'THRU') {lastKeyword = $type;};
 REDEFINES_KEYWORD         : 'REDEFINES' {lastKeyword = $type;};  
 BLANK_KEYWORD             : 'BLANK' {lastKeyword = $type;};
 WHEN_KEYWORD              : 'WHEN' {skip();};
-ZERO_KEYWORD              : 'ZERO' ('S' | 'ES')? {lastKeyword = $type;};
 EXTERNAL_KEYWORD          : 'EXTERNAL' {lastKeyword = $type;};
 GLOBAL_KEYWORD            : 'GLOBAL' {lastKeyword = $type;};
 GROUP_USAGE_KEYWORD       : 'GROUP-USAGE' {lastKeyword = $type;};
@@ -82,7 +82,19 @@ PROCEDURE_POINTER_KEYWORD : 'PROCEDURE-POINTER' {lastKeyword = $type;};
 FUNCTION_POINTER_KEYWORD  : 'FUNCTION-POINTER' {lastKeyword = $type;};
 VALUE_KEYWORD             : 'VALUE' ('S')? {lastKeyword = $type;};
 DATE_KEYWORD              : 'DATE FORMAT' {lastKeyword = $type;};
-  
+ 
+ /*------------------------------------------------------------------
+ * Figurative constants
+ * ZERO_CONSTANT is also a keyword in BLANK WHEN ZERO
+ *------------------------------------------------------------------*/
+ZERO_CONSTANT             : 'ZERO' ('S' | 'ES')?;
+SPACE_CONSTANT            : 'SPACE' ('S')?;
+HIGH_VALUE_CONSTANT       : 'HIGH-VALUE' ('S')?;
+LOW_VALUE_CONSTANT        : 'LOW-VALUE' ('S')?;
+QUOTE_CONSTANT            : 'QUOTE' ('S')?;
+ALL_CONSTANT              : 'ALL';
+NULL_CONSTANT             : 'NULL' ('S')?;
+ 
 /*------------------------------------------------------------------
  * Period is the data entry delimiter.
  * It might also appear in a PICTURE clause, FLOAT or DECIMAL literal.
@@ -224,7 +236,7 @@ ALPHANUM_LITERAL_FRAGMENT
 
 fragment
 CONTINUED_ALPHANUM_LITERAL_FRAGMENT
-  :  NEWLINE WHITESPACE CONTINUATION_CHAR WHITESPACE? ALPHANUM_LITERAL_FRAGMENT+
+  :  ('\r'? '\n') SPACE+ CONTINUATION_CHAR SPACE* ALPHANUM_LITERAL_FRAGMENT+
   ;
 
 fragment
@@ -277,14 +289,18 @@ COMMENT options { greedy = false; }
     ;
 
 /*------------------------------------------------------------------
- * Whitespaces, newlines are kept but hidden
+ * Whitespaces are not needed by the parser
  *------------------------------------------------------------------*/
 WHITESPACE
-    :   SPACE+ { $channel=HIDDEN; }
+    :   SPACE+ { skip(); }
     ;
 
+/*------------------------------------------------------------------
+ * Newlines are sent didden to the parser because of their delimiter
+ * role in certain circumstances
+ *------------------------------------------------------------------*/
 NEWLINE
-    :   ('\r'? '\n')+  { $channel=HIDDEN; }
+    :   ('\r'? '\n')+  { skip(); }
     ;
 
 /*------------------------------------------------------------------
@@ -306,8 +322,3 @@ fragment
 DECIMAL_POINT 
     :  '.'
     ;
-
-/*------------------------------------------------------------------
- * A non recognized character is dropped
- *------------------------------------------------------------------*/
-EVERYTHING_ELSE: . {skip();};
