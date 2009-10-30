@@ -238,7 +238,7 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
         lexAndCheck("       1 YY  DATE FORMAT YY.",
                 "[@0,7:7='1',<INT>,1:7]"
                 + "[@1,9:10='YY',<DATA_NAME>,1:9]"
-                + "[@2,13:23='DATE FORMAT',<DATE_KEYWORD>,1:13]"
+                + "[@2,18:23='FORMAT',<DATE_FORMAT_KEYWORD>,1:18]"
                 + "[@3,25:26='YY',<DATE_PATTERN>,1:25]"
                 + "[@4,27:27='.',<PERIOD>,1:27]");
     }
@@ -573,4 +573,58 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
                 "EEEEEEEEEE\r\n      -               \"GGGGGGGGGG".replaceAll(regex, ""));
     }
 
+    /**
+     * A condition.
+     */
+    public void testCondition() {
+        lexAndCheck(
+                "      88 CONDITION VALUE 99."
+                , "[@0,6:7='88',<INT>,1:6]"
+                + "[@1,9:17='CONDITION',<DATA_NAME>,1:9]"
+                + "[@2,19:23='VALUE',<VALUE_KEYWORD>,1:19]"
+                + "[@3,25:26='99',<INT>,1:25]"
+                + "[@4,27:27='.',<PERIOD>,1:27]");
+    }
+ 
+    /**
+     * A value clause followed by a keyword.
+     */
+    public void testValueThenKeyword() {
+        lexAndCheck(
+                "       01 myName PIC 9 SYNCHRONIZED."
+                , "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:15='myName',<DATA_NAME>,1:10]"
+                + "[@2,17:19='PIC',<PICTURE_KEYWORD>,1:17]"
+                + "[@3,21:21='9',<PICTURE_PART>,1:21]"
+                + "[@4,23:34='SYNCHRONIZED',<SYNCHRONIZED_KEYWORD>,1:23]"
+                + "[@5,35:35='.',<PERIOD>,1:35]");
+    }
+
+    /**
+     * A value clause followed by a keyword.
+     */
+    public void testUsageThenKeyword() {
+        lexAndCheck(
+                "       01 hisName USAGE COMPUTATIONAL-1."
+                , "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:16='hisName',<DATA_NAME>,1:10]"
+                + "[@2,18:22='USAGE',<USAGE_KEYWORD>,1:18]"
+                + "[@3,24:38='COMPUTATIONAL-1',<SINGLE_FLOAT_KEYWORD>,1:24]"
+                + "[@4,39:39='.',<PERIOD>,1:39]");
+
+        lexAndCheck(
+                "       01 hisName USAGE DISPLAY-1."
+                , "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:16='hisName',<DATA_NAME>,1:10]"
+                + "[@2,18:22='USAGE',<USAGE_KEYWORD>,1:18]"
+                + "[@3,24:32='DISPLAY-1',<DISPLAY_1_KEYWORD>,1:24]"
+                + "[@4,33:33='.',<PERIOD>,1:33]");
+
+        lexAndCheck(
+                "       01 hisName DISPLAY."
+                , "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:16='hisName',<DATA_NAME>,1:10]"
+                + "[@2,18:24='DISPLAY',<DISPLAY_KEYWORD>,1:18]"
+                + "[@3,25:25='.',<PERIOD>,1:25]");
+    }
 }

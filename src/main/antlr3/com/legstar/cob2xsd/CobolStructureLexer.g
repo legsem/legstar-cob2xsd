@@ -1,104 +1,74 @@
 lexer grammar CobolStructureLexer;
 /*------------------------------------------------------------------
+ * Lexer grammar for COBOL structures.
  * Built from IBM Entreprise COBOL V3R4
- * Parses COBOL WORKING-STORAGE or LINKAGE-SECTION statements only.
- * Source must be cleaned up, nothing but whitespaces should appear
- * before column 7 and after column 72.
- * This is not a validating recognizer. COBOL code is assumed to be
- * valid.
- * TODO:
- * ----
- * Separators such as ', ' or '; ' should be allowed wherever space is a separator
- * Handle Currency signs other than $
- * Handle Decimal point is comma
- * Figurative constant symbolic-character
- * Renames should follow the structure they rename
- * Handle NSYMBOL(DBCS) versus NSYMBOL(NATIONAL)
+ * COBOL keywords recognition is delegated to a secondary lexer.
  *------------------------------------------------------------------*/
-/*------------------------------------------------------------------
- * Fuzzy lexing (ignore what is not recognized)
- *------------------------------------------------------------------*/
-
+options {
+	tokenVocab=CobolStructureKeywordsLexer;
+}
 /*------------------------------------------------------------------
  * Java overrides
  *------------------------------------------------------------------*/
 @header {
 package com.legstar.cob2xsd;
+import java.io.IOException;
+import java.io.StringReader;
+import com.legstar.antlr.ANTLRNoCaseReaderStream;
 }
 
 @members {
     /** Keeps track of the last COBOL keyword recognized. This helps
         disambiguate lexing rules. */
     private int lastKeyword = PERIOD;
+
+    /** Secondary lexer specializing in keyword recognition.*/
+    private CobolStructureKeywordsLexerImpl keywordLexer
+            = new CobolStructureKeywordsLexerImpl();
+
+    /**
+     * Asks secondary lexer to check if text is a keyword. If there is a match,
+     * makes sure the entire text was matched (as opposed to a substring).
+     * If the text matches a keyword that needs to be skipped, skip.
+     * @param text the text to match with keywords
+     * @param originalType the initial token type
+     * @return the keyword type if a match is found otherwise the original type
+     * @throws RecognitionException if failed to call secondary lexer
+     */
+    public int matchKeywords(
+            final String text,
+            final int originalType) throws RecognitionException {
+        try {
+            int type = originalType;
+            keywordLexer.setCharStream( new ANTLRNoCaseReaderStream(
+                new StringReader(getText())));
+            CommonTokenStream kTokens = new CommonTokenStream(keywordLexer);
+            List < ? > kTokenl = kTokens.getTokens();
+            if (kTokenl.size() > 0) {
+                CommonToken kToken = (CommonToken) kTokenl.get(0);
+                if (kToken.getText().length() == getText().length()) {
+                    if (kToken.getType() == Token.SKIP_TOKEN.getType()) {
+                        skip();
+                    } else {
+                        type = kToken.getType();
+                        lastKeyword = type;
+                    }
+                }
+            }
+            return type;
+
+        } catch (IOException e) {
+            throw new RecognitionException(input);
+        }
+    }
 }
 /*------------------------------------------------------------------
  * Lexer grammar
  *------------------------------------------------------------------*/
 /*------------------------------------------------------------------
- * Keywords
- *------------------------------------------------------------------*/
-RENAMES_KEYWORD           : 'RENAMES' {lastKeyword = $type;};
-THROUGH_KEYWORD           : ('THROUGH' | 'THRU') {lastKeyword = $type;};
-REDEFINES_KEYWORD         : 'REDEFINES' {lastKeyword = $type;};  
-BLANK_KEYWORD             : 'BLANK' {lastKeyword = $type;};
-WHEN_KEYWORD              : 'WHEN' {skip();};
-EXTERNAL_KEYWORD          : 'EXTERNAL' {lastKeyword = $type;};
-GLOBAL_KEYWORD            : 'GLOBAL' {lastKeyword = $type;};
-GROUP_USAGE_KEYWORD       : 'GROUP-USAGE' {lastKeyword = $type;};
-IS_KEYWORD                : 'IS' {skip();};
-ARE_KEYWORD               : 'ARE' {skip();};
-NATIONAL_KEYWORD          : 'NATIONAL' {lastKeyword = $type;};
-JUSTIFIED_KEYWORD         : 'JUSTIFIED' | 'JUST' {lastKeyword = $type;};
-RIGHT_KEYWORD             : 'RIGHT' {lastKeyword = $type;};
-OCCURS_KEYWORD            : 'OCCURS' {lastKeyword = $type;};
-TIMES_KEYWORD             : 'TIMES' {skip();};
-TO_KEYWORD                : 'TO' {lastKeyword = $type;};
-ASCENDING_KEYWORD         : 'ASCENDING' {lastKeyword = $type;};
-DESCENDING_KEYWORD        : 'DESCENDING' {lastKeyword = $type;};
-KEY_KEYWORD               : 'KEY' {lastKeyword = $type;};
-INDEXED_KEYWORD           : 'INDEXED' {lastKeyword = $type;};
-BY_KEYWORD                : 'BY' {skip();};
-PICTURE_KEYWORD           : 'PIC' ('TURE')? {lastKeyword = $type;};
-DEPENDING_KEYWORD         : 'DEPENDING' {lastKeyword = $type;};
-ON_KEYWORD                : 'ON' {skip();};
-SIGN_KEYWORD              : 'SIGN' {skip();};
-SIGN_LEADING_KEYWORD      : 'LEADING' {lastKeyword = $type;};
-SIGN_TRAILING_KEYWORD     : 'TRAILING' {lastKeyword = $type;};
-SEPARATE_KEYWORD          : 'SEPARATE' {lastKeyword = $type;};
-CHARACTER_KEYWORD         : 'CHARACTER' {skip();};
-SYNCHRONIZED_KEYWORD      : 'SYNC' ('HRONIZED')? {lastKeyword = $type;};
-LEFT_KEYWORD              : 'LEFT' {lastKeyword = $type;};
-USAGE_KEYWORD             : 'USAGE' {lastKeyword = $type;};
-BINARY_KEYWORD            : ('BINARY' | 'COMP' ('UTATIONAL')?) {lastKeyword = $type;};  
-SINGLE_FLOAT_KEYWORD      : ('COMPUTATIONAL-1' | 'COMP-1') {lastKeyword = $type;}; 
-DOUBLE_FLOAT_KEYWORD      : ('COMPUTATIONAL-2' | 'COMP-2') {lastKeyword = $type;};
-PACKED_DECIMAL_KEYWORD    : ('PACKED-DECIMAL' | 'COMPUTATIONAL-3' | 'COMP-3') {lastKeyword = $type;};
-NATIVE_BINARY_KEYWORD     : ('COMPUTATIONAL-5' | 'COMP-5') {lastKeyword = $type;};
-DISPLAY_KEYWORD           : 'DISPLAY' {lastKeyword = $type;};
-DISPLAY_1_KEYWORD         : 'DISPLAY-1' {lastKeyword = $type;};
-INDEX_KEYWORD             : 'INDEX' {lastKeyword = $type;};
-POINTER_KEYWORD           : 'POINTER' {lastKeyword = $type;};
-PROCEDURE_POINTER_KEYWORD : 'PROCEDURE-POINTER' {lastKeyword = $type;};
-FUNCTION_POINTER_KEYWORD  : 'FUNCTION-POINTER' {lastKeyword = $type;};
-VALUE_KEYWORD             : 'VALUE' ('S')? {lastKeyword = $type;};
-DATE_KEYWORD              : 'DATE FORMAT' {lastKeyword = $type;};
- 
- /*------------------------------------------------------------------
- * Figurative constants
- * ZERO_CONSTANT is also a keyword in BLANK WHEN ZERO
- *------------------------------------------------------------------*/
-ZERO_CONSTANT             : 'ZERO' ('S' | 'ES')?;
-SPACE_CONSTANT            : 'SPACE' ('S')?;
-HIGH_VALUE_CONSTANT       : 'HIGH-VALUE' ('S')?;
-LOW_VALUE_CONSTANT        : 'LOW-VALUE' ('S')?;
-QUOTE_CONSTANT            : 'QUOTE' ('S')?;
-ALL_CONSTANT              : 'ALL';
-NULL_CONSTANT             : 'NULL' ('S')?;
- 
-/*------------------------------------------------------------------
  * Period is the data entry delimiter.
  * It might also appear in a PICTURE clause, FLOAT or DECIMAL literal.
- * Fortunately in these cases, it cannot appear as the last character
+ * Fortunately in these cases, it cannot appear as the last character.
  * The action here detects these cases and dynamically retype the
  * token produced by the lexer.
  *------------------------------------------------------------------*/
@@ -141,9 +111,9 @@ SIGNED_INT
 /*------------------------------------------------------------------
  * Floating point literals are fragmented because DECIMAL_POINT
  * occurs in the mantissa. The first part of the floating point is
- * recognized as an INT or SIGNED_IT and the second part, wich holds
- * at least of digit of the mantissa decimal part and the following
- * exponent is recognized here.
+ * recognized as an INT or SIGNED_INT and the second part, wich holds
+ * at least one digit of the mantissa decimal part and the following
+ * exponent, is recognized here.
  *------------------------------------------------------------------*/
 FLOAT_PART2
     : '0'..'9'+ 'E' ('+' | '-')? '0'..'9'+
@@ -165,7 +135,7 @@ FLOAT_PART2
 DATE_PATTERN
     : ('X'|'Y')+
     {
-        if (lastKeyword != DATE_KEYWORD) {
+        if (lastKeyword != DATE_FORMAT_KEYWORD) {
             if (lastKeyword == PICTURE_KEYWORD) {
                 $type = PICTURE_PART;
             } else {
@@ -179,12 +149,18 @@ DATE_PATTERN
  * Data item names
  * A data name such as ABE is ambiguous because it might as well be
  * a PICTURE_STRING. We retype the token if that's the case.
+ * All COBOL keywords fall into this category. Since COBOL keywords
+ * are reserved and cannot be used as DATA_NAME, we check with an
+ * auxiliary parser for a match and change the token type accordingly.
  *------------------------------------------------------------------*/
 DATA_NAME
     : LETTER (LETTER|'0'..'9'|'-')*
     {
-        if (lastKeyword == PICTURE_KEYWORD) {
-            $type = PICTURE_PART;
+        $type = matchKeywords(getText(), $type);
+        if ($type == DATA_NAME) {
+            if (lastKeyword == PICTURE_KEYWORD) {
+                $type = PICTURE_PART;
+            }
         }
     }
     ;
@@ -219,7 +195,7 @@ PICTURE_CHAR
  * Strings can be continued on multiple lines in which case:
  * - The continued line does not terminate with a delimiter
  * - The continuation line has a '-' in column 7
- * when we concatenate fragments from multiple lines, we end up
+ * when we concatenate fragments from multiple lines, we end up with
  * things like "aaa\n  - "bbb" which we manually clean up to become
  * "aaabbb"
  *------------------------------------------------------------------*/
@@ -296,8 +272,7 @@ WHITESPACE
     ;
 
 /*------------------------------------------------------------------
- * Newlines are sent didden to the parser because of their delimiter
- * role in certain circumstances
+ * Newlines are not needed by the parser
  *------------------------------------------------------------------*/
 NEWLINE
     :   ('\r'? '\n')+  { skip(); }

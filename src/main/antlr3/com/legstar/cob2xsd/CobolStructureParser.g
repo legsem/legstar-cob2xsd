@@ -225,7 +225,7 @@ condition_level
     ;
 
 condition_name_values
-    :   VALUE_KEYWORD (IS_KEYWORD | ARE_KEYWORD)? (v+=condition_name_value)+
+    :   VALUE_KEYWORD (v+=condition_name_value)+
     ->^($v)+
     ;
     
@@ -262,7 +262,7 @@ redefines_clause
     ;
 
 blank_when_zero_clause
-    :   BLANK_KEYWORD WHEN_KEYWORD? ZERO_CONSTANT
+    :   BLANK_KEYWORD ZERO_CONSTANT
     ->^(BLANKWHENZERO)
     ;
 
@@ -277,7 +277,7 @@ global_clause
     ;
 
 group_usage_clause
-    :   GROUP_USAGE_KEYWORD IS_KEYWORD? NATIONAL_KEYWORD
+    :   GROUP_USAGE_KEYWORD NATIONAL_KEYWORD
     ->^(GROUPUSAGENATIONAL)
     ;
 
@@ -292,12 +292,12 @@ occurs_clause
     ;
 
 picture_clause
-    :   PICTURE_KEYWORD IS_KEYWORD? picture_string
+    :   PICTURE_KEYWORD picture_string
     ->^(PICTURE picture_string)
     ;
 
 sign_clause
-    :   (SIGN_KEYWORD IS_KEYWORD?)? (sign_leading_clause | sign_trailing_clause)
+    :   (sign_leading_clause | sign_trailing_clause)
     ->^(SIGN sign_leading_clause? sign_trailing_clause?)
     ;
     
@@ -312,7 +312,7 @@ sign_trailing_clause
     ;
     
 separate_clause
-    :   SEPARATE_KEYWORD CHARACTER_KEYWORD?
+    :   SEPARATE_KEYWORD
     ->^(SEPARATE)
     ;
 
@@ -325,7 +325,7 @@ synchronized_clause
     ;
 
 usage_clause
-    :   (USAGE_KEYWORD IS_KEYWORD?)?
+    :   (USAGE_KEYWORD)?
         (
           BINARY_KEYWORD            ->^(USAGE BINARY)
         | SINGLE_FLOAT_KEYWORD      ->^(USAGE SINGLEFLOAT)
@@ -343,7 +343,7 @@ usage_clause
     ;
 
 value_clause
-    : VALUE_KEYWORD IS_KEYWORD? literal+
+    : VALUE_KEYWORD literal+
     ->^(VALUE literal+)
     ;
     
@@ -368,7 +368,7 @@ literal
     ;
 
 date_format_clause
-    : DATE_KEYWORD IS_KEYWORD? DATE_PATTERN
+    : DATE_FORMAT_KEYWORD DATE_PATTERN
     ->^(DATEFORMAT DATE_PATTERN)
     ;
   
@@ -376,14 +376,14 @@ date_format_clause
  * Arrays
  *------------------------------------------------------------------*/
 fixed_length_table
-    : OCCURS_KEYWORD INT TIMES_KEYWORD? (key_clause)* (index_clause)*
+    : OCCURS_KEYWORD INT (key_clause)* (index_clause)*
     ->^(FIXEDARRAY ^(HBOUND INT) key_clause* index_clause*)
     ;               
 
 variable_length_table
-    : (OCCURS_KEYWORD low_bound)=>OCCURS_KEYWORD low_bound hb=INT TIMES_KEYWORD? DEPENDING_KEYWORD ON_KEYWORD? DATA_NAME (key_clause)* (index_clause)*
+    : (OCCURS_KEYWORD low_bound)=>OCCURS_KEYWORD low_bound hb=INT DEPENDING_KEYWORD DATA_NAME (key_clause)* (index_clause)*
     ->^(VARARRAY low_bound ^(HBOUND $hb ^(DEPENDINGON DATA_NAME)) key_clause* index_clause*)
-    | OCCURS_KEYWORD hb=INT TIMES_KEYWORD? DEPENDING_KEYWORD ON_KEYWORD? DATA_NAME (key_clause)* (index_clause)*
+    | OCCURS_KEYWORD hb=INT DEPENDING_KEYWORD DATA_NAME (key_clause)* (index_clause)*
     ->^(VARARRAY ^(HBOUND $hb ^(DEPENDINGON DATA_NAME)) key_clause* index_clause*)
     ;
     
@@ -393,12 +393,12 @@ low_bound
     ;         
 
 key_clause
-    : (v=ASCENDING_KEYWORD | v=DESCENDING_KEYWORD) KEY_KEYWORD? IS_KEYWORD? DATA_NAME+
+    : (v=ASCENDING_KEYWORD | v=DESCENDING_KEYWORD) KEY_KEYWORD? DATA_NAME+
     ->^(KEY $v DATA_NAME)+
     ;
   
 index_clause
-    : INDEXED_KEYWORD BY_KEYWORD? DATA_NAME+
+    : INDEXED_KEYWORD DATA_NAME+
     ->^(INDEX DATA_NAME)+
     ; 
   

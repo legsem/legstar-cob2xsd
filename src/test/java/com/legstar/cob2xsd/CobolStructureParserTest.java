@@ -772,4 +772,19 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME A) (DATEFORMAT YYXXXX))");
     }
+
+    /**
+     * Test usage clauses.
+     */
+    public void testUsageClause() {
+        parseAndCheck(
+                "       01 hisName USAGE COMPUTATIONAL-1."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE SINGLEFLOAT))");
+
+        parseAndCheck(
+                "       01 hisName DISPLAY-1."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE DISPLAY1))");
+    }
 }
