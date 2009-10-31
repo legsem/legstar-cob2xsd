@@ -1,7 +1,6 @@
 package com.legstar.cob2xsd;
 
 
-import com.legstar.cob2xsd.CobolSourceCleaner.CleaningContext;
 
 /**
  * Test the source cleaner class.
@@ -35,48 +34,100 @@ public class CobolSourceCleanerTest extends AbstractCob2XsdTester {
                 CobolSourceCleaner.removeLineSequenceNumbering(
                 "123456*                                                              ABC123456"));
     }
-
+    
     /**
-     * Check that special characters are removed.
+     * Test that DATA DIVISION is properly delineated.
      */
-    public void testCleaningSpecialChars() {
-        assertEquals("one unwanted char here",
-                CobolSourceCleaner.removeUnwantedCharacters(
-                        "one unwanted char here" + (char) 0x1A));
-        assertEquals("one unwanted char here and here",
-                CobolSourceCleaner.removeUnwantedCharacters(
-                        "one unwanted char here" + (char) 0x1A + " and here" + (char) 0x1A));
+    public void testDataDivision() {
+        
+        CobolSourceCleaner.CleaningContext context = new CobolSourceCleaner.CleaningContext();
+        assertTrue(CobolSourceCleaner.isDataDivision("", context));
+        assertFalse(CobolSourceCleaner.isDataDivision(" PROCEDURE DIVISION", context));
+        assertFalse(CobolSourceCleaner.isDataDivision("whatever", context));
+    }
+    
+    /**
+     * Check that we correctly identify end of statements.
+     */
+    public void testEndStatementDetection() {
+        
+        CobolSourceCleaner.CleaningContext context = new CobolSourceCleaner.CleaningContext();
+
+        cleanAndCheck(" 01 A PIC 9.9.", " 01 A PIC 9.9.", context);
+        assertTrue(context.isLookingForLevel());
+        cleanAndCheck(" 01 A PIC X. ", " 01 A PIC X. ", context);
+        assertTrue(context.isLookingForLevel());
     }
 
     /**
-     * Check that data descriptions are correctly identified.
+     * Check cleaning of simple lines.
      */
-    public void testDataDescriptionDetection() {
-        CleaningContext dataDescription = new CleaningContext();
-        CobolSourceCleaner.setCleaningContext(" not a data description 01 . line", dataDescription);
-        assertFalse(dataDescription.isDataDescriptionStarted());
-        assertFalse(dataDescription.isDataDescriptionEnded());
+    public void testCleanSimpleLine() {
+        
+        CobolSourceCleaner.CleaningContext context = new CobolSourceCleaner.CleaningContext();
 
-        dataDescription = new CleaningContext();
-        CobolSourceCleaner.setCleaningContext(" 01 a data description single line.", dataDescription);
-        assertTrue(dataDescription.isDataDescriptionStarted());
-        assertTrue(dataDescription.isDataDescriptionEnded());
+        cleanAndCheck("", "", context);
+        cleanAndCheck(" 01.", " 01.", context);
+        assertTrue(context.isLookingForLevel());
+        cleanAndCheck(" 01", " 01", context);
+        assertFalse(context.isLookingForLevel());
+        cleanAndCheck(" .", " .", context);
+        assertTrue(context.isLookingForLevel());
+        cleanAndCheck(" 01 A.", " 01 A.", context);
+        assertTrue(context.isLookingForLevel());
+        cleanAndCheck(" 01   A.", " 01   A.", context);
+        assertTrue(context.isLookingForLevel());
+        cleanAndCheck(" 01   A  .", " 01   A  .", context);
+        assertTrue(context.isLookingForLevel());
+        cleanAndCheck("blabla", "", context);
+        assertTrue(context.isLookingForLevel());
+        cleanAndCheck("       01  FILEA.   COPY DFH0CFIL.", "       01  FILEA. ", context);
+        assertTrue(context.isLookingForLevel());
+    }
 
-        dataDescription = new CleaningContext();
-        CobolSourceCleaner.setCleaningContext("      01 a data description single line.   ", dataDescription);
-        assertTrue(dataDescription.isDataDescriptionStarted());
-        assertTrue(dataDescription.isDataDescriptionEnded());
+    /**
+     * Test cleaning of multi statement line.
+     */
+    public void testMultiStatementLine() {
+        
+        CobolSourceCleaner.CleaningContext context = new CobolSourceCleaner.CleaningContext();
 
-        dataDescription = new CleaningContext();
-        CobolSourceCleaner.setCleaningContext("      01 a data description '..99' multiline line   ", dataDescription);
-        assertTrue(dataDescription.isDataDescriptionStarted());
-        assertFalse(dataDescription.isDataDescriptionEnded());
-        CobolSourceCleaner.setCleaningContext("      01 a .. continuation   ", dataDescription);
-        assertTrue(dataDescription.isDataDescriptionStarted());
-        assertFalse(dataDescription.isDataDescriptionEnded());
-        CobolSourceCleaner.setCleaningContext("      finally th end.   ", dataDescription);
-        assertTrue(dataDescription.isDataDescriptionStarted());
-        assertTrue(dataDescription.isDataDescriptionEnded());
+        cleanAndCheck(" 01 A. 02 B.", " 01 A. 02 B.", context);
+        cleanAndCheck(" 01 A. 02 B.03 C.", " 01 A. 02 B.03 C.", context);
+        /* Extraneous characters past closed statement should be wiped out*/
+        cleanAndCheck(" 01 A. 02 B. blabla 03 C.", " 01 A. 02 B.        03 C.", context);
+
+    }
+
+    /**
+     * Test cleaning of multi line stements.
+     */
+    public void testMultiLineStatement() {
+        
+        CobolSourceCleaner.CleaningContext context = new CobolSourceCleaner.CleaningContext();
+
+        cleanAndCheck(" 01 A", " 01 A", context);
+        assertFalse(context.isLookingForLevel());
+        /* Whatever is within the statement should remain untouched */
+        cleanAndCheck("blabla", "blabla", context);
+        assertFalse(context.isLookingForLevel());
+        /* Extraneous characters past the closing statement should be wiped out */
+        cleanAndCheck(". blabla", ". ", context);
+        assertTrue(context.isLookingForLevel());
+
+    }
+
+    /**
+     * Helper method.
+     * @param line line of code
+     * @param expected expected cleaneup result
+     * @param context cleaning context
+     */
+    private void cleanAndCheck(
+            final String line,
+            final String expected,
+            final CobolSourceCleaner.CleaningContext context) {
+        assertEquals(expected, CobolSourceCleaner.removeExtraneousCharacters(line, context));
     }
 
     /**

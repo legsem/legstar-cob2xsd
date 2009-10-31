@@ -19,7 +19,7 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
                 + "       ." + LS
                 , "[@0,7:8='01',<INT>,1:7]"
                 + "[@1,10:10='A',<DATA_NAME>,1:10]"
-                + "[@2,39:39='.',<PERIOD>,3:7]");
+                + "[@2,22:22='.',<PERIOD>,3:7]");
         lexAndCheck(
                 ""
                 + "       01 A" + LS
@@ -27,7 +27,7 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
                 + "       ." + LS
                 , "[@0,7:8='01',<INT>,1:7]"
                 + "[@1,10:10='A',<DATA_NAME>,1:10]"
-                + "[@2,39:39='.',<PERIOD>,3:7]");
+                + "[@2,22:22='.',<PERIOD>,3:7]");
     }
 
     /**
@@ -627,4 +627,5 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
                 + "[@2,18:24='DISPLAY',<DISPLAY_KEYWORD>,1:18]"
                 + "[@3,25:25='.',<PERIOD>,1:25]");
     }
+
 }

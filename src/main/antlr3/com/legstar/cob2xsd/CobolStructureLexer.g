@@ -257,14 +257,6 @@ NATIONAL_HEX_LITERAL_STRING
 
 
 /*------------------------------------------------------------------
- * Comments start with '*' or '/' in column 7
- *------------------------------------------------------------------*/
-COMMENT options { greedy = false; }
-    : {getCharPositionInLine() == 6}?=> (ASTERISK | FSLASH) .* NEWLINE
-    { skip(); }
-    ;
-
-/*------------------------------------------------------------------
  * Whitespaces are not needed by the parser
  *------------------------------------------------------------------*/
 WHITESPACE
@@ -285,8 +277,6 @@ fragment LETTER     : 'A'..'Z'| 'a'..'z';
 fragment SPACE      : ' ' | '\t';
 fragment QUOTE      : '"';
 fragment APOST      : '\'';
-fragment ASTERISK   : '*';
-fragment FSLASH     : '/';
 /*------------------------------------------------------------------
  * DECIMAL_POINT is reported as a fragment so that the lexer code
  * generator does not complain when it is referenced from other

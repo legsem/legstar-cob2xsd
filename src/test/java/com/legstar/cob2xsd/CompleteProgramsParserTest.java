@@ -35,13 +35,45 @@ public class CompleteProgramsParserTest extends AbstractCob2XsdTester {
     }
 
     /**
-     * Try the DPLARCHC sample.
+     * Try the DPLARCHT sample.
      * @throws Exception if test fails
      */
-    public void testDplarchc() throws Exception {
+    public void testDplarcht() throws Exception {
         parseAndCheck(
-                FileUtils.readFileToString(new File(sampleFolder, "DPLARCHC"))
-                , "(DATA_ITEM (LEVEL 01) (NAME DFHCOMMAREA)"
+                FileUtils.readFileToString(new File(sampleFolder, "DPLARCHT"))
+                , "(DATA_ITEM (LEVEL 01) (NAME WS-MAX-ITEMS) (PICTURE 9(9)) (USAGE NATIVEBINARY) (VALUE 500))"
+                + " (DATA_ITEM (LEVEL 01) (NAME WS-MAX-ITEMS-D) (PICTURE 9(9)) (VALUE ZERO))"
+                + " (DATA_ITEM (LEVEL 01) (NAME WS-ERROR-STATUS) (PICTURE 9(4)) (USAGE BINARY) (VALUE ZERO)"
+                + " (CONDITION (LEVEL 88) (NAME NO-ERRORS) (LITERAL ZERO))"
+                + " (CONDITION (LEVEL 88) (NAME ERRORS) (LITERAL 1)))"
+                + " (DATA_ITEM (LEVEL 01) (NAME WS-ITEMS-SELECTION) (PICTURE 9(4)) (USAGE BINARY) (VALUE ZERO)"
+                + " (CONDITION (LEVEL 88) (NAME LIMITED-ITEMS) (LITERAL ZERO))"
+                + " (CONDITION (LEVEL 88) (NAME ALL-ITEMS) (LITERAL 1)))"
+                + " (DATA_ITEM (LEVEL 01) (NAME WS-SEARCH-STATUS) (PICTURE 9(4)) (USAGE BINARY) (VALUE ZERO)"
+                + " (CONDITION (LEVEL 88) (NAME SEARCH-ENDED) (LITERAL ZERO))"
+                + " (CONDITION (LEVEL 88) (NAME SEARCH-CONTINUE) (LITERAL 1))"
+                + " (CONDITION (LEVEL 88) (NAME SEARCH-FOUND) (LITERAL 2)))"
+                + " (DATA_ITEM (LEVEL 01) (NAME WS-ERROR-DESCRIPTION) (PICTURE X(256)) (VALUE SPACES))"
+                + " (DATA_ITEM (LEVEL 01) (NAME WS-FILE-DESCRIPTION)"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-FILE-START) (PICTURE X(8)) (VALUE SPACES))"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-FILE-NAME) (PICTURE X(8)) (VALUE SPACES))"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-FILE-DSNAME) (PICTURE X(44)) (VALUE SPACES))"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-FILE-ENABLESTATUS) (PICTURE 9(8)) (USAGE BINARY) (VALUE ZERO)))"
+                + " (DATA_ITEM (LEVEL 01) (NAME WS-PROGRAM-DESCRIPTION)"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-PROGRAM-START) (PICTURE X(8)) (VALUE SPACES))"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-PROGRAM-NAME) (PICTURE X(8)) (VALUE SPACES))"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-PROGRAM-TYPE) (PICTURE 9(8)) (USAGE BINARY) (VALUE ZERO))"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-PROGRAM-LANGUAGE) (PICTURE 9(8)) (USAGE BINARY) (VALUE ZERO))"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-PROGRAM-LENGTH) (PICTURE S9(9)) (USAGE BINARY))"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-PROGRAM-USECOUNT) (PICTURE S9(9)) (USAGE BINARY)))"
+                + " (DATA_ITEM (LEVEL 01) (NAME WS-TRANSACTION-DESCRIPTION)"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-TRANSACTION-START) (PICTURE X(8)) (VALUE SPACES))"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-TRANSACTION-NAME) (PICTURE X(8)) (VALUE SPACES))"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-TRANSACTION-PROGRAM) (PICTURE X(8)) (VALUE SPACES))"
+                + " (DATA_ITEM (LEVEL 05) (NAME WS-TRANSACTION-STATUS) (PICTURE 9(8)) (USAGE BINARY) (VALUE ZERO)))"
+                + " (DATA_ITEM (LEVEL 01) (NAME WS-RESP) (PICTURE S9(8)) (USAGE BINARY) (VALUE ZERO))"
+                + " (DATA_ITEM (LEVEL 01) (NAME WS-RESP2) (PICTURE S9(8)) (USAGE BINARY) (VALUE ZERO))"
+                + " (DATA_ITEM (LEVEL 01) (NAME DFHCOMMAREA)"
                 + " (DATA_ITEM (LEVEL 05) (NAME LS-REQUEST)"
                 + " (DATA_ITEM (LEVEL 10) (NAME LS-REQUEST-TYPE) (PICTURE 9(4)) (USAGE BINARY)"
                 + " (CONDITION (LEVEL 88) (NAME FILES-REQUESTED) (LITERAL 0))"
@@ -60,7 +92,7 @@ public class CompleteProgramsParserTest extends AbstractCob2XsdTester {
                 + " (DATA_ITEM (LEVEL 10) (NAME LS-REPLY-DATA)"
                 + " (DATA_ITEM (LEVEL 15) (NAME LS-ITEMS-COUNT) (PICTURE 9(9)) (USAGE NATIVEBINARY))"
                 + " (DATA_ITEM (LEVEL 15) (NAME LS-ITEMS-ARRAY)"
-                +              " (VARARRAY (LBOUND 1) (HBOUND 500 (DEPENDINGON LS-ITEMS-COUNT)))"
+                +             " (VARARRAY (LBOUND 1) (HBOUND 500 (DEPENDINGON LS-ITEMS-COUNT)))"
                 + " (DATA_ITEM (LEVEL 20) (NAME LS-FILES-DATA)"
                 + " (DATA_ITEM (LEVEL 25) (NAME LS-FILE-NAME) (PICTURE X(8)))"
                 + " (DATA_ITEM (LEVEL 25) (NAME LS-FILE-DSNAME) (PICTURE X(44)))"
@@ -77,6 +109,7 @@ public class CompleteProgramsParserTest extends AbstractCob2XsdTester {
                 + " (DATA_ITEM (LEVEL 25) (NAME LS-TRANSACTION-PROGRAM) (PICTURE X(8)))"
                 + " (DATA_ITEM (LEVEL 25) (NAME LS-TRANSACTION-STATUS) (PICTURE X(12)))"
                 + " (DATA_ITEM (LEVEL 25) (PICTURE X(36))))))))"
+                + " (DATA_ITEM (LEVEL 01) (NAME LS-ERROR-DESCRIPTION) (PICTURE X(256)))"
         );
     }
 
