@@ -8,7 +8,6 @@ parser grammar CobolStructureParser;
  * valid.
  * TODO:
  * ----
- * Separators such as ', ' or '; ' should be allowed wherever space is a separator
  * Handle Currency signs other than $
  * Handle Decimal point is comma
  * Renames should follow the structure they rename
@@ -69,8 +68,8 @@ tokens {
     PROCEDUREPOINTER;
     FUNCTIONPOINTER;
     VALUE;
-    LITERALDECIMALSTRING;
-    LITERALFLOATSTRING;
+    DECIMAL_LITERAL;
+    FLOAT_LITERAL;
     DATEFORMAT;
 }
 
@@ -232,7 +231,7 @@ condition_name_values
 condition_name_value
     :   v=literal
        (
-           THROUGH_KEYWORD w=literal ->^(RANGE $v $w?)
+           THROUGH_KEYWORD w=literal ->^(RANGE $v $w)
            |                         ->^(LITERAL $v)
         )
     ;
@@ -343,32 +342,32 @@ usage_clause
     ;
 
 value_clause
-    : VALUE_KEYWORD literal+
+    :   VALUE_KEYWORD literal+
     ->^(VALUE literal+)
     ;
     
 literal
-    : (float_literal)=> float_literal
-    | (decimal_literal)=> decimal_literal
-    | INT
-    | SIGNED_INT
-    | ALPHANUM_LITERAL_STRING
-    | HEX_LITERAL_STRING
-    | ZERO_LITERAL_STRING
-    | DBCS_LITERAL_STRING
-    | NATIONAL_LITERAL_STRING
-    | NATIONAL_HEX_LITERAL_STRING
-    | ZERO_CONSTANT
-    | SPACE_CONSTANT
-    | HIGH_VALUE_CONSTANT
-    | LOW_VALUE_CONSTANT
-    | QUOTE_CONSTANT
-    | ALL_CONSTANT
-    | NULL_CONSTANT
+    :   (float_literal)=> float_literal
+    |   (decimal_literal)=> decimal_literal
+    |   INT
+    |   SIGNED_INT
+    |   ALPHANUM_LITERAL_STRING
+    |   HEX_LITERAL_STRING
+    |   ZERO_LITERAL_STRING
+    |   DBCS_LITERAL_STRING
+    |   NATIONAL_LITERAL_STRING
+    |   NATIONAL_HEX_LITERAL_STRING
+    |   ZERO_CONSTANT
+    |   SPACE_CONSTANT
+    |   HIGH_VALUE_CONSTANT
+    |   LOW_VALUE_CONSTANT
+    |   QUOTE_CONSTANT
+    |   ALL_CONSTANT
+    |   NULL_CONSTANT
     ;
 
 date_format_clause
-    : DATE_FORMAT_KEYWORD DATE_PATTERN
+    :   DATE_FORMAT_KEYWORD DATE_PATTERN
     ->^(DATEFORMAT DATE_PATTERN)
     ;
   
@@ -376,15 +375,15 @@ date_format_clause
  * Arrays
  *------------------------------------------------------------------*/
 fixed_length_table
-    : OCCURS_KEYWORD INT (key_clause)* (index_clause)*
+    :   OCCURS_KEYWORD INT (key_clause)* (index_clause)*
     ->^(FIXEDARRAY ^(HBOUND INT) key_clause* index_clause*)
     ;               
 
 variable_length_table
-    : (OCCURS_KEYWORD low_bound)=>OCCURS_KEYWORD low_bound hb=INT DEPENDING_KEYWORD DATA_NAME (key_clause)* (index_clause)*
+    :   (OCCURS_KEYWORD low_bound)=>OCCURS_KEYWORD low_bound hb=INT DEPENDING_KEYWORD DATA_NAME (key_clause)* (index_clause)*
     ->^(VARARRAY low_bound ^(HBOUND $hb ^(DEPENDINGON DATA_NAME)) key_clause* index_clause*)
-    | OCCURS_KEYWORD hb=INT DEPENDING_KEYWORD DATA_NAME (key_clause)* (index_clause)*
-    ->^(VARARRAY ^(HBOUND $hb ^(DEPENDINGON DATA_NAME)) key_clause* index_clause*)
+    |   OCCURS_KEYWORD INT DEPENDING_KEYWORD DATA_NAME (key_clause)* (index_clause)*
+    ->^(VARARRAY ^(HBOUND INT ^(DEPENDINGON DATA_NAME)) key_clause* index_clause*)
     ;
     
 low_bound
@@ -393,12 +392,12 @@ low_bound
     ;         
 
 key_clause
-    : (v=ASCENDING_KEYWORD | v=DESCENDING_KEYWORD) KEY_KEYWORD? DATA_NAME+
+    :   (v=ASCENDING_KEYWORD | v=DESCENDING_KEYWORD) KEY_KEYWORD? DATA_NAME+
     ->^(KEY $v DATA_NAME)+
     ;
   
 index_clause
-    : INDEXED_KEYWORD DATA_NAME+
+    :   INDEXED_KEYWORD DATA_NAME+
     ->^(INDEX DATA_NAME)+
     ; 
   
@@ -442,7 +441,7 @@ decimal_literal
         sb.append('.');
         sb.append($w.getText());
     }
-    ->{getTreeAdaptor().create(LITERALDECIMALSTRING,sb.toString())}
+    ->{getTreeAdaptor().create(DECIMAL_LITERAL,sb.toString())}
     ;
 
 /*------------------------------------------------------------------
@@ -461,6 +460,6 @@ float_literal
         sb.append('.');
         sb.append($w.getText());
     }
-    ->{getTreeAdaptor().create(LITERALFLOATSTRING,sb.toString())}
+    ->{getTreeAdaptor().create(FLOAT_LITERAL,sb.toString())}
     ;
 

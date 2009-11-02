@@ -62,6 +62,25 @@ public abstract class AbstractAntlrTester extends TestCase {
     }
 
     /**
+     * A generic test helper that takes a source fragment and checks the result.
+     * @param source the source fragment
+     * @param expected the expected sub graph
+     */
+    public void emitAndCheck(final String source, final String expected) {
+        try {
+            String result = emit(source);
+            if (_log.isDebugEnabled()) {
+                _log.debug("Emitted content");
+                _log.debug(result);
+            }
+            assertEquals(expected, result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+
+    /**
      * @param token a lexer token
      * @return same as Token.toString but with token type label rather than int
      */
@@ -102,7 +121,15 @@ public abstract class AbstractAntlrTester extends TestCase {
      */
     public abstract CommonTree parse(final String source);
 
-        /**
+    /**
+     * Apply Lexer + Parser + Emitter to produce some translated content. 
+     * @param source the source code
+     * @return a translated result
+     * @throws Exception if emit fails
+     */
+    public abstract String emit(final String source) throws Exception;
+
+    /**
      * @return the parser token names (nicer looking than integer types)
      */
     public abstract String[] getTokenNames();

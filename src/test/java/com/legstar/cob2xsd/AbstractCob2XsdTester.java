@@ -2,10 +2,14 @@ package com.legstar.cob2xsd;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.TreeNodeStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -72,6 +76,24 @@ public abstract class AbstractCob2XsdTester extends AbstractAntlrTester {
             fail(e.toString());
         }
         return null;
+    }
+
+    /**
+     * Starting from a COBOL source fragment translates to XML Schema.
+     * @param source COBOL source fragment.
+     * @return an XML Schema
+     * @throws Exception if emit fails
+     */
+    public String emit(final String source) throws Exception {
+        CommonTree ast = parse(source);
+        if (_log.isDebugEnabled()) {
+            _log.debug(ast.toStringTree());
+        }
+        TreeNodeStream nodes = new CommonTreeNodeStream(ast);
+        CobolStructureXsdEmitter emitter = new CobolStructureXsdEmitter(nodes);
+        List < CobolDataEntry > dataEntries = new ArrayList < CobolDataEntry >();
+        emitter.cobdata(dataEntries);
+        return dataEntries.toString();
     }
 
     /**

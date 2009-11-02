@@ -628,4 +628,28 @@ public class CobolStructureLexerTest extends AbstractCob2XsdTester {
                 + "[@3,25:25='.',<PERIOD>,1:25]");
     }
 
-}
+    /**
+     * Special separator cases.
+     */
+    public void testSpecialSeparators() {
+        lexAndCheck(
+                "       01 hisName INDEXED BY A, B."
+                ,
+                "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:16='hisName',<DATA_NAME>,1:10]"
+                + "[@2,18:24='INDEXED',<INDEXED_KEYWORD>,1:18]"
+                + "[@3,29:30='A',<DATA_NAME>,1:29]"
+                + "[@4,32:32='B',<DATA_NAME>,1:32]"
+                + "[@5,33:33='.',<PERIOD>,1:33]");
+
+        lexAndCheck(
+                "       01 hisName VALUE 1, 2."
+                ,
+                "[@0,7:8='01',<INT>,1:7]"
+                + "[@1,10:16='hisName',<DATA_NAME>,1:10]"
+                + "[@2,18:22='VALUE',<VALUE_KEYWORD>,1:18]"
+                + "[@3,24:24='1',<INT>,1:24]"
+                + "[@4,27:27='2',<INT>,1:27]"
+                + "[@5,28:28='.',<PERIOD>,1:28]");
+    }
+ }

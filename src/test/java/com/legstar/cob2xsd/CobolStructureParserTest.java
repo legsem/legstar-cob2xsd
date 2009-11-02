@@ -317,7 +317,7 @@ public class CobolStructureParserTest extends AbstractCob2XsdTester {
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3) (INDEX myIndex)))");
 
         parseAndCheck(
-                "       01 myName OCCURS 3 INDEXED myIndex1 myIndex2."
+                "       01 myName OCCURS 3 INDEXED myIndex1, myIndex2."
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME myName) (FIXEDARRAY (HBOUND 3) (INDEX myIndex1) (INDEX myIndex2)))");
     }
