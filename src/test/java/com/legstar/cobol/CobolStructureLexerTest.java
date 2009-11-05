@@ -2,10 +2,10 @@ package com.legstar.cobol;
 
 
 /**
- * Test cases for the cob2xsd Lexer.
+ * Test cases for the cobol Lexer.
  *
  */
-public class CobolStructureLexerTest extends AbstractCob2XsdTester {
+public class CobolStructureLexerTest extends AbstractCobolTester {
 
     /**
      * Comments should be skipped from the token stream. Starting white

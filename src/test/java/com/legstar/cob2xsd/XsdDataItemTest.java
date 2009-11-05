@@ -1,6 +1,5 @@
 package com.legstar.cob2xsd;
 
-import com.legstar.cob2xsd.XsdDataItem;
 import com.legstar.cobol.model.CobolDataItem;
 import com.legstar.cobol.model.CobolDataItem.Usage;
 

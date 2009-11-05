@@ -6,7 +6,7 @@ package com.legstar.cobol;
  * Test the source cleaner class.
  *
  */
-public class CobolSourceCleanerTest extends AbstractCob2XsdTester {
+public class CobolSourceCleanerTest extends AbstractCobolTester {
 
     /**
      * Check that special characters are removed.

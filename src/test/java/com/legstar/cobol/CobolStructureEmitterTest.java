@@ -4,7 +4,7 @@ package com.legstar.cobol;
  * Test the tree walker emitter. The tree walker builds a data entry model.
  *
  */
-public class CobolStructureXsdEmitterTest extends AbstractCob2XsdTester {
+public class CobolStructureEmitterTest extends AbstractCobolTester {
 
     /**
      * A hierarchy.

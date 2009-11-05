@@ -22,7 +22,7 @@ import com.legstar.cobol.model.CobolDataItem;
  * Generic test code for ANTLR based lexers parsers and tree walkers.
  *
  */
-public abstract class AbstractCob2XsdTester extends AbstractAntlrTester {
+public abstract class AbstractCobolTester extends AbstractAntlrTester {
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());

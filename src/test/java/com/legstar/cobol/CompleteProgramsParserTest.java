@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
  * Check recognition on a complete program source.
  *
  */
-public class CompleteProgramsParserTest extends AbstractCob2XsdTester {
+public class CompleteProgramsParserTest extends AbstractCobolTester {
 
     /** Location of COBOL samples.*/
     private File sampleFolder = new File("src/test/resources/cobol");

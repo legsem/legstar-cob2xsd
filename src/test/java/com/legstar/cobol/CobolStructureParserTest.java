@@ -1,10 +1,10 @@
 package com.legstar.cobol;
 
 /**
- * Test the cob2xsd parser.
+ * Test the cobol parser.
  *
  */
-public class CobolStructureParserTest extends AbstractCob2XsdTester {
+public class CobolStructureParserTest extends AbstractCobolTester {
     
     /**
      * Just a simple level.

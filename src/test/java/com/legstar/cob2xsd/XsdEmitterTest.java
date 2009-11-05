@@ -1,7 +1,5 @@
 package com.legstar.cob2xsd;
 
-import com.legstar.cob2xsd.XsdEmitter;
-
 import junit.framework.TestCase;
 
 /**
