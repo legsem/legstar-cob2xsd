@@ -1,4 +1,4 @@
-package com.legstar.cob2xsd;
+package com.legstar.cobol;
 
 /**
  * Test the tree walker emitter. The tree walker builds a data entry model.

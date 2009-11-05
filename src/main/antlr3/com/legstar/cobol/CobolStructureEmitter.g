@@ -13,6 +13,7 @@ options {
  *------------------------------------------------------------------*/
 @header {
 package com.legstar.cobol;
+import com.legstar.cobol.model.CobolDataItem;
 import com.legstar.cobol.model.CobolDataItem.DataEntryType;
 import com.legstar.cobol.model.CobolDataItem.Range;
 import com.legstar.cobol.model.CobolDataItem.Usage;

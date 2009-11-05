@@ -1,4 +1,4 @@
-package com.legstar.cob2xsd;
+package com.legstar.cobol;
 
 /**
  * Test the cob2xsd parser.

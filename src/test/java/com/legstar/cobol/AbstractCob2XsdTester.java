@@ -1,4 +1,4 @@
-package com.legstar.cob2xsd;
+package com.legstar.cobol;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -15,8 +15,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.legstar.antlr.ANTLRNoCaseReaderStream;
 import com.legstar.antlr.AbstractAntlrTester;
-import com.legstar.cob2xsd.CobolStructureParser.cobdata_return;
-import com.legstar.cob2xsd.model.CobolDataItem;
+import com.legstar.cobol.CobolStructureParser.cobdata_return;
+import com.legstar.cobol.model.CobolDataItem;
 
 /**
  * Generic test code for ANTLR based lexers parsers and tree walkers.
@@ -91,7 +91,7 @@ public abstract class AbstractCob2XsdTester extends AbstractAntlrTester {
             _log.debug(ast.toStringTree());
         }
         TreeNodeStream nodes = new CommonTreeNodeStream(ast);
-        CobolStructureXsdEmitter emitter = new CobolStructureXsdEmitter(nodes);
+        CobolStructureEmitter emitter = new CobolStructureEmitter(nodes);
         List < CobolDataItem > dataEntries = new ArrayList < CobolDataItem >();
         emitter.cobdata(dataEntries);
         return dataEntries.toString();
