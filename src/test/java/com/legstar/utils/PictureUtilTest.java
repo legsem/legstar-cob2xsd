@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.legstar.cob2xsd.model.PictureSymbol;
+import com.legstar.cobol.utils.PictureUtil;
 
 import junit.framework.TestCase;
 

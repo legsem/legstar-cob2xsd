@@ -4,8 +4,8 @@ import java.util.Map;
 
 import com.legstar.cobol.model.CobolDataItem;
 import com.legstar.cobol.model.CobolDataItem.Usage;
+import com.legstar.cobol.utils.PictureUtil;
 import com.legstar.coxb.CobolType;
-import com.legstar.utils.PictureUtil;
 
 /**
  * XML Schema attributes derived from a COBOL data item.
