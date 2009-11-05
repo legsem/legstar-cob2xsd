@@ -77,7 +77,7 @@ tokens {
  * Java overrides
  *------------------------------------------------------------------*/
 @header {
-package com.legstar.cob2xsd;
+package com.legstar.cobol;
 }
 
 @members {

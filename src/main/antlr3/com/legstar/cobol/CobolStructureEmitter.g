@@ -1,4 +1,4 @@
-tree grammar CobolStructureXsdEmitter;
+tree grammar CobolStructureEmitter;
 /*------------------------------------------------------------------
  * Generates a COBOL model from an AST.
  *------------------------------------------------------------------*/
@@ -12,10 +12,10 @@ options {
  * Java overrides
  *------------------------------------------------------------------*/
 @header {
-package com.legstar.cob2xsd;
-import com.legstar.cob2xsd.CobolDataItem.DataEntryType;
-import com.legstar.cob2xsd.CobolDataItem.Range;
-import com.legstar.cob2xsd.CobolDataItem.Usage;
+package com.legstar.cobol;
+import com.legstar.cobol.model.CobolDataItem.DataEntryType;
+import com.legstar.cobol.model.CobolDataItem.Range;
+import com.legstar.cobol.model.CobolDataItem.Usage;
 }
 
 /*------------------------------------------------------------------

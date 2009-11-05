@@ -1,4 +1,4 @@
-package com.legstar.cob2xsd.xsd;
+package com.legstar.cob2xsd;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -16,7 +16,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.legstar.cob2xsd.model.CobolDataItem;
+import com.legstar.cobol.model.CobolDataItem;
 import com.legstar.coxb.CobolMarkup;
 
 /**

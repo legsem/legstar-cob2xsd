@@ -37,7 +37,7 @@ public abstract class AbstractCobolStructureEmitter extends TreeParser {
      * Construct from a tree nodes stream.
      * @param input the tree nodes stream
      */
-    public AbstractCobolStructureXsdEmitter(final TreeNodeStream input) {
+    public AbstractCobolStructureEmitter(final TreeNodeStream input) {
         this(input, new RecognizerSharedState());
     }
 
@@ -46,7 +46,7 @@ public abstract class AbstractCobolStructureEmitter extends TreeParser {
      * @param input the tree nodes stream
      * @param state the shared state
      */
-    public AbstractCobolStructureXsdEmitter(final TreeNodeStream input, final RecognizerSharedState state) {
+    public AbstractCobolStructureEmitter(final TreeNodeStream input, final RecognizerSharedState state) {
         super(input, state);
          
     }

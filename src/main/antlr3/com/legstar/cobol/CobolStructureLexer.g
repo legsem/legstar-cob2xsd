@@ -11,7 +11,7 @@ options {
  * Java overrides
  *------------------------------------------------------------------*/
 @header {
-package com.legstar.cob2xsd;
+package com.legstar.cobol;
 import java.io.IOException;
 import java.io.StringReader;
 import com.legstar.antlr.ANTLRNoCaseReaderStream;

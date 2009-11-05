@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.legstar.cob2xsd.model.PictureSymbol;
+import com.legstar.cobol.model.PictureSymbol;
 
 /**
  * Utility class provides methods to introspect COBOL picture clauses.
