@@ -1,11 +1,11 @@
 tree grammar CobolStructureXsdEmitter;
 /*------------------------------------------------------------------
- * Generates an XML Schema from an AST.
+ * Generates a COBOL model from an AST.
  *------------------------------------------------------------------*/
 options {
     tokenVocab = CobolStructureParser;
     ASTLabelType=CommonTree;
-    superClass=AbstractCobolStructureXsdEmitter;
+    superClass=AbstractCobolStructureEmitter;
 }
 
 /*------------------------------------------------------------------
