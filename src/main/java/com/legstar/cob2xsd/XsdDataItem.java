@@ -1,5 +1,7 @@
 package com.legstar.cob2xsd;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import com.legstar.cobol.model.CobolDataItem;
@@ -9,49 +11,75 @@ import com.legstar.coxb.CobolType;
 
 /**
  * XML Schema attributes derived from a COBOL data item.
+ * Acts as a facade to the CobolDataItem type.
+ * 
  */
 public class XsdDataItem {
 
+    /** The COBOL data item this facade is built from. */
+    private CobolDataItem _cobolDataItem;
+    
     /** XSD simple built-in types.*/
-    public enum XsdType { STRING, HEXBINARY, SHORT, USHORT, INT, UINT, LONG, ULONG, INTEGER, DECIMAL, FLOAT, DOUBLE };
+    public enum XsdType {
+        /** Maps XML Schema types.*/
+        COMPLEX, STRING, HEXBINARY, SHORT, USHORT, INT, UINT, LONG, ULONG, INTEGER, DECIMAL, FLOAT, DOUBLE
+    };
+
+    /** Ordered list of direct children.*/
+    private List < XsdDataItem > _children = new LinkedList < XsdDataItem >();
 
     /** XML schema type mapping the COBOL data item.*/
     private XsdType _xsdType;
+
+    /** XML Schema element name. */
+    private String _xsdElementName;
+
+    /** Complex types are named (as opposed to anonymous). */
+    private String _xsdTypeName;
 
     /** A derived COBOL type used in annotations.*/
     private CobolType _cobolType;
 
     /** For xsd:string and xsd:hexBinary. */
-    private int _length;
+    private int _length = -1;
 
     /** For xsd:string derived from numeric edited. */
     private String _pattern;
 
     /** For xsd numeric types, the total number of digits. */
-    private int _totalDigits;
+    private int _totalDigits = -1;
 
     /** For xsd numeric types, the fractional digits. */
-    private int _fractionDigits;
-    
+    private int _fractionDigits = -1;
+
     /** Lower bound for a numeric. */
     private String _minInclusive;
-    
+
     /** Upper bound for a numeric. */
     private String _maxInclusive;
-    
-    
-    /** TODO Move to options. */
-    private static final char CURRENCY_SIGN = '$';
-    /** TODO Move to options. */
-    private static final boolean NSYMBOLDBCS = false;
-    /** TODO Move to options. */
-    private static final boolean DECIMALPOINTISCOMMA = false;
+
 
     /**
      * COBOL data item is analyzed at construction time.
      * @param dataItem the COBOL elementary data item
+     * @param context the translator options in effect
      */
-    public XsdDataItem(final CobolDataItem dataItem) {
+    public XsdDataItem(final CobolDataItem dataItem, final Cob2XsdContext context) {
+
+        _cobolDataItem = dataItem;
+        
+        _xsdTypeName = formatTypeName(dataItem.getCobolName());
+        _xsdElementName = Character.toLowerCase(_xsdTypeName.charAt(0)) + _xsdTypeName.substring(1);
+
+        /* By default an item is a structure */
+        _xsdType = XsdType.COMPLEX;
+        _cobolType = CobolType.GROUP_ITEM;
+        
+        /* Create the list of children by decorating the COBOL item children */
+        for (CobolDataItem child : dataItem.getChildren()) {
+            _children.add(new XsdDataItem(child, context));
+        }
+
         if (dataItem.getUsage() != null) {
             setFromUsage(dataItem.getUsage());
         }
@@ -59,9 +87,9 @@ public class XsdDataItem {
             setFromPicture(
                     dataItem.getPicture(),
                     dataItem.isSignSeparate(),
-                    CURRENCY_SIGN,
-                    NSYMBOLDBCS,
-                    DECIMALPOINTISCOMMA);
+                    context.getCurrencySymbol(),
+                    context.isNSymbolDbcs(),
+                    context.decimalPointIsComma());
         }
     }
 
@@ -204,18 +232,18 @@ public class XsdDataItem {
             _xsdType = XsdType.STRING;
             return;
         }
-        
+
         /* At this stage we are left with pure numeric picture clauses.*/
-        
+
         /* Usage was DISPLAY, we can now refine since we now know it is a
          * numeric not an alphanumeric. */
         if (_cobolType == CobolType.ALPHANUMERIC_ITEM) {
             _cobolType = CobolType.ZONED_DECIMAL_ITEM;
         }
         setNumericAttributes(picture, currencySign, decimalPointIsComma);
-        
+
     }
-    
+
     /**
      * Once we have identified the COBOL data item as being numeric, this
      * will perform more analysis on the picture clause to extract such
@@ -235,7 +263,7 @@ public class XsdDataItem {
             final char currencySign,
             final boolean decimalPointIsComma) {
         char decimalPoint = (decimalPointIsComma) ? ',' : '.';
-        
+
         /* Look for the integer part (digits before the decimal point)*/
         int iV = picture.indexOf('V');
         if (iV == -1) {
@@ -252,11 +280,12 @@ public class XsdDataItem {
             _totalDigits = intCharNum.get('9') + _fractionDigits;
         } else {
             intCharNum = PictureUtil.getPictureCharOccurences(picture, currencySign);
+            _fractionDigits = 0;
             _totalDigits = intCharNum.get('9');
         }
-        
+
         boolean signed = (intCharNum.get('S') > 0) ? true : false;
-        
+
         if (_fractionDigits == 0) {
             if (_totalDigits < 5) {
                 _xsdType = (signed) ? XsdType.SHORT : XsdType.USHORT;
@@ -267,7 +296,7 @@ public class XsdDataItem {
             } else {
                 _xsdType = XsdType.INTEGER;
             }
-            
+
         } else {
             _xsdType = XsdType.DECIMAL;
         }
@@ -292,6 +321,48 @@ public class XsdDataItem {
             }
             _maxInclusive = sb.toString();
         }
+    }
+
+    /**
+     * Turn a COBOL name to an XSD type name.
+     * <p/>
+     * This is not strictly necessary as the only requirement for an XML schema element
+     * name is to be an NCName (non columnized name) which is a superset of valid
+     * COBOL names.
+     * <p/>
+     * COBOL names look ugly in XML schema though. They are often uppercased and hyphens,
+     * even if they are valid for NCNames, will have to be transformed again when the 
+     * XML schema is mapped to java.
+     * So we remove hyphens.
+     * We lower case all characters which are not word breakers. Word breakers are
+     * hyphens and numerics. This creates Camel style names.
+     * Complex type names customarily start with uppercase.
+     * @param cobolName the original COBOL name
+     * @return a nice XML type name
+     */
+    public static String formatTypeName(final String cobolName) {
+
+        StringBuilder sb = new StringBuilder();
+        boolean wordBreaker = true;
+        for (int i = 0; i < cobolName.length(); i++) {
+            char c = cobolName.charAt(i);
+            if (c != '-') {
+                if (Character.isDigit(c)) {
+                    sb.append(c);
+                    wordBreaker = true;
+                } else {
+                    if (wordBreaker) {
+                        sb.append(Character.toUpperCase(c));
+                    } else {
+                        sb.append(Character.toLowerCase(c));
+                    }
+                    wordBreaker = false;
+                }
+            } else {
+                wordBreaker = true;
+            }
+        }
+        return sb.toString();
     }
 
     /**
@@ -348,6 +419,40 @@ public class XsdDataItem {
      */
     public String getMaxInclusive() {
         return _maxInclusive;
+    }
+
+    /**
+     * @return the XML Schema element name
+     */
+    public String getXsdElementName() {
+        return _xsdElementName;
+    }
+
+    /**
+     * @return the XML Schema type name
+     */
+    public String getXsdTypeName() {
+        return _xsdTypeName;
+    }
+
+    /**
+     * @return the ordered list of direct children
+     */
+    public List < XsdDataItem > getChildren() {
+        return _children;
+    }
+    /**
+     * @return the minimum number of occurrences
+     */
+    public int getMinOccurs() {
+        return _cobolDataItem.getMinOccurs();
+    }
+
+    /**
+     * @return the maximum number of occurrences
+     */
+    public int getMaxOccurs() {
+        return _cobolDataItem.getMaxOccurs();
     }
 
 }

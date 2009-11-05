@@ -507,7 +507,7 @@ public class CobolDataItem {
         public void setChildren(final List < CobolDataItem > children) {
             _children = children;
         }
-        
+
         /**
          * @return true if this data item is a structure (group).
          */
@@ -636,18 +636,20 @@ public class CobolDataItem {
             sb.append(',');
             sb.append("cobolName:" + getCobolName());
 
-            switch(getDataEntryType()) {
-            case DATA_DESCRIPTION:
-                toStringDataDescription(sb);
-                break;
-            case RENAMES:
-                toStringRenames(sb);
-                break;
-            case CONDITION:
-                toStringCondition(sb);
-                break;
-            default:
-                break;
+            if (getDataEntryType() != null) {
+                switch(getDataEntryType()) {
+                case DATA_DESCRIPTION:
+                    toStringDataDescription(sb);
+                    break;
+                case RENAMES:
+                    toStringRenames(sb);
+                    break;
+                case CONDITION:
+                    toStringCondition(sb);
+                    break;
+                default:
+                    break;
+                }
             }
             sb.append(',');
             sb.append("srceLine:" + getSrceLine());
