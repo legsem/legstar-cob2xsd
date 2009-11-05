@@ -1,4 +1,4 @@
-package com.legstar.utils;
+package com.legstar.cobol.utils;
 
 import java.util.List;
 import java.util.Map;
