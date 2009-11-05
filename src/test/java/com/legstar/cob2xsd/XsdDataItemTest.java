@@ -1,8 +1,8 @@
-package com.legstar.cob2xsd.xsd;
+package com.legstar.cob2xsd;
 
 import com.legstar.cob2xsd.XsdDataItem;
-import com.legstar.cob2xsd.model.CobolDataItem;
-import com.legstar.cob2xsd.model.CobolDataItem.Usage;
+import com.legstar.cobol.model.CobolDataItem;
+import com.legstar.cobol.model.CobolDataItem.Usage;
 
 import junit.framework.TestCase;
 

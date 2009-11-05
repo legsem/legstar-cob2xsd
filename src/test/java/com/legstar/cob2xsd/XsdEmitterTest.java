@@ -1,6 +1,6 @@
-package com.legstar.cob2xsd.xsd;
+package com.legstar.cob2xsd;
 
-import com.legstar.cob2xsd.xsd.XsdEmitter;
+import com.legstar.cob2xsd.XsdEmitter;
 
 import junit.framework.TestCase;
 
