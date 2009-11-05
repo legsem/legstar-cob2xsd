@@ -1,4 +1,4 @@
-package com.legstar.cob2xsd;
+package com.legstar.cob2xsd.xsd;
 
 import java.io.StringWriter;
 

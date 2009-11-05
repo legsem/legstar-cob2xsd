@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import com.legstar.antlr.ANTLRNoCaseReaderStream;
 import com.legstar.antlr.AbstractAntlrTester;
 import com.legstar.cob2xsd.CobolStructureParser.cobdata_return;
+import com.legstar.cob2xsd.model.CobolDataItem;
 
 /**
  * Generic test code for ANTLR based lexers parsers and tree walkers.
@@ -91,7 +92,7 @@ public abstract class AbstractCob2XsdTester extends AbstractAntlrTester {
         }
         TreeNodeStream nodes = new CommonTreeNodeStream(ast);
         CobolStructureXsdEmitter emitter = new CobolStructureXsdEmitter(nodes);
-        List < CobolDataEntry > dataEntries = new ArrayList < CobolDataEntry >();
+        List < CobolDataItem > dataEntries = new ArrayList < CobolDataItem >();
         emitter.cobdata(dataEntries);
         return dataEntries.toString();
     }

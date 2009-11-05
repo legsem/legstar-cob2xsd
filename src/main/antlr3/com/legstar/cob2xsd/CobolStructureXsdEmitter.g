@@ -13,24 +13,24 @@ options {
  *------------------------------------------------------------------*/
 @header {
 package com.legstar.cob2xsd;
-import com.legstar.cob2xsd.CobolDataEntry.DataEntryType;
-import com.legstar.cob2xsd.CobolDataEntry.Range;
-import com.legstar.cob2xsd.CobolDataEntry.Usage;
+import com.legstar.cob2xsd.CobolDataItem.DataEntryType;
+import com.legstar.cob2xsd.CobolDataItem.Range;
+import com.legstar.cob2xsd.CobolDataItem.Usage;
 }
 
 /*------------------------------------------------------------------
  * Emitter grammar. Populates a list of data entries
  *------------------------------------------------------------------*/
-cobdata[List < CobolDataEntry > dataEntries]
+cobdata[List < CobolDataItem > dataEntries]
      :  data_entry[$dataEntries]*
      ;
     
-data_entry[List < CobolDataEntry > dataEntries]
+data_entry[List < CobolDataItem > dataEntries]
 scope {
-    CobolDataEntry dataEntry;
+    CobolDataItem dataEntry;
 }
 @init {
-    $data_entry::dataEntry = new CobolDataEntry();
+    $data_entry::dataEntry = new CobolDataItem();
     $data_entry::dataEntry.setSrceLine(((CommonTree) input.LT(1)).getLine());
 }
 @after {
