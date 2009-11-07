@@ -1,4 +1,0 @@
-       01  WS-COBOL-LEVEL-01.
-       77  WS-COBOL-LEVEL-77.
-       66  WS-COBOL-LEVEL-66.
-       88  WS-COBOL-LEVEL-88.
