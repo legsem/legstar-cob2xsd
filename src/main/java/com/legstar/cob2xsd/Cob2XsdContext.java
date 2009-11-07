@@ -27,6 +27,12 @@ public class Cob2XsdContext {
     /** Whether we should generate COBOL/JAXB annotations. */
     private boolean _addLegStarAnnotations = false;
     
+    /** The JAXB package name (appears in schema annotations).*/
+    private String _jaxbPackageName;
+
+    /** JAXB appends this suffix to all generated types.*/
+    private String _jaxbTypeClassesSuffix;
+
     /**
      * @return the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
      */
@@ -82,6 +88,34 @@ public class Cob2XsdContext {
      */
     public void setAddLegStarAnnotations(final boolean addLegStarAnnotations) {
         _addLegStarAnnotations = addLegStarAnnotations;
+    }
+
+    /**
+     * @return the JAXB package name for generated Java classes
+     */
+    public String getJaxbPackageName() {
+        return _jaxbPackageName;
+    }
+
+    /**
+     * @return the JAXB type name prefix (generated JAXB class names will have this suffix)
+     */
+    public String getJaxbTypeClassesSuffix() {
+        return _jaxbTypeClassesSuffix;
+    }
+
+    /**
+     * @param jaxbPackageName the JAXB package name for generated Java classes
+     */
+    public void setJaxbPackageName(final String jaxbPackageName) {
+        _jaxbPackageName = jaxbPackageName;
+    }
+
+    /**
+     * @param jaxbTypeClassesSuffix the JAXB type name prefix (generated JAXB class names will have this suffix)
+     */
+    public void setJaxbTypeClassesSuffix(final String jaxbTypeClassesSuffix) {
+        _jaxbTypeClassesSuffix = jaxbTypeClassesSuffix;
     }
 
 

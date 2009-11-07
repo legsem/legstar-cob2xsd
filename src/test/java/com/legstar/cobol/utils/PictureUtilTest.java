@@ -100,7 +100,7 @@ public class PictureUtilTest extends TestCase {
         assertFalse(checkRegexFromPicture("A", "ab"));
         assertTrue(checkRegexFromPicture("A(2)", "a "));
         assertFalse(checkRegexFromPicture("A(2)", "a b"));
-        assertTrue(checkRegexFromPicture("X(5)", "a 7 _"));
+        assertTrue(checkRegexFromPicture("X(5)", null));
         assertTrue(checkRegexFromPicture("S999PPP", "-1000"));
         assertTrue(checkRegexFromPicture("$9(5).9(2)CR", "$1000.99CR"));
         assertTrue(checkRegexFromPicture("$9(5).9(2)DB", "$100.9  "));
@@ -149,15 +149,21 @@ public class PictureUtilTest extends TestCase {
     
     /**
      * Turns a picture into a regex and then checks that the test value matches.
+     * A special case is when regex returned is null (meaning no restriction) in
+     * this case the testValue must be null.
      * @param picture the COBOL picture clause
      * @param testValue the test value
      * @return true if there is a match
      */
     private boolean checkRegexFromPicture(final String picture, final String testValue) {
         String regex = PictureUtil.getRegexFromPicture(picture, '$');
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(testValue);
-        return matcher.find();
+        if (regex != null) {
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(testValue);
+            return matcher.find();
+        } else {
+            return (testValue == null);
+        }
     }
     
 }

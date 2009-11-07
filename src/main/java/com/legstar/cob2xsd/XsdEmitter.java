@@ -5,13 +5,11 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaAnnotation;
-import org.apache.ws.commons.schema.XmlSchemaAppInfo;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaFractionDigitsFacet;
-import org.apache.ws.commons.schema.XmlSchemaLengthFacet;
 import org.apache.ws.commons.schema.XmlSchemaMaxInclusiveFacet;
+import org.apache.ws.commons.schema.XmlSchemaMaxLengthFacet;
 import org.apache.ws.commons.schema.XmlSchemaMinInclusiveFacet;
 import org.apache.ws.commons.schema.XmlSchemaPatternFacet;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
@@ -19,15 +17,12 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.XmlSchemaTotalDigitsFacet;
 import org.apache.ws.commons.schema.XmlSchemaType;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import com.legstar.coxb.CobolMarkup;
 
 /**
  * Populates an XML Schema from COBOL data items.
- * TODO comment
- * TODO add option to control inclusion of LegStar specific annotations
+ * Uses the {@link XsdDataItem} facade to CobolDataItem. This will have all 
+ * XSD attributes ready.
+ * This class uses Apache XmlSchema to produce the XML schema.
  *
  */
 public class XsdEmitter {
@@ -41,14 +36,8 @@ public class XsdEmitter {
     /** The translator options in effect. */
     private Cob2XsdContext _context;
 
-    /**TODO externalize in options Cobol annotations namespace. */
-    private static final String COBOL_NS = "http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd";
-
-    /**TODO externalize in options Cobol annotation parent element name. */
-    private static final String COBOL_PARENT_ELN = "cb:cobolElements";
-
-    /**TODO externalize in options Cobol annotation element name. */
-    private static final String COBOL_ELN = "cb:cobolElement";
+    /** Specialized LegStar/JAXB annotations emitter. */
+    private XsdAnnotationEmitter _annotationEmitter;
 
     /**TODO make XSD name formatting optional*/
 
@@ -65,6 +54,12 @@ public class XsdEmitter {
         _docBuilder = docBuilder;
         _xsd = xsd;
         _context = context;
+        if (_context.addLegStarAnnotations()) {
+            _annotationEmitter = new XsdAnnotationEmitter(
+                    xsd,
+                    _context.getJaxbPackageName(),
+                    _context.getJaxbTypeClassesSuffix());
+        }
     }
 
     /**
@@ -135,15 +130,16 @@ public class XsdEmitter {
     public XmlSchemaElement createXmlSchemaElement(final XsdDataItem xsdDataItem) {
         XmlSchemaElement element = new XmlSchemaElement();
         element.setName(xsdDataItem.getXsdElementName());
-        /* TODO review the semantic discrepancy between COBOL and XSD here .
-         * We should allow elements to be optional. */
-        if (xsdDataItem.getMaxOccurs() > 0) {
-            element.setMinOccurs(xsdDataItem.getMinOccurs());
+        if (xsdDataItem.getMaxOccurs() != 1) {
             element.setMaxOccurs(xsdDataItem.getMaxOccurs());
+        }
+        if (xsdDataItem.getMinOccurs() != 1) {
+            element.setMinOccurs(xsdDataItem.getMinOccurs());
         }
         element.setSchemaType(createXmlSchemaType(xsdDataItem));
         if (getContext().addLegStarAnnotations()) {
-            element.setAnnotation(createLegStarAnnotation());
+            element.setAnnotation(
+                    _annotationEmitter.createLegStarAnnotation(xsdDataItem));
         }
         return element;
     }
@@ -154,15 +150,15 @@ public class XsdEmitter {
      * COBOL alphanumeric fields are fixed length so we create a facet to enforce that constraint.
      * A pattern derived from the picture clause can also be used as a facet.
      * @param xsdDataItem COBOL data item decorated with XSD attributes
-      * @param xsdTypeName the XML schema built-in type name to use as a restriction
-    * @return an XML schema simple type
+     * @param xsdTypeName the XML schema built-in type name to use as a restriction
+     * @return an XML schema simple type
      */
     protected XmlSchemaSimpleType createAlphaXmlSchemaSimpleType(
             final XsdDataItem xsdDataItem, final String xsdTypeName) {
 
         XmlSchemaSimpleTypeRestriction restriction = createRestriction(xsdTypeName);
         if (xsdDataItem.getLength() > -1) {
-            restriction.getFacets().add(createLengthFacet(xsdDataItem.getLength()));
+            restriction.getFacets().add(createMaxLengthFacet(xsdDataItem.getLength()));
         }
         if (xsdDataItem.getPattern() != null) {
             restriction.getFacets().add(createPatternFacet(xsdDataItem.getPattern()));
@@ -197,7 +193,7 @@ public class XsdEmitter {
         }
         return createXmlSchemaSimpleType(restriction);
     }
-    
+
     /**
      * Create an XML schema simple type from a restriction.
      * @param restriction the XML schema restriction
@@ -208,7 +204,7 @@ public class XsdEmitter {
         xmlSchemaSimpleType.setContent(restriction);
         return xmlSchemaSimpleType;
     }
-    
+
     /**
      * Create an XML schema restriction.
      * @param xsdTypeName the XML schema built-in type name to use as a restriction
@@ -221,14 +217,14 @@ public class XsdEmitter {
     }
 
     /**
-     * Create an XML schema length facet.
+     * Create an XML schema maxLength facet.
      * @param length the value to set
      * @return an XML schema length facet
      */
-    protected XmlSchemaLengthFacet createLengthFacet(final int length) {
-        XmlSchemaLengthFacet xmlSchemaLengthFacet = new XmlSchemaLengthFacet();
-        xmlSchemaLengthFacet.setValue(length);
-        return xmlSchemaLengthFacet;
+    protected XmlSchemaMaxLengthFacet createMaxLengthFacet(final int length) {
+        XmlSchemaMaxLengthFacet xmlSchemaMaxLengthFacet = new XmlSchemaMaxLengthFacet();
+        xmlSchemaMaxLengthFacet.setValue(length);
+        return xmlSchemaMaxLengthFacet;
     }
 
     /**
@@ -252,7 +248,7 @@ public class XsdEmitter {
         xmlSchemaTotalDigitsFacet.setValue(totalDigits);
         return xmlSchemaTotalDigitsFacet;
     }
-    
+
     /**
      * Create an XML schema fractionDigits facet.
      * @param fractionDigits the value to set
@@ -263,7 +259,7 @@ public class XsdEmitter {
         xmlSchemaFractionDigitsFacet.setValue(fractionDigits);
         return xmlSchemaFractionDigitsFacet;
     }
-    
+
     /**
      * Create an XML schema minInclusive facet.
      * @param minInclusive the value to set
@@ -274,7 +270,7 @@ public class XsdEmitter {
         xmlSchemaMinInclusiveFacet.setValue(minInclusive);
         return xmlSchemaMinInclusiveFacet;
     }
-    
+
     /**
      * Create an XML schema maxInclusive facet.
      * @param maxInclusive the value to set
@@ -284,31 +280,6 @@ public class XsdEmitter {
         XmlSchemaMaxInclusiveFacet xmlSchemaMaxInclusiveFacet = new XmlSchemaMaxInclusiveFacet();
         xmlSchemaMaxInclusiveFacet.setValue(maxInclusive);
         return xmlSchemaMaxInclusiveFacet;
-    }
-    
-    /**
-     * Create an XML Schema annotation with markup corresponding to the original COBOL
-     * data item attributes. 
-     * @return an XML schema annotation
-     */
-    protected XmlSchemaAnnotation createLegStarAnnotation() {
-        
-        Document doc = _docBuilder.newDocument();
-        Element el = doc.createElementNS(COBOL_NS, COBOL_PARENT_ELN);
-        Element elc = doc.createElementNS(COBOL_NS, COBOL_ELN);
-
-        elc.setAttribute(CobolMarkup.LEVEL_NUMBER, Integer.toString(5));
-        elc.setAttribute(CobolMarkup.COBOL_NAME, "C-ARRAY");
-
-        el.appendChild(elc);
-
-        XmlSchemaAppInfo appInfo = new XmlSchemaAppInfo();
-        appInfo.setMarkup(el.getChildNodes());
-
-        /* Create annotation */
-        XmlSchemaAnnotation annotation = new XmlSchemaAnnotation();
-        annotation.getItems().add(appInfo);
-        return annotation;
     }
 
     /**

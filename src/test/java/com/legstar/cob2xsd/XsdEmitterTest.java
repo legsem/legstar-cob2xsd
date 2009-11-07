@@ -1,19 +1,5 @@
 package com.legstar.cob2xsd;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
-import org.custommonkey.xmlunit.XMLTestCase;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-
 import com.legstar.cobol.model.CobolDataItem;
 import com.legstar.cobol.model.CobolDataItem.Usage;
 
@@ -21,24 +7,7 @@ import com.legstar.cobol.model.CobolDataItem.Usage;
  * Test the CobolDataItemToXSD class.
  *
  */
-public class XsdEmitterTest extends XMLTestCase {
-
-    /** DOM document factory. */
-    private DocumentBuilder _docBuilder;
-
-    /** Translator options.*/
-    private Cob2XsdContext _context;
-
-    /** Logger. */
-    private final Log _log = LogFactory.getLog(getClass());
-
-    /** {@inheritDoc}*/
-    public void setUp() throws Exception {
-        DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
-        docFac.setNamespaceAware(true);
-        _docBuilder = docFac.newDocumentBuilder();
-        _context = new Cob2XsdContext();
-    }
+public class XsdEmitterTest extends AbstractXsdEmitterTester {
 
     /**
      * Empty COBOL item.
@@ -46,7 +15,7 @@ public class XsdEmitterTest extends XMLTestCase {
     public void testAnEmptyCobolItem() {
         emitAndCheck(
                 "<complexType name=\"Filler\"><sequence/></complexType>",
-                new CobolDataItem());
+                new CobolDataItem(), false);
     }
 
     /**
@@ -61,14 +30,13 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "<element name=\"aString\">"
                 + "<simpleType>"
                 + "<restriction base=\"string\">"
-                + "<length value=\"5\"/>"
-                + "<pattern value=\"^.{0,5}$\"/>"
+                + "<maxLength value=\"5\"/>"
                 + "</restriction>"
                 + "</simpleType>"
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct);
+                struct, false);
     }
 
     /**
@@ -91,7 +59,7 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct);
+                struct, false);
     }
 
     /**
@@ -114,7 +82,7 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "</sequence>"
                 + "</complexType>"
                 ,
-                struct);
+                struct, false);
     }
 
     /**
@@ -137,7 +105,7 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct);
+                struct, false);
     }
 
     /**
@@ -160,7 +128,7 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct);
+                struct, false);
     }
 
     /**
@@ -183,7 +151,7 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct);
+                struct, false);
     }
 
     /**
@@ -204,7 +172,7 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct);
+                struct, false);
     }
 
     /**
@@ -227,7 +195,7 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct);
+                struct, false);
     }
 
     /**
@@ -251,7 +219,7 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct);
+                struct, false);
     }
 
     /**
@@ -271,7 +239,7 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct);
+                struct, false);
     }
 
     /**
@@ -291,7 +259,7 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct);
+                struct, false);
     }
 
     /**
@@ -309,15 +277,51 @@ public class XsdEmitterTest extends XMLTestCase {
                 + "<element maxOccurs=\"3\" minOccurs=\"0\" name=\"aString\">"
                 + "<simpleType>"
                 + "<restriction base=\"string\">"
-                + "<length value=\"7\"/>"
+                + "<maxLength value=\"7\"/>"
                 + "<pattern value=\"^[a-zA-Z\\s]{0,5}\\d{0,2}$\"/>"
                 + "</restriction>"
                 + "</simpleType>"
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct);
+                struct, false);
     }
+
+    /**
+     * Test generation of LegStar annotations.
+     */
+    public void testAnnotations() {
+        CobolDataItem struct = new CobolDataItem();
+        struct.getChildren().add(getACobolElementaryItem("A-STRING", "X(5)", Usage.DISPLAY));
+        emitAndCheck(
+                ""
+                + "<annotation>"
+                + "<appinfo>"
+                + "<jaxb:schemaBindings>"
+                + "<jaxb:package name=\"com.legstar.test\"/>"
+                + "</jaxb:schemaBindings>"
+                + "</appinfo>"
+                + "</annotation>"
+                + "<complexType name=\"Filler\">"
+                + "<sequence>"
+                + "<element name=\"aString\">"
+                + "<annotation>"
+                + "<appinfo>"
+                + "<cb:cobolElement cobolName=\"A-STRING\" levelNumber=\"1\""
+                        + " picture=\"X(5)\" type=\"ALPHANUMERIC_ITEM\" usage=\"DISPLAY\"/>"
+                + "</appinfo>"
+                + "</annotation>"
+                + "<simpleType>"
+                + "<restriction base=\"string\">"
+                + "<maxLength value=\"5\"/>"
+                + "</restriction>"
+                + "</simpleType>"
+                + "</element>"
+                + "</sequence>"
+                + "</complexType>",
+                struct, true);
+    }
+
     /**
      * @return a COBOL data item.
      * @param cobolName the desired COBOL name
@@ -331,50 +335,5 @@ public class XsdEmitterTest extends XMLTestCase {
         cobolItem.setUsage(usage);
         return cobolItem;
     }
-
-    /**
-     * Helper that emits XML schema from a COBOL data item and checks result.
-     * @param expected the expected XML Schema (without the schema element for simplicity)
-     * @param dataItem the COBOL data item
-     */
-    private void emitAndCheck(final String expected, final CobolDataItem dataItem) {
-        XmlSchema xsd = new XmlSchema("http://legstar.com/test", new XmlSchemaCollection());
-        XsdEmitter emitter = new XsdEmitter(xsd, _docBuilder, _context);
-        XsdDataItem xsdDataItem = new XsdDataItem(dataItem, _context);
-        xsd.getItems().add(emitter.createXmlSchemaType(xsdDataItem));
-        if (_log.isDebugEnabled()) {
-            StringWriter writer = new StringWriter();
-            xsd.write(writer);
-            _log.debug("result:\n" + writer.toString());
-        }
-        try {
-            assertXMLEqual(getExpectedXMLSchema(expected), xsd.getSchemaDocument());
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    /**
-     * Wrap the expected content in a complete XML schema and make it a DOM.
-     * @param expected the XML Schema content
-     * @return a DOM document
-     * @throws Exception if something goes wrong
-     */
-    private Document getExpectedXMLSchema(final String expected) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<schema xmlns=\"http://www.w3.org/2001/XMLSchema\""
-                + " xmlns:tns=\"http://legstar.com/test\""
-                + " attributeFormDefault=\"unqualified\""
-                + " elementFormDefault=\"unqualified\""
-                + " targetNamespace=\"http://legstar.com/test\">");
-        sb.append(expected);
-        sb.append("</schema>");
-        InputSource is = new InputSource();
-        is.setCharacterStream(
-                new StringReader(sb.toString()));
-        return _docBuilder.parse(is);
-    }
-
 
 }

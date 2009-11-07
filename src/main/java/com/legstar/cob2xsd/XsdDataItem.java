@@ -4,6 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.legstar.cobol.model.CobolDataItem;
 import com.legstar.cobol.model.CobolDataItem.Usage;
 import com.legstar.cobol.utils.PictureUtil;
@@ -12,18 +15,27 @@ import com.legstar.coxb.CobolType;
 /**
  * XML Schema attributes derived from a COBOL data item.
  * Acts as a facade to the CobolDataItem type.
+ * This class is constructed from a CobolDataItem. All XSD attributes
+ * are derived at construction time.
+ * The isODOObject and isRedefined properties are the only ones that
+ * are not set at construction time (And therefore have setters).
+ * This is because these members can be set only when some data item
+ * downstream happens to reference this one.
  * 
  */
 public class XsdDataItem {
 
     /** The COBOL data item this facade is built from. */
     private CobolDataItem _cobolDataItem;
-    
+
     /** XSD simple built-in types.*/
     public enum XsdType {
         /** Maps XML Schema types.*/
         COMPLEX, STRING, HEXBINARY, SHORT, USHORT, INT, UINT, LONG, ULONG, INTEGER, DECIMAL, FLOAT, DOUBLE
     };
+
+    /** The parent data item or null if root. */
+    private XsdDataItem _parent;
 
     /** Ordered list of direct children.*/
     private List < XsdDataItem > _children = new LinkedList < XsdDataItem >();
@@ -58,38 +70,143 @@ public class XsdDataItem {
     /** Upper bound for a numeric. */
     private String _maxInclusive;
 
+    /** Determines if a numeric item is signed or unsigned.*/
+    private boolean _isSigned;
+
+    /* Array boundaries have a different semantic in XSD. MinOccurs defaults
+     * to MaxOccurs in COBOL while, it defaults to 1 in XSD. The meaning of
+     * maxOccurs = 1 is also different: it is meant as an array of 1 dimension
+     * in COBOL while it means "not an array" in XSD.*/
+    /** Arrays minimum number of occurrences. */
+    private int _minOccurs = 1;
+
+    /** Arrays maximum number of occurrences. */
+    private int _maxOccurs = 1;
+
+    /** True if some array size downstream depends on this data item value.*/
+    private boolean _isODOObject;
+
+    /** True if some item downstream redefines this data item.*/
+    private boolean _isRedefined;
+
+    /** Logger. */
+    private final Log _log = LogFactory.getLog(getClass());
+
 
     /**
-     * COBOL data item is analyzed at construction time.
-     * @param dataItem the COBOL elementary data item
+     * COBOL data item is analyzed at construction time and all XSD attributes are 
+     * derived from the COBOL attributes.
+     * @param cobolDataItem the COBOL elementary data item
      * @param context the translator options in effect
+     * @param parent the parent data item or null if root
+     * @param uniqueXsdTypeNames a list of unique type names used to detect name collisions
      */
-    public XsdDataItem(final CobolDataItem dataItem, final Cob2XsdContext context) {
+    public XsdDataItem(
+            final CobolDataItem cobolDataItem,
+            final Cob2XsdContext context,
+            final XsdDataItem parent,
+            final List < String > uniqueXsdTypeNames) {
 
-        _cobolDataItem = dataItem;
-        
-        _xsdTypeName = formatTypeName(dataItem.getCobolName());
-        _xsdElementName = Character.toLowerCase(_xsdTypeName.charAt(0)) + _xsdTypeName.substring(1);
+        _cobolDataItem = cobolDataItem;
+        _parent = parent;
 
-        /* By default an item is a structure */
-        _xsdType = XsdType.COMPLEX;
-        _cobolType = CobolType.GROUP_ITEM;
-        
+        _xsdTypeName = formatTypeName(cobolDataItem, uniqueXsdTypeNames);
+        _xsdElementName = Character.toLowerCase(_xsdTypeName.charAt(0))
+        + _xsdTypeName.substring(1);
+
+        if (cobolDataItem.getChildren().size() > 0) {
+            _xsdType = XsdType.COMPLEX;
+            _cobolType = CobolType.GROUP_ITEM;
+        } else {
+            if (cobolDataItem.getUsage() != null) {
+                setFromUsage(cobolDataItem.getUsage());
+            }
+            if (cobolDataItem.getPicture() != null) {
+                setFromPicture(
+                        cobolDataItem.getPicture(),
+                        cobolDataItem.isSignSeparate(),
+                        context.getCurrencySymbol(),
+                        context.isNSymbolDbcs(),
+                        context.decimalPointIsComma());
+            }
+        }
+
+        /* Set XSD minOccurs/maxOccurs from COBOL. If no minOccurs set
+         * in COBOL, this is a fixed size array. */
+        if (cobolDataItem.getMaxOccurs() > 0) {
+            _maxOccurs = cobolDataItem.getMaxOccurs();
+            if (cobolDataItem.getMinOccurs() > -1) {
+                _minOccurs = cobolDataItem.getMinOccurs();
+            } else {
+                _minOccurs = cobolDataItem.getMaxOccurs();
+            }
+        }
+
+        /* Inform object upstream that someone depends on him.*/
+        if (getDependingOn() != null && getParent() != null) {
+            getParent().updateDependency(getDependingOn());
+        }
+
+        /* Inform object upstream that someone redefines him.*/
+        if (getRedefines() != null && getParent() != null) {
+            getParent().updateRedefinition(getRedefines());
+        }
+
         /* Create the list of children by decorating the COBOL item children */
-        for (CobolDataItem child : dataItem.getChildren()) {
-            _children.add(new XsdDataItem(child, context));
+        for (CobolDataItem child : cobolDataItem.getChildren()) {
+            _children.add(new XsdDataItem(child, context, this, uniqueXsdTypeNames));
         }
 
-        if (dataItem.getUsage() != null) {
-            setFromUsage(dataItem.getUsage());
+        /* This should not happen. The COBOL type was not identified */
+        if (_cobolType == null) {
+            _cobolType = CobolType.GROUP_ITEM;
+            _xsdType = XsdType.COMPLEX;
+            _log.warn("Unable to identify COBOL type for " + cobolDataItem);
         }
-        if (dataItem.getPicture() != null) {
-            setFromPicture(
-                    dataItem.getPicture(),
-                    dataItem.isSignSeparate(),
-                    context.getCurrencySymbol(),
-                    context.isNSymbolDbcs(),
-                    context.decimalPointIsComma());
+
+    }
+
+    /**
+     * Called when some child (or child of a child) has a DEPENDING ON clause.
+     * We look up our children for an item matching the COBOL name of the depending on
+     * object.
+     * If found, we update its isODOObject member, otherwise we propagate the
+     * request to our own parent. 
+     * @param cobolName the depending on object.
+     */
+    public void updateDependency(final String cobolName) {
+        boolean found = false;
+        for (XsdDataItem child : getChildren()) {
+            if (child.getCobolName().equals(cobolName)) {
+                child.setIsODOObject(true);
+                found = true;
+                break;
+            }
+        }
+        if (!found && getParent() != null) {
+            getParent().updateDependency(cobolName);
+        }
+    }
+
+    /**
+     * Called when some child (or child of a child) has a REDEFINES clause.
+     * We look up our children for an item matching the COBOL name of the REDEFINES
+     * object.
+     * If found, we update its isRedefined member, otherwise we propagate the
+     * request to our own parent. 
+     * @param cobolName the redefines object.
+     */
+    public void updateRedefinition(final String cobolName) {
+        boolean found = false;
+        for (XsdDataItem child : getChildren()) {
+            if (child.getCobolName().equals(cobolName)) {
+                child.setIsRedefined(true);
+                found = true;
+                break;
+            }
+        }
+        if (!found && getParent() != null) {
+            getParent().updateRedefinition(cobolName);
         }
     }
 
@@ -235,9 +352,9 @@ public class XsdDataItem {
 
         /* At this stage we are left with pure numeric picture clauses.*/
 
-        /* Usage was DISPLAY, we can now refine since we now know it is a
+        /* If usage was DISPLAY, we can now refine since we now know it is a
          * numeric not an alphanumeric. */
-        if (_cobolType == CobolType.ALPHANUMERIC_ITEM) {
+        if (_cobolType == null || _cobolType == CobolType.ALPHANUMERIC_ITEM) {
             _cobolType = CobolType.ZONED_DECIMAL_ITEM;
         }
         setNumericAttributes(picture, currencySign, decimalPointIsComma);
@@ -284,15 +401,15 @@ public class XsdDataItem {
             _totalDigits = intCharNum.get('9');
         }
 
-        boolean signed = (intCharNum.get('S') > 0) ? true : false;
+        _isSigned = (intCharNum.get('S') > 0) ? true : false;
 
         if (_fractionDigits == 0) {
             if (_totalDigits < 5) {
-                _xsdType = (signed) ? XsdType.SHORT : XsdType.USHORT;
+                _xsdType = (_isSigned) ? XsdType.SHORT : XsdType.USHORT;
             } else if (_totalDigits < 10) {
-                _xsdType = (signed) ? XsdType.INT : XsdType.UINT;
+                _xsdType = (_isSigned) ? XsdType.INT : XsdType.UINT;
             } else if (_totalDigits < 20) {
-                _xsdType = (signed) ? XsdType.LONG : XsdType.ULONG;
+                _xsdType = (_isSigned) ? XsdType.LONG : XsdType.ULONG;
             } else {
                 _xsdType = XsdType.INTEGER;
             }
@@ -314,7 +431,7 @@ public class XsdDataItem {
                     sb.append('9');
                 }
             }
-            if (signed) {
+            if (_isSigned) {
                 _minInclusive = '-' + sb.toString();
             } else {
                 _minInclusive = "0";
@@ -337,15 +454,22 @@ public class XsdDataItem {
      * We lower case all characters which are not word breakers. Word breakers are
      * hyphens and numerics. This creates Camel style names.
      * Complex type names customarily start with uppercase.
-     * @param cobolName the original COBOL name
+     * <p/>
+     * The proposed name might be conflicting with another so we disambiguate xsd type
+     * names by appending the source line number.
+     * 
+     * @param dataItem the original COBOL data item
+     * @param uniqueXsdTypeNames a list of unique type names
      * @return a nice XML type name
      */
-    public static String formatTypeName(final String cobolName) {
+    public static String formatTypeName(
+            final CobolDataItem dataItem,
+            final List < String > uniqueXsdTypeNames) {
 
         StringBuilder sb = new StringBuilder();
         boolean wordBreaker = true;
-        for (int i = 0; i < cobolName.length(); i++) {
-            char c = cobolName.charAt(i);
+        for (int i = 0; i < dataItem.getCobolName().length(); i++) {
+            char c = dataItem.getCobolName().charAt(i);
             if (c != '-') {
                 if (Character.isDigit(c)) {
                     sb.append(c);
@@ -362,6 +486,11 @@ public class XsdDataItem {
                 wordBreaker = true;
             }
         }
+
+        if (uniqueXsdTypeNames.contains(sb.toString())) {
+            sb.append(dataItem.getSrceLine());
+        }
+        uniqueXsdTypeNames.add(sb.toString());
         return sb.toString();
     }
 
@@ -442,17 +571,184 @@ public class XsdDataItem {
         return _children;
     }
     /**
-     * @return the minimum number of occurrences
+     * @return the minimum number of occurrences (XSD semantic)
      */
     public int getMinOccurs() {
+        return _minOccurs;
+    }
+
+    /**
+     * @return the minimum number of occurrences (COBOL semantic)
+     */
+    public int getCobolMinOccurs() {
         return _cobolDataItem.getMinOccurs();
     }
 
     /**
-     * @return the maximum number of occurrences
+     * @return the maximum number of occurrences (XSD semantic)
      */
     public int getMaxOccurs() {
+        return _maxOccurs;
+    }
+
+    /**
+     * @return the maximum number of occurrences (COBOL semantic)
+     */
+    public int getCobolMaxOccurs() {
         return _cobolDataItem.getMaxOccurs();
+    }
+
+    /**
+     * @return the Level in the hierarchy
+     */
+    public int getLevelNumber() {
+        return _cobolDataItem.getLevelNumber();
+    }
+    /**
+     * @return the Cobol element name
+     */
+    public String getCobolName() {
+        return _cobolDataItem.getCobolName();
+    }
+    /**
+     * @return the Cobol picture clause
+     */
+    public String getPicture() {
+        return _cobolDataItem.getPicture();
+    }
+
+    /**
+     * @return the Cobol usage clause (enum)
+     */
+    public Usage getUsage() {
+        return _cobolDataItem.getUsage();
+    }
+
+    /**
+     * @return the Cobol generic usage.
+     * This is needed because COBOL usage values are not accepted as java identifiers.
+     */
+    public String getUsageForCobol() {
+        switch (getUsage()) {
+        case BINARY:
+            return "BINARY";
+        case SINGLEFLOAT:
+            return "COMP-1";
+        case DOUBLEFLOAT:
+            return "COMP-2";
+        case PACKEDDECIMAL:
+            return "PACKED-DECIMAL";
+        case NATIVEBINARY:
+            return "COMP-5";
+        case DISPLAY:
+            return "DISPLAY";
+        case DISPLAY1:
+            return "DISPLAY-1";
+        case INDEX:
+            return "INDEX";
+        case NATIONAL:
+            return "NATIONAL";
+        case POINTER:
+            return "POINTER";
+        case PROCEDUREPOINTER:
+            return "PROCEDURE-POINTER";
+            /** Function pointer. */
+        case FUNCTIONPOINTER:
+            return "FUNCTION-POINTER";
+        default:
+            return null;
+        }
+    }
+
+    /**
+     * @return true if String is right justified
+     */
+    public boolean isJustifiedRight() {
+        return _cobolDataItem.isJustifiedRight();
+    }
+
+    /**
+     * @return true if sign clause specifies sign in leading byte (false means trailing byte)
+     */
+    public boolean isSignLeading() {
+        return _cobolDataItem.isSignLeading();
+    }
+
+    /**
+     * @return true if sign clause specifies sign in separate byte (overpunch)
+     */
+    public boolean isSignSeparate() {
+        return _cobolDataItem.isSignSeparate();
+    }
+
+    /**
+     * @return the Cobol element giving array actual size
+     */
+    public String getDependingOn() {
+        return _cobolDataItem.getDependingOn();
+    }
+
+    /**
+     * @return true if a numeric item is signed
+     */
+    public boolean isSigned() {
+        return _isSigned;
+    }
+
+    /**
+     * @return the Cobol element sharing same memory location
+     */
+    public String getRedefines() {
+        return _cobolDataItem.getRedefines();
+    }
+
+    /**
+     * @return the Cobol value clause
+     */
+    public List < String > getValues() {
+        return _cobolDataItem.getValues();
+    }
+
+    /**
+     * @return the Line number in the original source file 
+     */
+    public int getSrceLine() {
+        return _cobolDataItem.getSrceLine();
+    }
+
+    /**
+     * @return the parent data item or null if root
+     */
+    public XsdDataItem getParent() {
+        return _parent;
+    }
+
+    /**
+     * @return true if some array size downstream depends on this data item value
+     */
+    public boolean isODOObject() {
+        return _isODOObject;
+    }
+
+    /**
+     * @return true if some item downstream redefines this data item
+     */
+    public boolean isRedefined() {
+        return _isRedefined;
+    }
+
+    /**
+     * @param isODOObject true if some array size downstream depends on this data item value
+     */
+    public void setIsODOObject(final boolean isODOObject) {
+        _isODOObject = isODOObject;
+    }
+
+    /**
+     * @param isRedefined true if some item downstream redefines this data item
+     */
+    public void setIsRedefined(final boolean isRedefined) {
+        _isRedefined = isRedefined;
     }
 
 }

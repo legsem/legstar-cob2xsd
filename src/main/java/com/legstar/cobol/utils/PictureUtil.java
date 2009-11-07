@@ -119,6 +119,9 @@ public final class PictureUtil {
     
     /**
      * Try to infer a regular expression to match a COBOL picture clause.
+     * <p/>
+     * If a picture is not restrictive, for instance PIC X does not impose
+     * any restriction, then we return null (no pattern).
      * @param picture the picture clause
      * @param currencySign the currency sign
      * @return a regular expression
@@ -153,6 +156,14 @@ public final class PictureUtil {
         charRegex.put(currencySign, "[\\" + currencySign + "\\d]");
         
         List < PictureSymbol > pictureSymbols = parsePicture(picture, currencySign);
+
+        /* If there is only one symbol and it is non restrictive, no pattern*/
+        if (pictureSymbols.size() == 1) {
+            String symbol =  charRegex.get(pictureSymbols.get(0).getSymbol());
+            if (symbol == null || symbol.equals(".")) {
+                return null;
+            }
+        }
         for (PictureSymbol pictureSymbol : pictureSymbols) {
             String regex = charRegex.get(pictureSymbol.getSymbol());
             if (charRegex != null) {
