@@ -111,6 +111,9 @@ public class XsdEmitter {
         XmlSchemaComplexType xmlSchemaComplexType  = new XmlSchemaComplexType(getXsd());
         xmlSchemaComplexType.setParticle(xmlSchemaSequence);
         xmlSchemaComplexType.setName(xsdDataItem.getXsdTypeName());
+        
+        /* This is because we want to use Named complex types. */
+        getXsd().getItems().add(xmlSchemaComplexType);
 
         return xmlSchemaComplexType;
     }
@@ -129,7 +132,16 @@ public class XsdEmitter {
         if (xsdDataItem.getMinOccurs() != 1) {
             element.setMinOccurs(xsdDataItem.getMinOccurs());
         }
-        element.setSchemaType(createXmlSchemaType(xsdDataItem));
+        
+        /* Create this element schema type, then if its a simple type
+         * set it as an anonymous type otherwise, in case of a complex type,
+         * reference the named complex type by name. */
+        XmlSchemaType xmlSchemaType = createXmlSchemaType(xsdDataItem);
+        if (xmlSchemaType instanceof XmlSchemaSimpleType) {
+            element.setSchemaType(xmlSchemaType);
+        } else {
+            element.setSchemaTypeName(xmlSchemaType.getQName());
+        }
         if (getContext().addLegStarAnnotations()) {
             element.setAnnotation(
                     _annotationEmitter.createLegStarAnnotation(xsdDataItem));

@@ -195,6 +195,8 @@ public class CobolStructureToXsd {
 
     /**
      * Generate an XML Schema using a model of COBOL data items.
+     * The model is a list of root level items. From these, we only
+     * process group items (structures) with children. 
      * @param cobolDataItems a list of COBOL data items
      * @return the XML schema
      */
@@ -206,9 +208,11 @@ public class CobolStructureToXsd {
         List < String > uniqueXsdTypeNames = new ArrayList < String >();
         XsdEmitter emitter = new XsdEmitter(xsd, getContext());
         for (CobolDataItem cobolDataItem : cobolDataItems) {
-            XsdDataItem xsdDataItem = new XsdDataItem(
-                    cobolDataItem, getContext(), null, uniqueXsdTypeNames);
-            xsd.getItems().add(emitter.createXmlSchemaType(xsdDataItem));
+            if (cobolDataItem.getChildren().size() > 0) {
+                XsdDataItem xsdDataItem = new XsdDataItem(
+                        cobolDataItem, getContext(), null, uniqueXsdTypeNames);
+                emitter.createXmlSchemaType(xsdDataItem);
+            }
         }
         return xsd;
     }

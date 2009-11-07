@@ -125,6 +125,7 @@ package com.legstar.cobol;
     /**
      * Search the tree hierarchy for the first node with a lower level than the one received.
      * Level 66 renames are a special case where we look for a level 01 to hook them to.
+     * Level 77 are identical to level 01, they are roots.
      * @param tree the DATA_ITEM subtree to start from (moving up)
      * @param level the level for which we are looking for a suitable parent
      * @return the DATA_ITEM which can be used as a parent or the Nil node
@@ -133,7 +134,12 @@ package com.legstar.cobol;
         if (getTreeAdaptor().isNil(tree)) {
             return tree;
         } else {
-            int targetLevel = (level == 66 ) ? 02 : level; 
+            int targetLevel = level;
+            if (level == 66) {
+                targetLevel = 02;
+            } else if (level == 77) {
+                targetLevel = 01;
+            }
             if (getLevel(tree) < targetLevel) {
                 return tree;
             } else {

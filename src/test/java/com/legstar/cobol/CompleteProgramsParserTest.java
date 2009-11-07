@@ -20,8 +20,8 @@ public class CompleteProgramsParserTest extends AbstractCobolTester {
     public void testLsfileae() throws Exception {
         parseAndCheck(
                 FileUtils.readFileToString(new File(sampleFolder, "LSFILEAE"))
-                , "(DATA_ITEM (LEVEL 01) (NAME FILEA)"
-                + " (DATA_ITEM (LEVEL 77) (NAME RESPONSE) (PICTURE S9(8))))"
+                , "(DATA_ITEM (LEVEL 01) (NAME FILEA))"
+                + " (DATA_ITEM (LEVEL 77) (NAME RESPONSE) (PICTURE S9(8)))"
                 + " (DATA_ITEM (LEVEL 01) (NAME DFHCOMMAREA)"
                 + " (DATA_ITEM (LEVEL 05) (NAME COM-NUMBER) (PICTURE 9(6)))"
                 + " (DATA_ITEM (LEVEL 05) (NAME COM-PERSONAL)"

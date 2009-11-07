@@ -55,7 +55,7 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
         XmlSchema xsd = getXmlSchema();
         XsdEmitter emitter = new XsdEmitter(xsd, context);
         XsdDataItem xsdDataItem = new XsdDataItem(dataItem, context, null, new ArrayList < String >());
-        xsd.getItems().add(emitter.createXmlSchemaType(xsdDataItem));
+        emitter.createXmlSchemaType(xsdDataItem);
         check(expected, xsd, withLegStarAnnotations);
     }
     
