@@ -2,7 +2,6 @@ package com.legstar.cob2xsd;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
 
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
@@ -27,9 +26,6 @@ import org.apache.ws.commons.schema.XmlSchemaType;
  */
 public class XsdEmitter {
 
-    /** This builder is used for annotation markup elements. */
-    private DocumentBuilder _docBuilder;
-
     /** The XML Schema being built. */
     private XmlSchema _xsd;
 
@@ -44,14 +40,11 @@ public class XsdEmitter {
     /**
      * Constructor.
      * @param xsd the XML Schema to be populated.
-     * @param docBuilder a DOM document builder for COBOL annotations markup
      * @param context the translator options
      */
     public XsdEmitter(
             final XmlSchema xsd,
-            final DocumentBuilder docBuilder,
             final Cob2XsdContext context) {
-        _docBuilder = docBuilder;
         _xsd = xsd;
         _context = context;
         if (_context.addLegStarAnnotations()) {
@@ -280,13 +273,6 @@ public class XsdEmitter {
         XmlSchemaMaxInclusiveFacet xmlSchemaMaxInclusiveFacet = new XmlSchemaMaxInclusiveFacet();
         xmlSchemaMaxInclusiveFacet.setValue(maxInclusive);
         return xmlSchemaMaxInclusiveFacet;
-    }
-
-    /**
-     * @return the builder used for annotation markup elements
-     */
-    public DocumentBuilder getDocBuilder() {
-        return _docBuilder;
     }
 
     /**

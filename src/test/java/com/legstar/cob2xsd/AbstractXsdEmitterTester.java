@@ -53,7 +53,7 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
             context.setJaxbPackageName("com.legstar.test");
         }
         XmlSchema xsd = getXmlSchema();
-        XsdEmitter emitter = new XsdEmitter(xsd, _docBuilder, context);
+        XsdEmitter emitter = new XsdEmitter(xsd, context);
         XsdDataItem xsdDataItem = new XsdDataItem(dataItem, context, null, new ArrayList < String >());
         xsd.getItems().add(emitter.createXmlSchemaType(xsdDataItem));
         check(expected, xsd, withLegStarAnnotations);

@@ -6,15 +6,22 @@ package com.legstar.cob2xsd;
  */
 public class Cob2XsdContext {
 
-    /** Default Currency symbol used. */
+    /** Default Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
     public static final char DEFAULT_CURRENCY_SYMBOL = '$';
 
-    /** Default NSYMBOL(DBCS) compiler option. */
+    /** Default NSYMBOL(DBCS) COBOL compiler option. */
     public static final boolean DEFAULT_NSYMBOLDBCS = false;
 
-    /** Default Whether comma is the decimal point. */
+    /** Default Whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES). */
     public static final boolean DEFAULT_DECIMALPOINTISCOMMA = false;
     
+    /** Default target namespace. */
+    public static final String DEFAULT_TARGET_NAMESPACE = "http://www.acme.com/test";
+
+    /** Default JAXB package name. */
+    public static final String DEFAULT_JAXB_PACKAGE_NAME = "com.acme.test";
+    
+
     /** Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
     private char _currencySymbol = DEFAULT_CURRENCY_SYMBOL;
     
@@ -24,15 +31,18 @@ public class Cob2XsdContext {
     /** Whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES). */
     private boolean _decimalPointIsComma = DEFAULT_DECIMALPOINTISCOMMA;
 
+    /** Target namespace for generated XML schema.*/
+    private String _targetNamespace = DEFAULT_TARGET_NAMESPACE;
+
     /** Whether we should generate COBOL/JAXB annotations. */
     private boolean _addLegStarAnnotations = false;
     
     /** The JAXB package name (appears in schema annotations).*/
-    private String _jaxbPackageName;
+    private String _jaxbPackageName = DEFAULT_JAXB_PACKAGE_NAME;
 
     /** JAXB appends this suffix to all generated types.*/
     private String _jaxbTypeClassesSuffix;
-
+    
     /**
      * @return the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
      */
@@ -116,6 +126,20 @@ public class Cob2XsdContext {
      */
     public void setJaxbTypeClassesSuffix(final String jaxbTypeClassesSuffix) {
         _jaxbTypeClassesSuffix = jaxbTypeClassesSuffix;
+    }
+
+    /**
+     * @return the target namespace for generated XML schema
+     */
+    public String getTargetNamespace() {
+        return _targetNamespace;
+    }
+
+    /**
+     * @param targetNamespace the target namespace for generated XML schema
+     */
+    public void setTargetNamespace(final String targetNamespace) {
+        _targetNamespace = targetNamespace;
     }
 
 
