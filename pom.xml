@@ -295,9 +295,8 @@
                         <id>add-source</id>
                         <phase>generate-resources</phase>
                         <goals>
-                            <goal>parse-version</goal>
+                            <goal>add-resource</goal>
                         </goals>
-                        <!--
                         <configuration>
                             <resources>
                                 <resource>
@@ -305,7 +304,6 @@
                                 </resource>
                             </resources>
                         </configuration>
-                        -->
                     </execution>
                 </executions>
             </plugin>

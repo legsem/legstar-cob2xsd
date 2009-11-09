@@ -14,7 +14,7 @@
         <!-- Temporary location  -->
         <property name="test.dir" value="${basedir}/target/test-distro" />
         <!-- Distribution name  -->
-        <property name="dist.name" value="legstar-pli2cob-${project.version}" />
+        <property name="dist.name" value="legstar-cob2xsd-${project.version}" />
         <!-- Distribution zip file  -->
         <property name="dist.zip" value="${dist.name}.zip" />
         <!-- Distribution file location   -->
@@ -22,7 +22,7 @@
         <!-- Distribution zip file   -->
         <property name="zip.file" value="${dist.dir}/${dist.zip}" />
         <!-- Sample generated XSD file full path -->
-        <property name="xsdSampleFilePath" value="${test.dir}/${dist.name}/schema/sample.xsd"/>
+        <property name="xsdSampleFilePath" value="${test.dir}/${dist.name}/schema/sample.cbl.xsd"/>
     
     </target>
 

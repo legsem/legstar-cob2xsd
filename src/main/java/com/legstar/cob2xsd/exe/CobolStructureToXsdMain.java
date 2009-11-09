@@ -1,9 +1,6 @@
 package com.legstar.cob2xsd.exe;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
@@ -69,7 +66,7 @@ public class CobolStructureToXsdMain {
             CommandLineParser parser = new PosixParser();
             try {
                 CommandLine line = parser.parse(options, args);
-                if (processLine(line)) {
+                if (processLine(line, options)) {
                     execute(_input, _output);
                 }
                 return;
@@ -77,8 +74,15 @@ public class CobolStructureToXsdMain {
                 System.err.println("Parsing failed.  Reason: " + e.getMessage());
             }
         }
+        produceHelp(options);
+    }
+    
+    /**
+     * @param options options available
+     */
+    private void produceHelp(final Options options) {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("cob2xsd", options);
+        formatter.printHelp("java -jar legstar-cob2xsd-" + getVersion() + "-exe.jar", options);
     }
 
     /**
@@ -90,6 +94,9 @@ public class CobolStructureToXsdMain {
         Option version = new Option("v", "version", false, "print the version information and exit");
         options.addOption(version);
 
+        Option help = new Option("h", "help", false, "print the options available");
+        options.addOption(help);
+
         Option input = new Option("i", "input", true,
         "file or folder holding the COBOL code to translate. Name is relative or absolute");
         options.addOption(input);
@@ -98,41 +105,41 @@ public class CobolStructureToXsdMain {
         "folder receiving the translated XML schema");
         options.addOption(output);
 
-        Option targetNamespace = new Option("targetNamespace", true,
+        Option targetNamespace = new Option("t", "targetNamespace", true,
         "Target namespace for generated XML schema");
         options.addOption(targetNamespace);
 
-        Option mapConditionsToFacets = new Option("mapConditionsToFacets",
+        Option mapConditionsToFacets = new Option("m", "mapConditionsToFacets", false,
         "Whether COBOL conditions (level 88) should be mapped to facets."
                 + " Facets restrict the content which might not be desirable");
         options.addOption(mapConditionsToFacets);
 
-        Option addLegStarAnnotations = new Option("addLegStarAnnotations",
+        Option addLegStarAnnotations = new Option("a", "addLegStarAnnotations", false,
         "Whether we should generate COBOL/JAXB annotations");
         options.addOption(addLegStarAnnotations);
 
-        Option jaxbPackageName = new Option("jaxbPackageName", true,
+        Option jaxbPackageName = new Option("p", "jaxbPackageName", true,
         "the JAXB package name for generated Java classes");
         options.addOption(jaxbPackageName);
 
-        Option jaxbTypeClassesSuffix = new Option("jaxbTypeClassesSuffix", true,
+        Option jaxbTypeClassesSuffix = new Option("s", "jaxbTypeClassesSuffix", true,
         "The JAXB type name prefix (generated JAXB class names will have this suffix)");
         options.addOption(jaxbTypeClassesSuffix);
 
         Option decimalPointIsComma = new Option("decimalPointIsComma",
-        "Whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)");
+        "Whether COBOL comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)");
         options.addOption(decimalPointIsComma);
 
         Option isNSymbolDbcs = new Option("isNSymbolDbcs",
-        "The NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false");
+        "The COBOL NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false");
         options.addOption(isNSymbolDbcs);
 
         Option currencySymbol = new Option("currencySymbol", true,
-        "The currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)");
+        "The COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)");
         options.addOption(currencySymbol);
 
-        Option customXslt = new Option("customXslt", true,
-        "optional XSLT transform for XML schema customization");
+        Option customXslt = new Option("x", "customXslt", true,
+        "Optional XSLT transform stylesheet for XML schema customization");
         options.addOption(customXslt);
 
         return options;
@@ -141,11 +148,16 @@ public class CobolStructureToXsdMain {
     /**
      * Process the command line options selected.
      * @param line the parsed command line
+     * @param options available
      * @return false if processing needs to stop, true if its ok to continue
      */
-    protected boolean processLine(final CommandLine line) {
+    protected boolean processLine(final CommandLine line, final Options options) {
         if (line.hasOption("version")) {
             System.out.println("version " + getVersion());
+            return false;
+        }
+        if (line.hasOption("help")) {
+            produceHelp(options);
             return false;
         }
         if (line.hasOption("targetNamespace")) {
