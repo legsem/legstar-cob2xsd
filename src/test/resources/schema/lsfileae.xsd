@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://legstar.com/test/coxb/lsfileae"
+xmlns="http://legstar.com/test/coxb/lsfileae"
+xmlns:xsns="http://legstar.com/test/coxb/lsfileae"
+xmlns:cb="http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd"
+xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+jaxb:version="2.0"
+jaxb:extensionBindingPrefixes="cb"
+elementFormDefault="qualified">
+ <xs:annotation><xs:appinfo>
+ <jaxb:schemaBindings>
+ <jaxb:package  name="com.legstar.test.coxb.lsfileae"/>
+ </jaxb:schemaBindings>
+ </xs:appinfo></xs:annotation>
+ <xs:complexType name="Dfhcommarea">
+    <xs:sequence>
+     <xs:element name="comNumber">
+       <xs:annotation>
+         <xs:appinfo>
+         <cb:cobolElement levelNumber='5' cobolName='COM-NUMBER' type='ZONED_DECIMAL_ITEM' picture='9(6)' signed='false' totalDigits='6' srceLine='32'/>
+         </xs:appinfo>
+       </xs:annotation>
+       <xs:simpleType>
+         <xs:restriction base="xs:unsignedInt">
+         <xs:totalDigits value="6"/>
+         </xs:restriction>
+       </xs:simpleType>
+     </xs:element>
+     <xs:element name="comPersonal" type="xsns:ComPersonal">
+       <xs:annotation>
+         <xs:appinfo>
+         <cb:cobolElement levelNumber='5' cobolName='COM-PERSONAL' type='GROUP_ITEM' srceLine='33'/>
+         </xs:appinfo>
+       </xs:annotation>
+     </xs:element>
+     <xs:element name="comDate">
+       <xs:annotation>
+         <xs:appinfo>
+         <cb:cobolElement levelNumber='5' cobolName='COM-DATE' type='ALPHANUMERIC_ITEM' picture='X(8)' srceLine='37'/>
+         </xs:appinfo>
+       </xs:annotation>
+       <xs:simpleType>
+         <xs:restriction base="xs:string">
+         <xs:maxLength value='8'/>
+         </xs:restriction>
+       </xs:simpleType>
+     </xs:element>
+     <xs:element name="comAmount">
+       <xs:annotation>
+         <xs:appinfo>
+         <cb:cobolElement levelNumber='5' cobolName='COM-AMOUNT' type='ALPHANUMERIC_ITEM' picture='X(8)' srceLine='38'/>
+         </xs:appinfo>
+       </xs:annotation>
+       <xs:simpleType>
+         <xs:restriction base="xs:string">
+         <xs:maxLength value='8'/>
+         </xs:restriction>
+       </xs:simpleType>
+     </xs:element>
+     <xs:element name="comComment">
+       <xs:annotation>
+         <xs:appinfo>
+         <cb:cobolElement levelNumber='5' cobolName='COM-COMMENT' type='ALPHANUMERIC_ITEM' picture='X(9)' srceLine='39'/>
+         </xs:appinfo>
+       </xs:annotation>
+       <xs:simpleType>
+         <xs:restriction base="xs:string">
+         <xs:maxLength value='9'/>
+         </xs:restriction>
+       </xs:simpleType>
+     </xs:element>
+    </xs:sequence>
+ </xs:complexType>
+ <xs:complexType name="ComPersonal">
+    <xs:sequence>
+     <xs:element name="comName">
+       <xs:annotation>
+         <xs:appinfo>
+         <cb:cobolElement levelNumber='10' cobolName='COM-NAME' type='ALPHANUMERIC_ITEM' picture='X(20)' srceLine='34'/>
+         </xs:appinfo>
+       </xs:annotation>
+       <xs:simpleType>
+         <xs:restriction base="xs:string">
+         <xs:maxLength value='20'/>
+         </xs:restriction>
+       </xs:simpleType>
+     </xs:element>
+     <xs:element name="comAddress">
+       <xs:annotation>
+         <xs:appinfo>
+         <cb:cobolElement levelNumber='10' cobolName='COM-ADDRESS' type='ALPHANUMERIC_ITEM' picture='X(20)' srceLine='35'/>
+         </xs:appinfo>
+       </xs:annotation>
+       <xs:simpleType>
+         <xs:restriction base="xs:string">
+         <xs:maxLength value='20'/>
+         </xs:restriction>
+       </xs:simpleType>
+     </xs:element>
+     <xs:element name="comPhone">
+       <xs:annotation>
+         <xs:appinfo>
+         <cb:cobolElement levelNumber='10' cobolName='COM-PHONE' type='ALPHANUMERIC_ITEM' picture='X(8)' srceLine='36'/>
+         </xs:appinfo>
+       </xs:annotation>
+       <xs:simpleType>
+         <xs:restriction base="xs:string">
+         <xs:maxLength value='8'/>
+         </xs:restriction>
+       </xs:simpleType>
+     </xs:element>
+    </xs:sequence>
+ </xs:complexType>
+</xs:schema>

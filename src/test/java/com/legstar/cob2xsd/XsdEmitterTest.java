@@ -1,6 +1,11 @@
 package com.legstar.cob2xsd;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.legstar.cobol.model.CobolDataItem;
+import com.legstar.cobol.model.CobolDataItem.DataEntryType;
+import com.legstar.cobol.model.CobolDataItem.Range;
 import com.legstar.cobol.model.CobolDataItem.Usage;
 
 /**
@@ -14,8 +19,8 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
      */
     public void testAnEmptyCobolItem() {
         emitAndCheck(
-                "<complexType name=\"Filler\"><sequence/></complexType>",
-                new CobolDataItem(), false);
+                "<complexType name=\"Filler0\"><sequence/></complexType>",
+                new CobolDataItem());
     }
 
     /**
@@ -25,7 +30,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         CobolDataItem struct = new CobolDataItem();
         struct.getChildren().add(getACobolElementaryItem("A-STRING", "X(5)", Usage.DISPLAY));
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"aString\">"
                 + "<simpleType>"
@@ -36,7 +41,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct, false);
+                struct);
     }
 
     /**
@@ -46,20 +51,18 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         CobolDataItem struct = new CobolDataItem();
         struct.getChildren().add(getACobolElementaryItem("NUM1", "S9(4)", Usage.BINARY));
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"num1\">"
                 + "<simpleType>"
                 + "<restriction base=\"short\">"
                 + "<totalDigits value=\"4\"/>"
-                + "<minInclusive value=\"-9999\"/>"
-                + "<maxInclusive value=\"9999\"/>"
                 + "</restriction>"
                 + "</simpleType>"
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct, false);
+                struct);
     }
 
     /**
@@ -70,7 +73,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         CobolDataItem struct = new CobolDataItem();
         struct.getChildren().add(getACobolElementaryItem("NUM1", "9(2)", Usage.NATIVEBINARY));
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"num1\">"
                 + "<simpleType>"
@@ -82,7 +85,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
                 + "</sequence>"
                 + "</complexType>"
                 ,
-                struct, false);
+                struct);
     }
 
     /**
@@ -92,20 +95,18 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         CobolDataItem struct = new CobolDataItem();
         struct.getChildren().add(getACobolElementaryItem("NUM1", "S9(9)", Usage.BINARY));
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"num1\">"
                 + "<simpleType>"
                 + "<restriction base=\"int\">"
                 + "<totalDigits value=\"9\"/>"
-                + "<minInclusive value=\"-999999999\"/>"
-                + "<maxInclusive value=\"999999999\"/>"
                 + "</restriction>"
                 + "</simpleType>"
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct, false);
+                struct);
     }
 
     /**
@@ -115,20 +116,18 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         CobolDataItem struct = new CobolDataItem();
         struct.getChildren().add(getACobolElementaryItem("NUM1", "9(9)", Usage.DISPLAY));
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"num1\">"
                 + "<simpleType>"
                 + "<restriction base=\"unsignedInt\">"
                 + "<totalDigits value=\"9\"/>"
-                + "<minInclusive value=\"0\"/>"
-                + "<maxInclusive value=\"999999999\"/>"
                 + "</restriction>"
                 + "</simpleType>"
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct, false);
+                struct);
     }
 
     /**
@@ -138,20 +137,18 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         CobolDataItem struct = new CobolDataItem();
         struct.getChildren().add(getACobolElementaryItem("NUM1", "S9(18)", Usage.BINARY));
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"num1\">"
                 + "<simpleType>"
                 + "<restriction base=\"long\">"
                 + "<totalDigits value=\"18\"/>"
-                + "<minInclusive value=\"-999999999999999999\"/>"
-                + "<maxInclusive value=\"999999999999999999\"/>"
                 + "</restriction>"
                 + "</simpleType>"
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct, false);
+                struct);
     }
 
     /**
@@ -161,7 +158,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         CobolDataItem struct = new CobolDataItem();
         struct.getChildren().add(getACobolElementaryItem("NUM1", "9(12)", Usage.NATIVEBINARY));
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"num1\">"
                 + "<simpleType>"
@@ -172,7 +169,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct, false);
+                struct);
     }
 
     /**
@@ -182,20 +179,18 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         CobolDataItem struct = new CobolDataItem();
         struct.getChildren().add(getACobolElementaryItem("NUM1", "S9(31)", Usage.DISPLAY));
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"num1\">"
                 + "<simpleType>"
                 + "<restriction base=\"integer\">"
                 + "<totalDigits value=\"31\"/>"
-                + "<minInclusive value=\"-9999999999999999999999999999999\"/>"
-                + "<maxInclusive value=\"9999999999999999999999999999999\"/>"
                 + "</restriction>"
                 + "</simpleType>"
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct, false);
+                struct);
     }
 
     /**
@@ -205,21 +200,19 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         CobolDataItem struct = new CobolDataItem();
         struct.getChildren().add(getACobolElementaryItem("NUM1", "S9(8)V99", Usage.PACKEDDECIMAL));
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"num1\">"
                 + "<simpleType>"
                 + "<restriction base=\"decimal\">"
                 + "<totalDigits value=\"10\"/>"
                 + "<fractionDigits value=\"2\"/>"
-                + "<minInclusive value=\"-99999999.99\"/>"
-                + "<maxInclusive value=\"99999999.99\"/>"
                 + "</restriction>"
                 + "</simpleType>"
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct, false);
+                struct);
     }
 
     /**
@@ -229,7 +222,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         CobolDataItem struct = new CobolDataItem();
         struct.getChildren().add(getACobolElementaryItem("NUM1", null, Usage.SINGLEFLOAT));
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"num1\">"
                 + "<simpleType>"
@@ -239,7 +232,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct, false);
+                struct);
     }
 
     /**
@@ -249,7 +242,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         CobolDataItem struct = new CobolDataItem();
         struct.getChildren().add(getACobolElementaryItem("NUM1", null, Usage.DOUBLEFLOAT));
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"num1\">"
                 + "<simpleType>"
@@ -259,7 +252,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct, false);
+                struct);
     }
 
     /**
@@ -272,7 +265,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         array.setMaxOccurs(3);
         struct.getChildren().add(array);
         emitAndCheck(
-                "<complexType name=\"Filler\">"
+                "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element maxOccurs=\"3\" minOccurs=\"0\" name=\"aString\">"
                 + "<simpleType>"
@@ -284,7 +277,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
                 + "</element>"
                 + "</sequence>"
                 + "</complexType>",
-                struct, false);
+                struct);
     }
 
     /**
@@ -302,13 +295,13 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
                 + "</jaxb:schemaBindings>"
                 + "</appinfo>"
                 + "</annotation>"
-                + "<complexType name=\"Filler\">"
+                + "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"aString\">"
                 + "<annotation>"
                 + "<appinfo>"
                 + "<cb:cobolElement cobolName=\"A-STRING\" levelNumber=\"1\""
-                        + " picture=\"X(5)\" type=\"ALPHANUMERIC_ITEM\" usage=\"DISPLAY\"/>"
+                + " picture=\"X(5)\" type=\"ALPHANUMERIC_ITEM\" usage=\"DISPLAY\"/>"
                 + "</appinfo>"
                 + "</annotation>"
                 + "<simpleType>"
@@ -320,6 +313,210 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
                 + "</sequence>"
                 + "</complexType>",
                 struct, true);
+    }
+
+    /**
+     * A COBOL RENAMES clause. If should not emit anything.
+     * A warning is logged.
+     */
+    public void testRename() {
+        CobolDataItem struct = new CobolDataItem();
+        CobolDataItem cobolItem = new CobolDataItem();
+        cobolItem.setDataEntryType(DataEntryType.RENAMES);
+        struct.getChildren().add(cobolItem);
+        emitAndCheck(
+                "<complexType name=\"Filler0\">"
+                + "<sequence/>"
+                + "</complexType>",
+                struct);
+    }
+
+    /**
+     * A COBOL CONDITION clause with a single value, then 2.
+     * Check what happens if a range is passed.
+     * Check that enumeration emission is controlled by context option.
+     */
+    public void testConditionSingleValue() {
+
+        CobolDataItem struct = new CobolDataItem();
+
+        CobolDataItem cobolItem = new CobolDataItem();
+        cobolItem.setCobolName("COBOL-NAME");
+        cobolItem.setPicture("X(6)");
+
+        CobolDataItem cobolCondition = new CobolDataItem();
+        cobolCondition.setDataEntryType(DataEntryType.CONDITION);
+        cobolCondition.setCobolName("A-CONDITION");
+        List < String > literals = new ArrayList < String >();
+        literals.add("avalue");
+        cobolCondition.setConditionLiterals(literals);
+        cobolItem.getChildren().add(cobolCondition);
+
+        struct.getChildren().add(cobolItem);
+
+        emitAndCheck(
+                "<complexType name=\"Filler0\">"
+                + "<sequence>"
+                + "<element name=\"cobolName\">"
+                + "<simpleType>"
+                + "<restriction base=\"string\">"
+                + "<maxLength value=\"6\"/>"
+                + "<enumeration value=\"avalue\"/>"
+                + "</restriction>"
+                + "</simpleType>"
+                + "</element>"
+                + "</sequence>"
+                + "</complexType>",
+                struct, false, true);
+
+        literals.add("anotherValue");
+
+        emitAndCheck(
+                "<complexType name=\"Filler0\">"
+                + "<sequence>"
+                + "<element name=\"cobolName\">"
+                + "<simpleType>"
+                + "<restriction base=\"string\">"
+                + "<maxLength value=\"6\"/>"
+                + "<enumeration value=\"avalue\"/>"
+                + "<enumeration value=\"anotherValue\"/>"
+                + "</restriction>"
+                + "</simpleType>"
+                + "</element>"
+                + "</sequence>"
+                + "</complexType>",
+                struct, false, true);
+
+        List < Range > conditionRanges = new ArrayList < Range >();
+        conditionRanges.add(new Range("18", "56"));
+        cobolCondition.setConditionRanges(conditionRanges);
+        cobolCondition.getConditionLiterals().clear();
+
+        emitAndCheck(
+                "<complexType name=\"Filler0\">"
+                + "<sequence>"
+                + "<element name=\"cobolName\">"
+                + "<simpleType>"
+                + "<restriction base=\"string\">"
+                + "<maxLength value=\"6\"/>"
+                + "<minInclusive value=\"18\"/>"
+                + "<maxInclusive value=\"56\"/>"
+                + "</restriction>"
+                + "</simpleType>"
+                + "</element>"
+                + "</sequence>"
+                + "</complexType>",
+                struct, false, true);
+
+        emitAndCheck(
+                "<complexType name=\"Filler0\">"
+                + "<sequence>"
+                + "<element name=\"cobolName\">"
+                + "<simpleType>"
+                + "<restriction base=\"string\">"
+                + "<maxLength value=\"6\"/>"
+                + "</restriction>"
+                + "</simpleType>"
+                + "</element>"
+                + "</sequence>"
+                + "</complexType>",
+                struct, false, false);
+
+    }
+
+    /**
+     * Test an xsd:choice case.
+     */
+    public void testChoice() {
+        CobolDataItem struct = new CobolDataItem();
+
+        CobolDataItem redefined = new CobolDataItem();
+        redefined.setCobolName("COBOL-REDEFINED");
+        struct.getChildren().add(redefined);
+
+        CobolDataItem redefining = new CobolDataItem();
+        redefining.setCobolName("COBOL-REDEFINING");
+        redefining.setRedefines("COBOL-REDEFINED");
+        struct.getChildren().add(redefining);
+
+        emitAndCheck(
+                "<complexType name=\"Filler0\">"
+                + "<sequence>"
+                + "<choice>"
+                + "<element name=\"cobolRedefined\" type=\"tns:CobolRedefined\"/>"
+                + "<element name=\"cobolRedefining\" type=\"tns:CobolRedefining\"/>"
+                + "</choice>"
+                + "</sequence>"
+                + "</complexType>"
+                + "<complexType name=\"CobolRedefined\">"
+                + "<sequence/>"
+                + "</complexType>"
+                + "<complexType name=\"CobolRedefining\">"
+                + "<sequence/>"
+                + "</complexType>",
+                struct);
+
+    }
+
+    /**
+     * Test an xsd:choice complex case.
+     */
+    public void testChoiceComplex() {
+        CobolDataItem a = new CobolDataItem("A");
+        CobolDataItem b = new CobolDataItem("B");
+        CobolDataItem c = new CobolDataItem("C");
+        CobolDataItem d = new CobolDataItem("D");
+        CobolDataItem e = new CobolDataItem("E");
+        CobolDataItem f = new CobolDataItem("F");
+        CobolDataItem g = new CobolDataItem("G");
+
+        d.setRedefines("C");
+        f.setRedefines("E");
+
+        d.getChildren().add(e);
+        d.getChildren().add(f);
+
+        a.getChildren().add(b);
+        a.getChildren().add(c);
+        a.getChildren().add(d);
+        a.getChildren().add(g);
+
+        emitAndCheck(
+                "<complexType name=\"A\">"
+                + "<sequence>"
+                + "<element name=\"b\" type=\"tns:B\"/>"
+                + "<choice>"
+                + "<element name=\"c\" type=\"tns:C\"/>"
+                + "<element name=\"d\" type=\"tns:D\"/>"
+                + "</choice>"
+                + "<element name=\"g\" type=\"tns:G\"/>"
+                + "</sequence>"
+                + "</complexType>"
+                + "<complexType name=\"B\">"
+                + "<sequence/>"
+                + "</complexType>"
+                + "<complexType name=\"C\">"
+                + "<sequence/>"
+                + "</complexType>"
+                + "<complexType name=\"D\">"
+                + "<sequence>"
+                + "<choice>"
+                + "<element name=\"e\" type=\"tns:E\"/>"
+                + "<element name=\"f\" type=\"tns:F\"/>"
+                + "</choice>"
+                + "</sequence>"
+                + "</complexType>"
+                + "<complexType name=\"E\">"
+                + "<sequence/>"
+                + "</complexType>"
+                + "<complexType name=\"F\">"
+                + "<sequence/>"
+                + "</complexType>"
+                + "<complexType name=\"G\">"
+                + "<sequence/>"
+                + "</complexType>",
+                a);
+
     }
 
     /**

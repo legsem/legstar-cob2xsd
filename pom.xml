@@ -224,6 +224,92 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId> 
+                <configuration>
+                    <descriptors>
+                        <descriptor>assembly-exe.xml</descriptor>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.legstar.cob2xsd.exe.CobolStructureToXsdMain</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+      
+                <executions>
+
+                    <!-- Generate a version properties file -->
+                    <execution>
+                        <id>generate-version</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <tasks>
+                                <ant antfile="${basedir}/src/main/ant/maven-to-version-properties.xml" />
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- Test the distribution files -->
+                    <execution>
+                        <id>test-distribution</id>
+                        <phase>verify</phase>
+                        <configuration>
+                            <tasks>
+                                <ant antfile="${basedir}/src/main/ant/test-distribution.xml" />
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+
+                </executions>
+            </plugin>
+
+            <!-- Let maven know about the location where we generate the version properties file
+                 so that it gets included in the target jar file  -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <!--
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/generated-sources/version</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                        -->
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 

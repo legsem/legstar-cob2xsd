@@ -1,0 +1,23 @@
+<!-- =================================================================================
+     This script is responsible for generating a properties file based on
+     Maven properties (versions, etc.). This properties file is used at runtime
+     to display version numbers, etc...
+ -->
+<project basedir="../../.." default="mavenToProperties" name="maven-to-properties">
+
+    <target name="mavenToProperties">
+
+        <xmlproperty file="pom.xml"/>
+        <tstamp prefix="now"/>
+        <property name="gendir" value="${basedir}/target/generated-sources/version"/>
+      
+        <!-- Generate the version.properties file with the correct version and date -->
+        <echo message="Generating version.properties version=${project.version}"/>
+        <mkdir dir="${gendir}"/>
+
+        <echo file="${gendir}/version.properties"># legstar-cob2xsd version
+version = ${project.version} (date=${now.DSTAMP}${now.TSTAMP})        
+        </echo>
+
+  </target>
+</project>

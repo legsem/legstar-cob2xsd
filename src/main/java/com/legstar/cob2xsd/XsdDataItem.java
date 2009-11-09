@@ -8,6 +8,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.legstar.cobol.model.CobolDataItem;
+import com.legstar.cobol.model.CobolDataItem.DataEntryType;
+import com.legstar.cobol.model.CobolDataItem.Range;
 import com.legstar.cobol.model.CobolDataItem.Usage;
 import com.legstar.cobol.utils.PictureUtil;
 import com.legstar.coxb.CobolType;
@@ -31,7 +33,7 @@ public class XsdDataItem {
     /** XSD simple built-in types.*/
     public enum XsdType {
         /** Maps XML Schema types.*/
-        COMPLEX, STRING, HEXBINARY, SHORT, USHORT, INT, UINT, LONG, ULONG, INTEGER, DECIMAL, FLOAT, DOUBLE
+        COMPLEX, ENUM, STRING, HEXBINARY, SHORT, USHORT, INT, UINT, LONG, ULONG, INTEGER, DECIMAL, FLOAT, DOUBLE
     };
 
     /** The parent data item or null if root. */
@@ -63,12 +65,6 @@ public class XsdDataItem {
 
     /** For xsd numeric types, the fractional digits. */
     private int _fractionDigits = -1;
-
-    /** Lower bound for a numeric. */
-    private String _minInclusive;
-
-    /** Upper bound for a numeric. */
-    private String _maxInclusive;
 
     /** Determines if a numeric item is signed or unsigned.*/
     private boolean _isSigned;
@@ -109,26 +105,60 @@ public class XsdDataItem {
 
         _cobolDataItem = cobolDataItem;
         _parent = parent;
-
         _xsdTypeName = formatTypeName(cobolDataItem, uniqueXsdTypeNames);
         _xsdElementName = Character.toLowerCase(_xsdTypeName.charAt(0))
         + _xsdTypeName.substring(1);
 
-        if (cobolDataItem.getChildren().size() > 0) {
+        switch (cobolDataItem.getDataEntryType()) {
+        case DATA_DESCRIPTION:
+            setDataDescription(cobolDataItem, context, uniqueXsdTypeNames);
+            break;
+        case RENAMES:
+           /* COBOL renames don't map to an XSD type. */
+            _log.warn("Unhandled data entry type " + cobolDataItem.toString());
+            break;
+        case CONDITION:
+            /* Will map to an enumeration facet. */
+            _xsdType = XsdType.ENUM;
+            if (context.mapConditionsToFacets() && getConditionRanges().size() > 1) {
+                _log.warn("Condition with multiple ranges cannot be mapped to enumeration facet "
+                        + cobolDataItem.toString());
+            }
+            break;
+        default:
+            _log.error("Unrecognized data entry type " + cobolDataItem.toString());
+        }
+
+
+    }
+
+    /**
+     * Setup a regular data description entry, elementary data items and groups.
+     * @param cobolDataItem the COBOL elementary data item
+     * @param context the translator options in effect
+     * @param uniqueXsdTypeNames a list of unique type names used to detect name collisions
+     */
+    protected void setDataDescription(
+            final CobolDataItem cobolDataItem,
+            final Cob2XsdContext context,
+            final List < String > uniqueXsdTypeNames) {
+
+        if (cobolDataItem.getUsage() != null) {
+            setFromUsage(cobolDataItem.getUsage());
+        }
+        if (cobolDataItem.getPicture() != null) {
+            setFromPicture(
+                    cobolDataItem.getPicture(),
+                    cobolDataItem.isSignSeparate(),
+                    context.getCurrencySymbol(),
+                    context.isNSymbolDbcs(),
+                    context.decimalPointIsComma());
+        }
+
+        /* If the xsdType is not set yet, then this is not an elementary data item.*/
+        if (_xsdType == null) {
             _xsdType = XsdType.COMPLEX;
             _cobolType = CobolType.GROUP_ITEM;
-        } else {
-            if (cobolDataItem.getUsage() != null) {
-                setFromUsage(cobolDataItem.getUsage());
-            }
-            if (cobolDataItem.getPicture() != null) {
-                setFromPicture(
-                        cobolDataItem.getPicture(),
-                        cobolDataItem.isSignSeparate(),
-                        context.getCurrencySymbol(),
-                        context.isNSymbolDbcs(),
-                        context.decimalPointIsComma());
-            }
         }
 
         /* Set XSD minOccurs/maxOccurs from COBOL. If no minOccurs set
@@ -155,13 +185,6 @@ public class XsdDataItem {
         /* Create the list of children by decorating the COBOL item children */
         for (CobolDataItem child : cobolDataItem.getChildren()) {
             _children.add(new XsdDataItem(child, context, this, uniqueXsdTypeNames));
-        }
-
-        /* This should not happen. The COBOL type was not identified */
-        if (_cobolType == null) {
-            _cobolType = CobolType.GROUP_ITEM;
-            _xsdType = XsdType.COMPLEX;
-            _log.warn("Unable to identify COBOL type for " + cobolDataItem);
         }
 
     }
@@ -418,26 +441,6 @@ public class XsdDataItem {
             _xsdType = XsdType.DECIMAL;
         }
 
-        /* For numerics with further constraints populate minInclusive
-         * and maxInclusive. */
-        if (_cobolType != CobolType.NATIVE_BINARY_ITEM) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < (_totalDigits - _fractionDigits); i++) {
-                sb.append('9');
-            }
-            if (_fractionDigits > 0) {
-                sb.append('.');
-                for (int i = 0; i < _fractionDigits; i++) {
-                    sb.append('9');
-                }
-            }
-            if (_isSigned) {
-                _minInclusive = '-' + sb.toString();
-            } else {
-                _minInclusive = "0";
-            }
-            _maxInclusive = sb.toString();
-        }
     }
 
     /**
@@ -447,16 +450,19 @@ public class XsdDataItem {
      * name is to be an NCName (non columnized name) which is a superset of valid
      * COBOL names.
      * <p/>
-     * COBOL names look ugly in XML schema though. They are often uppercased and hyphens,
-     * even if they are valid for NCNames, will have to be transformed again when the 
-     * XML schema is mapped to java.
+     * COBOL names look ugly in XML schema though. They are often uppercased and use
+     * hyphens extensively. XML schema names they will have to be transformed later
+     * to java identifiers so we try to get as close as possible to naming convention
+     * to suits XML Schema as well as Java.
+     * <p>
      * So we remove hyphens.
      * We lower case all characters which are not word breakers. Word breakers are
      * hyphens and numerics. This creates Camel style names.
-     * Complex type names customarily start with uppercase.
+     * Complex type names customarily start with an uppercase character.
      * <p/>
      * The proposed name might be conflicting with another so we disambiguate xsd type
      * names by appending the source line number.
+     * We also do that same disambiguation for all COBOL anonymous FILLER data items.
      * 
      * @param dataItem the original COBOL data item
      * @param uniqueXsdTypeNames a list of unique type names
@@ -466,6 +472,10 @@ public class XsdDataItem {
             final CobolDataItem dataItem,
             final List < String > uniqueXsdTypeNames) {
 
+        if (dataItem.getCobolName().equalsIgnoreCase("FILLER")) {
+            return "Filler" + dataItem.getSrceLine();
+        }
+        
         StringBuilder sb = new StringBuilder();
         boolean wordBreaker = true;
         for (int i = 0; i < dataItem.getCobolName().length(); i++) {
@@ -534,20 +544,6 @@ public class XsdDataItem {
      */
     public int getFractionDigits() {
         return _fractionDigits;
-    }
-
-    /**
-     * @return the Lower bound for a numeric
-     */
-    public String getMinInclusive() {
-        return _minInclusive;
-    }
-
-    /**
-     * @return the Upper bound for a numeric
-     */
-    public String getMaxInclusive() {
-        return _maxInclusive;
     }
 
     /**
@@ -714,6 +710,27 @@ public class XsdDataItem {
      */
     public int getSrceLine() {
         return _cobolDataItem.getSrceLine();
+    }
+
+    /**
+     * @return the data entry type. Could also be inferred from the level
+     */
+    public DataEntryType getDataEntryType() {
+        return _cobolDataItem.getDataEntryType();
+    }
+
+    /**
+     * @return the one or more literal values of a condition
+     */
+    public List < String > getConditionLiterals() {
+        return _cobolDataItem.getConditionLiterals();
+    }
+
+    /**
+     * @return the one or more ranges of literal values of a condition
+     */
+    public List < Range >  getConditionRanges() {
+        return _cobolDataItem.getConditionRanges();
     }
 
     /**

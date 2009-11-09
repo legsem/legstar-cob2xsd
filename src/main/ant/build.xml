@@ -1,0 +1,40 @@
+<!-- =================================================================================
+     This script generates XML Schemas from COBOL Structures.
+ -->
+<project basedir="." default="cob2xsd" name="translate-cobol-structure-to-xsd">
+
+    <!-- ===========================================================  -->
+    <!-- Setup environment
+    -->
+    <target name="init">
+    
+        <!-- Location of input COBOL source code  -->
+        <property name="cobol.dir" value="cobol"/>
+
+        <!-- Location of output XML Schemas  -->
+        <property name="xsd.dir" value="schema"/>
+        <mkdir dir="${xsd.dir}"/>
+
+        <!-- COBOL Structure to XSD translator ant task  -->
+        <taskdef name="cob2xsd"
+            classname="com.legstar.cob2xsd.task.CobolStructureToXsdTask">
+            <classpath>
+                <fileset dir="${basedir}" includes="lib/*.jar"/>
+                <pathelement location="${basedir}/conf"/>
+            </classpath>
+        </taskdef>
+    
+    </target>
+
+    <!-- ===========================================================  -->
+    <!-- Generate XML Schemas
+    -->
+    <target name="cob2xsd" depends="init">
+        <cob2xsd targetDir="${xsd.dir}">
+            <fileset dir="${cobol.dir}">
+                <include name="*.c*"/>
+            </fileset>
+        </cob2xsd>
+    </target>
+  
+</project>

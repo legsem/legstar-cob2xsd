@@ -3,7 +3,9 @@ package com.legstar.cob2xsd;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.legstar.cob2xsd.XsdDataItem.XsdType;
 import com.legstar.cobol.model.CobolDataItem;
+import com.legstar.cobol.model.CobolDataItem.DataEntryType;
 import com.legstar.cobol.model.CobolDataItem.Usage;
 
 import junit.framework.TestCase;
@@ -180,8 +182,6 @@ public class XsdDataItemTest extends TestCase {
         assertEquals("DECIMAL", mapper.getXsdType().toString());
         assertEquals(3, mapper.getTotalDigits());
         assertEquals(1, mapper.getFractionDigits());
-        assertEquals("0", mapper.getMinInclusive());
-        assertEquals("99.9", mapper.getMaxInclusive());
         assertEquals("99.9", mapper.getPicture());
 
         dataItem.setPicture("S99.9");
@@ -191,8 +191,6 @@ public class XsdDataItemTest extends TestCase {
         assertEquals("DECIMAL", mapper.getXsdType().toString());
         assertEquals(3, mapper.getTotalDigits());
         assertEquals(1, mapper.getFractionDigits());
-        assertEquals("-99.9", mapper.getMinInclusive());
-        assertEquals("99.9", mapper.getMaxInclusive());
 
         dataItem.setPicture("S999");
         dataItem.setUsage(Usage.BINARY);
@@ -201,8 +199,6 @@ public class XsdDataItemTest extends TestCase {
         assertEquals("SHORT", mapper.getXsdType().toString());
         assertEquals(3, mapper.getTotalDigits());
         assertEquals(0, mapper.getFractionDigits());
-        assertEquals("-999", mapper.getMinInclusive());
-        assertEquals("999", mapper.getMaxInclusive());
 
         dataItem.setPicture("999999999");
         dataItem.setUsage(Usage.NATIVEBINARY);
@@ -211,8 +207,6 @@ public class XsdDataItemTest extends TestCase {
         assertEquals("UINT", mapper.getXsdType().toString());
         assertEquals(9, mapper.getTotalDigits());
         assertEquals(0, mapper.getFractionDigits());
-        assertEquals(null, mapper.getMinInclusive());
-        assertEquals(null, mapper.getMaxInclusive());
 
         dataItem.setPicture("S99999999999");
         dataItem.setUsage(Usage.BINARY);
@@ -221,8 +215,6 @@ public class XsdDataItemTest extends TestCase {
         assertEquals("LONG", mapper.getXsdType().toString());
         assertEquals(11, mapper.getTotalDigits());
         assertEquals(0, mapper.getFractionDigits());
-        assertEquals("-99999999999", mapper.getMinInclusive());
-        assertEquals("99999999999", mapper.getMaxInclusive());
     }
     
     /**
@@ -303,6 +295,32 @@ public class XsdDataItemTest extends TestCase {
                 grandParent, _context, null, new ArrayList < String >());
         
         assertTrue(xsdGrandParent.getChildren().get(0).isRedefined());
+        
+    }
+
+    /**
+     * Test a RENAMES data entry.
+     */
+    public void testRenames() {
+        CobolDataItem dataItem = new CobolDataItem("COBOL-RENAME");
+        dataItem.setDataEntryType(DataEntryType.RENAMES);
+        
+        XsdDataItem xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertTrue(xsdDataItem.getXsdType() == null);
+        
+    }
+    
+    /**
+     * Test a CONDITION data entry.
+     */
+    public void testCondition() {
+        CobolDataItem dataItem = new CobolDataItem("COBOL-RENAME");
+        dataItem.setDataEntryType(DataEntryType.CONDITION);
+        
+        XsdDataItem xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(XsdType.ENUM, xsdDataItem.getXsdType());
         
     }
 }

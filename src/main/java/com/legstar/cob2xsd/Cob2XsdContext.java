@@ -1,5 +1,7 @@
 package com.legstar.cob2xsd;
 
+import java.io.File;
+
 /**
  * This class gathers execution parameters for the COBOL to XSD utility.
  *
@@ -42,6 +44,13 @@ public class Cob2XsdContext {
 
     /** JAXB appends this suffix to all generated types.*/
     private String _jaxbTypeClassesSuffix;
+    
+    /** Whether COBOL conditions (level 88) should be mapped to facets. Facets 
+     * restrict the content which might not be desirable. */
+    private boolean _mapConditionsToFacets = false;
+    
+    /** An optional XSLT transform for XML schema customization. */
+    private File _customXslt;
     
     /**
      * @return the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
@@ -140,6 +149,36 @@ public class Cob2XsdContext {
      */
     public void setTargetNamespace(final String targetNamespace) {
         _targetNamespace = targetNamespace;
+    }
+
+    /**
+     * @return whether COBOL conditions (level 88) should be mapped to facets. Facets 
+     * restrict the content which might not be desirable
+     */
+    public boolean mapConditionsToFacets() {
+        return _mapConditionsToFacets;
+    }
+
+    /**
+     * @param mapConditionsToFacets Whether COBOL conditions (level 88) should be mapped to facets. Facets 
+     * restrict the content which might not be desirable
+     */
+    public void setMapConditionsToFacets(final boolean mapConditionsToFacets) {
+        _mapConditionsToFacets = mapConditionsToFacets;
+    }
+
+    /**
+     * @return an optional XSLT transform for XML schema customization
+     */
+    public File getCustomXslt() {
+        return _customXslt;
+    }
+
+    /**
+     * @param customXslt an optional XSLT transform for XML schema customization
+     */
+    public void setCustomXslt(final File customXslt) {
+        _customXslt = customXslt;
     }
 
 

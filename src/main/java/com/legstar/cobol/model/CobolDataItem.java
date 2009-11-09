@@ -19,7 +19,7 @@ public class CobolDataItem {
     public enum DataEntryType { DATA_DESCRIPTION, RENAMES, CONDITION };
 
     /** The data entry type. Could also be inferred from the level. */
-    private DataEntryType _dataEntryType;
+    private DataEntryType _dataEntryType = DataEntryType.DATA_DESCRIPTION;
 
     /** Cobol element sharing same memory location. */
     private String _redefines;

@@ -1,0 +1,63 @@
+<!-- =================================================================================
+     This script tests the distribution file. It unzips the distro to a temporary
+     location and runs the quickstarts.
+ -->
+<project basedir="../../.." default="testDistro" name="build-sample">
+
+    <!-- ===========================================================  -->
+    <!-- Setup environment
+    -->
+    <target name="init">
+        <xmlproperty file="${basedir}/pom.xml"/>
+        
+        <property environment="env"/>
+        <!-- Temporary location  -->
+        <property name="test.dir" value="${basedir}/target/test-distro" />
+        <!-- Distribution name  -->
+        <property name="dist.name" value="legstar-pli2cob-${project.version}" />
+        <!-- Distribution zip file  -->
+        <property name="dist.zip" value="${dist.name}.zip" />
+        <!-- Distribution file location   -->
+        <property name="dist.dir" value="${basedir}/target" />
+        <!-- Distribution zip file   -->
+        <property name="zip.file" value="${dist.dir}/${dist.zip}" />
+        <!-- Sample generated XSD file full path -->
+        <property name="xsdSampleFilePath" value="${test.dir}/${dist.name}/schema/sample.xsd"/>
+    
+    </target>
+
+    <!-- ===========================================================  -->
+    <!-- Unzip distro to temporary location
+    -->
+    <target name="installDistro" depends="init">
+        <unzip src="${zip.file}" dest="${test.dir}"/>
+    </target>
+    
+    <!-- ===========================================================  -->
+    <!-- Run the sample standalone jar
+    -->
+    <target name="testStandalone" depends="installDistro">
+        <delete file="${xsdSampleFilePath}"/>
+        <exec dir="${test.dir}/${dist.name}" executable="cmd" failonerror="true">
+            <arg value="/c"/>
+            <arg value="run"/>
+        </exec>
+        <available file="${xsdSampleFilePath}" property="isFileAvail1"/>
+        <fail unless="isFileAvail1" message="Run.bat failed!"/>
+    </target>
+
+  <!-- ===========================================================  -->
+    <!-- Run the sample ant build
+    -->
+    <target name="testAnt" depends="installDistro">
+        <delete file="${xsdSampleFilePath}"/>
+        <ant antfile="build.xml" dir="${test.dir}/${dist.name}" target="cob2xsd"/>
+        <available file="${xsdSampleFilePath}" property="isFileAvail2"/>
+        <fail unless="isFileAvail2" message="Buil.xml failed!"/>
+    </target>
+
+  <!-- ===========================================================  -->
+    <!-- Run the samples
+    -->
+    <target name="testDistro" depends="testStandalone,testAnt"/>
+</project>

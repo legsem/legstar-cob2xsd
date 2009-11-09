@@ -4,8 +4,10 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaChoice;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.XmlSchemaEnumerationFacet;
 import org.apache.ws.commons.schema.XmlSchemaFractionDigitsFacet;
 import org.apache.ws.commons.schema.XmlSchemaMaxInclusiveFacet;
 import org.apache.ws.commons.schema.XmlSchemaMaxLengthFacet;
@@ -16,6 +18,9 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.XmlSchemaTotalDigitsFacet;
 import org.apache.ws.commons.schema.XmlSchemaType;
+
+import com.legstar.cobol.model.CobolDataItem.DataEntryType;
+import com.legstar.cobol.model.CobolDataItem.Range;
 
 /**
  * Populates an XML Schema from COBOL data items.
@@ -65,6 +70,9 @@ public class XsdEmitter {
      * @return a corresponding XML schema type
      */
     public XmlSchemaType createXmlSchemaType(final XsdDataItem xsdDataItem) {
+        if (xsdDataItem.getXsdType() == null) {
+            return null;
+        }
         switch (xsdDataItem.getXsdType()) {
         case COMPLEX: 
             return createXmlSchemaComplexType(xsdDataItem);
@@ -99,21 +107,53 @@ public class XsdEmitter {
 
     /**
      * Create an XML schema complex type.
+     * We want to use Named complex types so we add them to the XSD directly.
+     * We add complex types before their children because its nicer for the XSD
+     * layout to list roots before leafs.
+     * Redefined and redefining elements are grouped into an XML Schema choice.
+     * A choice is created when an element marked as isRedefined is encountered and
+     * it groups all subsequent elements marked as redefines until a non redefining
+     * element is found.
      * @param xsdDataItem COBOL data item decorated with XSD attributes
      * @return a new complex type
      */
     public XmlSchemaComplexType createXmlSchemaComplexType(final XsdDataItem xsdDataItem) {
+        XmlSchemaComplexType xmlSchemaComplexType  = new XmlSchemaComplexType(getXsd());
+        getXsd().getItems().add(xmlSchemaComplexType);
+        
+        XmlSchemaChoice xmlSchemaChoice = null;
+
         XmlSchemaSequence xmlSchemaSequence = new XmlSchemaSequence();
         for (XsdDataItem child : xsdDataItem.getChildren()) {
-            xmlSchemaSequence.getItems().add(
-                    createXmlSchemaElement(child));
+            XmlSchemaElement xmlSchemaElement = createXmlSchemaElement(child);
+            if (xmlSchemaElement != null) {
+                if (xmlSchemaChoice == null) {
+                    if (child.isRedefined()) {
+                        xmlSchemaChoice = new XmlSchemaChoice();
+                        xmlSchemaChoice.getItems().add(xmlSchemaElement);
+                    } else {
+                        xmlSchemaSequence.getItems().add(xmlSchemaElement);
+                    }
+                } else {
+                    if (child.getRedefines() != null) {
+                        xmlSchemaChoice.getItems().add(xmlSchemaElement);
+                    } else {
+                        xmlSchemaSequence.getItems().add(xmlSchemaChoice);
+                        xmlSchemaChoice = null;
+                        xmlSchemaSequence.getItems().add(xmlSchemaElement);
+                    }
+                }
+            }
         }
-        XmlSchemaComplexType xmlSchemaComplexType  = new XmlSchemaComplexType(getXsd());
+        
+        if (xmlSchemaChoice != null) {
+            xmlSchemaSequence.getItems().add(xmlSchemaChoice);
+            xmlSchemaChoice = null;
+        }
+
         xmlSchemaComplexType.setParticle(xmlSchemaSequence);
         xmlSchemaComplexType.setName(xsdDataItem.getXsdTypeName());
         
-        /* This is because we want to use Named complex types. */
-        getXsd().getItems().add(xmlSchemaComplexType);
 
         return xmlSchemaComplexType;
     }
@@ -134,9 +174,12 @@ public class XsdEmitter {
         }
         
         /* Create this element schema type, then if its a simple type
-         * set it as an anonymous type otherwise, in case of a complex type,
-         * reference the named complex type by name. */
+         * set it as an anonymous type. Otherwise, it is a named complex type,
+         * so reference it by name. */
         XmlSchemaType xmlSchemaType = createXmlSchemaType(xsdDataItem);
+        if (xmlSchemaType == null) {
+            return null;
+        }
         if (xmlSchemaType instanceof XmlSchemaSimpleType) {
             element.setSchemaType(xmlSchemaType);
         } else {
@@ -154,6 +197,7 @@ public class XsdEmitter {
      * <p/>
      * COBOL alphanumeric fields are fixed length so we create a facet to enforce that constraint.
      * A pattern derived from the picture clause can also be used as a facet.
+     * If the item has children conditions, we add enumeration facets
      * @param xsdDataItem COBOL data item decorated with XSD attributes
      * @param xsdTypeName the XML schema built-in type name to use as a restriction
      * @return an XML schema simple type
@@ -168,13 +212,14 @@ public class XsdEmitter {
         if (xsdDataItem.getPattern() != null) {
             restriction.getFacets().add(createPatternFacet(xsdDataItem.getPattern()));
         }
+        addEnumerationFacets(xsdDataItem, restriction);
         return createXmlSchemaSimpleType(restriction);
     }
-
+    
     /**
      * Create a simple type for an numeric type.
      * <p/>
-     * These fields have totaDigits and fractionDigits facets as well as minInclusive and MaxInclusive.
+     * These fields have totaDigits and fractionDigits facets.
      * @param xsdDataItem COBOL data item decorated with XSD attributes
      * @param xsdTypeName the XML schema built-in type name to use as a restriction
      * @return an XML schema simple type
@@ -190,13 +235,34 @@ public class XsdEmitter {
         if (xsdDataItem.getFractionDigits() > 0) {
             restriction.getFacets().add(createFractionDigitsFacet(xsdDataItem.getFractionDigits()));
         }
-        if (xsdDataItem.getMinInclusive() != null) {
-            restriction.getFacets().add(createMinInclusiveFacet(xsdDataItem.getMinInclusive()));
-        }
-        if (xsdDataItem.getMaxInclusive() != null) {
-            restriction.getFacets().add(createMaxInclusiveFacet(xsdDataItem.getMaxInclusive()));
-        }
+        addEnumerationFacets(xsdDataItem, restriction);
         return createXmlSchemaSimpleType(restriction);
+    }
+    
+    /**
+     * If simple type has conditions attached to it, emit enumeration facets.
+     * @param xsdDataItem COBOL data item decorated with XSD attributes
+     * @param restriction the current set of constraints
+     */
+    protected void addEnumerationFacets(
+            final XsdDataItem xsdDataItem,
+            final XmlSchemaSimpleTypeRestriction restriction) {
+        if (getContext().mapConditionsToFacets()) {
+            for (XsdDataItem child : xsdDataItem.getChildren()) {
+                if (child.getDataEntryType() == DataEntryType.CONDITION) {
+                    for (String conditionValue : child.getConditionLiterals()) {
+                        restriction.getFacets().add(
+                                createEnumerationFacet(conditionValue));
+                    }
+                    for (Range conditionRange : child.getConditionRanges()) {
+                        restriction.getFacets().add(
+                                createMinInclusiveFacet(conditionRange.getFrom()));
+                        restriction.getFacets().add(
+                                createMaxInclusiveFacet(conditionRange.getTo()));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -241,6 +307,17 @@ public class XsdEmitter {
         XmlSchemaPatternFacet xmlSchemaPatternFacet = new XmlSchemaPatternFacet();
         xmlSchemaPatternFacet.setValue(pattern);
         return xmlSchemaPatternFacet;
+    }
+
+    /**
+     * Create an XML schema enumeration facet.
+     * @param conditionValue the value to set
+     * @return an XML schema enumeration facet
+     */
+    protected XmlSchemaEnumerationFacet createEnumerationFacet(final String conditionValue) {
+        XmlSchemaEnumerationFacet xmlSchemaEnumerationFacet = new XmlSchemaEnumerationFacet();
+        xmlSchemaEnumerationFacet.setValue(conditionValue);
+        return xmlSchemaEnumerationFacet;
     }
 
     /**

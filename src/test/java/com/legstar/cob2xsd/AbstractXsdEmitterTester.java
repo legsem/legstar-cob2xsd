@@ -41,17 +41,44 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
      * Helper that emits XML schema from a COBOL data item and checks result.
      * @param expected the expected XML Schema (without the schema element for simplicity)
      * @param dataItem the COBOL data item
+     */
+    public void emitAndCheck(
+            final String expected,
+            final CobolDataItem dataItem) {
+        emitAndCheck(expected, dataItem, false, false);
+    }
+
+    /**
+     * Helper that emits XML schema from a COBOL data item and checks result.
+     * @param expected the expected XML Schema (without the schema element for simplicity)
+     * @param dataItem the COBOL data item
      * @param withLegStarAnnotations true if LegStar annotations are to be added
      */
     public void emitAndCheck(
             final String expected,
             final CobolDataItem dataItem,
             final boolean withLegStarAnnotations) {
+        emitAndCheck(expected, dataItem, withLegStarAnnotations, false);
+    }
+
+    /**
+     * Helper that emits XML schema from a COBOL data item and checks result.
+     * @param expected the expected XML Schema (without the schema element for simplicity)
+     * @param dataItem the COBOL data item
+     * @param withLegStarAnnotations true if LegStar annotations are to be added
+     * @param mapConditionsToFacets true if facets must be generated for conditions
+     */
+    public void emitAndCheck(
+            final String expected,
+            final CobolDataItem dataItem,
+            final boolean withLegStarAnnotations,
+            final boolean mapConditionsToFacets) {
         Cob2XsdContext context = new Cob2XsdContext();
         if (withLegStarAnnotations) {
             context.setAddLegStarAnnotations(true);
             context.setJaxbPackageName("com.legstar.test");
         }
+        context.setMapConditionsToFacets(mapConditionsToFacets);
         XmlSchema xsd = getXmlSchema();
         XsdEmitter emitter = new XsdEmitter(xsd, context);
         XsdDataItem xsdDataItem = new XsdDataItem(dataItem, context, null, new ArrayList < String >());

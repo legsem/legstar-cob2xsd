@@ -11,27 +11,27 @@
 package com.legstar.cob2xsd;
 
 /**
- * The COBOL source is unreadable or corrupted.
+ * The generation of the XML schema failed.
  *
  */
-public class CobolStructureLexingException extends Exception {
+public class CobolStructureToXsdException extends Exception {
 
     /**
      * A serial ID.
      */
-    private static final long serialVersionUID = -2807700761928716132L;
+    private static final long serialVersionUID = 7160263971438334834L;
 
     /**
      * @param msg the exception message
      */
-    public CobolStructureLexingException(final String msg) {
+    public CobolStructureToXsdException(final String msg) {
         super(msg);
     }
 
     /**
      * @param e the exception
      */
-    public CobolStructureLexingException(final Throwable e) {
+    public CobolStructureToXsdException(final Throwable e) {
         super(e);
     }
 }

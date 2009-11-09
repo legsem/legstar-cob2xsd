@@ -1,0 +1,76 @@
+<!--
+Assembly descriptor for the full distribution.
+-->
+<assembly>
+    <id></id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <directory>src/main/ant</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>build.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>src/test/resources</directory>
+            <outputDirectory>conf</outputDirectory>
+            <includes>
+                <include>log4j.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/cobol</directory>
+            <outputDirectory>cobol</outputDirectory>
+            <includes>
+                <include>*.*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>.</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>readme.txt</include>
+                <include>license.txt</include>
+            </includes>
+        </fileSet>
+        
+        <!-- Copy over the standalone executable jar -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>*-exe.jar</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+    
+    <files>
+        <!-- Copy command files to run standalone executable jar -->
+        <file>
+            <source>run.bat</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>run.sh</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+    </files>
+
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+            <scope>runtime</scope>
+            <!-- Only need to distribute the antlr runtime -->
+            <excludes>
+                <exclude>org.antlr:antlr</exclude>
+            </excludes>
+        </dependencySet>
+     </dependencySets>
+</assembly>
