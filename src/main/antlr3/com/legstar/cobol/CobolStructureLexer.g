@@ -113,6 +113,16 @@ INT :   '0'..'9'+
         if (lastKeyword == PICTURE_KEYWORD) {
             $type = PICTURE_PART;
         }
+        if (lastKeyword == PERIOD) {
+            int level = Integer.parseInt($text);
+            if (level == 66) {
+                $type = RENAMES_LEVEL;
+            } else if (level == 88) {
+                $type = CONDITION_LEVEL;
+            } else {
+                $type = DATA_ITEM_LEVEL;
+            }
+        }
     }
     ;
 
@@ -322,4 +332,18 @@ fragment APOST      : '\'';
 fragment
 DECIMAL_POINT 
     :  '.'
+    ;
+
+fragment
+DATA_ITEM_LEVEL
+    : ('0'..'9')('0'..'9')?
+    ;
+
+fragment
+RENAMES_LEVEL
+    : '66'
+    ;
+fragment
+CONDITION_LEVEL
+    : '88'
     ;

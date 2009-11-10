@@ -4,8 +4,8 @@
     <artifactId>legstar-cob2xsd</artifactId>
     <packaging>jar</packaging>
     <version>0.0.2-SNAPSHOT</version>
-    <name>LegStar COBOL to XSD translator</name>
-    <description>Translates COBOL structures to XML schema</description>
+    <name>LegStar COBOL to XML schema translator</name>
+    <description>Translates COBOL structures to XML schema.</description>
 
     <issueManagement>
         <system>Google Code Issue Tracking</system>

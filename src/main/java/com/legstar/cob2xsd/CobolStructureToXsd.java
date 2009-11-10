@@ -52,7 +52,11 @@ import com.legstar.cobol.model.CobolDataItem;
  * <li>Emitting XSD from the COBOL model</li>
  * <li>Optionally applying a customization XSLT to the XSD</li>
  * </ul>
- * 
+ * <p/>
+ * To invoke the translator, you normally call one of {@link #translate(String)} or
+ *  {@link #translate(File, File)} methods.
+ * <p/>
+ * All options are bundled in {@link Cob2XsdContext}.
  * 
  */
 public class CobolStructureToXsd {

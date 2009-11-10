@@ -197,8 +197,8 @@ data_description_entry
     ;
   
 data_item_level
-    :   {inRange(input.LT(1).getText(), 1, 50) || inRange(input.LT(1).getText(), 77, 77)}?=> INT
-    ->^(LEVEL INT)
+    :  DATA_ITEM_LEVEL
+    ->^(LEVEL DATA_ITEM_LEVEL)
     ;
 
 /*------------------------------------------------------------------
@@ -212,8 +212,8 @@ rename_description_entry
     ; 
 
 rename_level
-    :   {inRange(input.LT(1).getText(), 66, 66)}?=> INT
-    ->^(LEVEL INT)
+    :   RENAMES_LEVEL
+    ->^(LEVEL RENAMES_LEVEL)
     ;
 
 /*------------------------------------------------------------------
@@ -225,8 +225,8 @@ condition_description_entry
     ; 
 
 condition_level
-    :   {inRange(input.LT(1).getText(), 88, 88)}?=> INT
-    ->^(LEVEL INT)
+    :   CONDITION_LEVEL
+    ->^(LEVEL CONDITION_LEVEL)
     ;
 
 condition_name_values

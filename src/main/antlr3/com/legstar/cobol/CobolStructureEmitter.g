@@ -51,8 +51,8 @@ data_description_entry
     ;
     
 data_item_level
-    :   ^(LEVEL INT)
-        {$data_entry::dataEntry.setLevelNumber(Integer.parseInt($INT.text));}
+    :   ^(LEVEL DATA_ITEM_LEVEL)
+        {$data_entry::dataEntry.setLevelNumber(Integer.parseInt($DATA_ITEM_LEVEL.text));}
     ;
 
 data_item_name
@@ -64,10 +64,15 @@ data_item_name
  * A rename expression such as: 66 NEWN RENAMES OLD.
  *------------------------------------------------------------------*/
 rename_description_entry
-    :   ^(RENAME data_item_level data_item_name (rename_subject_literal | rename_subject_range))
+    :   ^(RENAME rename_level data_item_name (rename_subject_literal | rename_subject_range))
         {$data_entry::dataEntry.setDataEntryType(DataEntryType.RENAMES);}
     ; 
     
+rename_level
+    :   ^(LEVEL RENAMES_LEVEL)
+        {$data_entry::dataEntry.setLevelNumber(Integer.parseInt($RENAMES_LEVEL.text));}
+    ;
+
 rename_subject_literal
     :   ^(LITERAL DATA_NAME)
         {$data_entry::dataEntry.setRenamesSubject($DATA_NAME.text);}
@@ -82,9 +87,14 @@ rename_subject_range
  * A condition such as: 88 TRUE VALUE 1.
  *------------------------------------------------------------------*/
 condition_description_entry
-    :   ^(CONDITION data_item_level data_item_name (condition_subject_literal | condition_subject_range)+)
+    :   ^(CONDITION condition_level data_item_name (condition_subject_literal | condition_subject_range)+)
         {$data_entry::dataEntry.setDataEntryType(DataEntryType.CONDITION);}
     ; 
+
+condition_level
+    :   ^(LEVEL CONDITION_LEVEL)
+        {$data_entry::dataEntry.setLevelNumber(Integer.parseInt($CONDITION_LEVEL.text));}
+    ;
 
 condition_subject_literal
     :   ^(LITERAL literal)
