@@ -40,8 +40,8 @@ import com.legstar.cobol.CobolStructureParser.cobdata_return;
 import com.legstar.cobol.model.CobolDataItem;
 
 /**
- * Implements a COBOL Structure to XSD translator.
- * This is the API made available to programmatically invoke the COBOL to XSD translator.
+ * Implements a COBOL Structure to XML Schema translator.
+ * This is the API made available to programmatically invoke the COBOL to XML Schema translator.
  * <p/>
  * There are 6 steps involved:
  * <ul>
@@ -50,7 +50,7 @@ import com.legstar.cobol.model.CobolDataItem;
  * <li>Parsing keywords to extract meaningful COBOL statements</li>
  * <li>Emitting a COBOL model (a set of java classes) from the Abstract Syntax Tree</li>
  * <li>Emitting XSD from the COBOL model</li>
- * <li>Optionally applying a customization XSLT to the XSD</li>
+ * <li>Optionally applying a customization XSLT to the XML Schema</li>
  * </ul>
  * <p/>
  * To invoke the translator, you normally call one of {@link #translate(String)} or

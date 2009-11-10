@@ -3,6 +3,7 @@ package com.legstar.cob2xsd;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -88,7 +89,7 @@ public class XsdAnnotationEmitter {
             _jaxbTypeClassesSuffix = jaxbTypeClassesSuffix;
 
             InputStream is =
-                this.getClass().getResourceAsStream(ANNOTATIONS_FILE_NAME);
+                XsdAnnotationEmitter.class.getResourceAsStream(ANNOTATIONS_FILE_NAME);
             if (is == null) {
                 _log.error("Was unable to locate file " + ANNOTATIONS_FILE_NAME + " from the classpath");
             } else {
@@ -239,56 +240,55 @@ public class XsdAnnotationEmitter {
      */
     protected String resolveFigurative(final XsdDataItem xsdDataItem) {
         String value = xsdDataItem.getValues().get(0);
-        if (value.toUpperCase().matches("^ZERO(S|ES)?$")) {
+        if (value.toUpperCase(Locale.getDefault()).matches("^ZERO(S|ES)?$")) {
             return "0";
         }
 
         /* We avoid filling with spaces because this is the most common
          * initial value for large strings*/
-        if (value.toUpperCase().matches("^SPACES?$")) {
+        if (value.toUpperCase(Locale.getDefault()).matches("^SPACES?$")) {
             return "";
         }
 
-        if (value.toUpperCase().matches("^QUOTES?$")) {
+        if (value.toUpperCase(Locale.getDefault()).matches("^QUOTES?$")) {
             return "\"";
         }
-        if (value.toUpperCase().matches("^APOST$")) {
+        if (value.toUpperCase(Locale.getDefault()).matches("^APOST$")) {
             return "\'";
         }
-        
+
 
         /* For binary content, we use pseudo hexadecimal representation
          * This is understood downstream by the COBOL binder. */
-        if (value.toUpperCase().matches("^HIGH-VALUES?$")) {
+        if (value.toUpperCase(Locale.getDefault()).matches("^HIGH-VALUES?$")) {
             return fillHex("FF", xsdDataItem.getLength());
         }
-        if (value.toUpperCase().matches("^LOW-VALUES?$")) {
+        if (value.toUpperCase(Locale.getDefault()).matches("^LOW-VALUES?$")) {
             return fillHex("00", xsdDataItem.getLength());
         }
         /* Nulls are treated like low-value. */
-        if (value.toUpperCase().matches("^NULLS?$")) {
+        if (value.toUpperCase(Locale.getDefault()).matches("^NULLS?$")) {
             return fillHex("00", xsdDataItem.getLength());
         }
 
         /* All is a special case where a value is used to fill the
          * data item. That value normally follows in the values list.*/
-        if (value.toUpperCase().matches("^ALL$")) {
-            if (xsdDataItem.getValues().size() > 1) {
-                String allValue = xsdDataItem.getValues().get(1);
-                if (allValue != null && allValue.length() > 0) {
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < (xsdDataItem.getLength() / allValue.length()); i++) {
-                        sb.append(allValue);
-                    }
-                    return sb.toString();
+        if (value.toUpperCase(Locale.getDefault()).matches("^ALL$")
+                && xsdDataItem.getValues().size() > 1) {
+            String allValue = xsdDataItem.getValues().get(1);
+            if (allValue != null && allValue.length() > 0) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < (xsdDataItem.getLength() / allValue.length()); i++) {
+                    sb.append(allValue);
                 }
+                return sb.toString();
             }
         }
 
         return value;
 
     }
-    
+
     /**
      * Create a hexadecimal string representation repeating the hexByte
      * sequence the requested number of times.
@@ -307,7 +307,7 @@ public class XsdAnnotationEmitter {
         }
         return sb.toString();
     }
-    
+
 
     /**
      * Adds the JAXB and COXB namespaces and associated prefixes to the

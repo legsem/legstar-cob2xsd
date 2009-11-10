@@ -292,8 +292,7 @@ public class XsdDataItem {
             _xsdType = XsdType.STRING;
             break;
         default:
-            _cobolType = CobolType.ALPHANUMERIC_ITEM;
-            _xsdType = XsdType.STRING;
+            _log.error("Unrecognized usage clause " + toString());
         }
     }
 
@@ -766,6 +765,19 @@ public class XsdDataItem {
      */
     public void setIsRedefined(final boolean isRedefined) {
         _isRedefined = isRedefined;
+    }
+    
+    /** {@inheritDoc}*/
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append('{');
+        sb.append("typeName:" + getXsdTypeName());
+        sb.append(',');
+        sb.append("type:" + getXsdType().toString());
+        sb.append(',');
+        sb.append(_cobolDataItem.toString());
+        return sb.toString();
+        
     }
 
 }

@@ -161,28 +161,28 @@ public class CobolStructureToXsdMain {
             return false;
         }
         if (line.hasOption("targetNamespace")) {
-            setTargetNamespace(line.getOptionValue("targetNamespace").trim());
+            getContext().setTargetNamespace(line.getOptionValue("targetNamespace").trim());
         }
         if (line.hasOption("addLegStarAnnotations")) {
-            setAddLegStarAnnotations(true);
+            getContext().setAddLegStarAnnotations(true);
         }
         if (line.hasOption("mapConditionsToFacets")) {
-            setMapConditionsToFacets(true);
+            getContext().setMapConditionsToFacets(true);
         }
         if (line.hasOption("jaxbPackageName")) {
-            setJaxbPackageName(line.getOptionValue("jaxbPackageName").trim());
+            getContext().setJaxbPackageName(line.getOptionValue("jaxbPackageName").trim());
         }
         if (line.hasOption("jaxbTypeClassesSuffix")) {
-            setJaxbTypeClassesSuffix(line.getOptionValue("jaxbTypeClassesSuffix").trim());
+            getContext().setJaxbTypeClassesSuffix(line.getOptionValue("jaxbTypeClassesSuffix").trim());
         }
         if (line.hasOption("decimalPointIsComma")) {
-            setDecimalPointIsComma(true);
+            getContext().setDecimalPointIsComma(true);
         }
         if (line.hasOption("isNSymbolDbcs")) {
-            setNSymbolDbcs(true);
+            getContext().setNSymbolDbcs(true);
         }
         if (line.hasOption("currencySymbol")) {
-            setCurrencySymbol(line.getOptionValue("currencySymbol").trim().charAt(0));
+            getContext().setCurrencySymbol(line.getOptionValue("currencySymbol").trim().charAt(0));
         }
 
         if (line.hasOption("customXslt")) {
@@ -319,134 +319,5 @@ public class CobolStructureToXsdMain {
     private Cob2XsdContext getContext() {
         return _context;
     }
-
-   /**
-    * @return the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
-    */
-   public char getCurrencySymbol() {
-       return getContext().getCurrencySymbol();
-   }
-
-   /**
-    * @param currencySymbol the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
-    */
-   public void setCurrencySymbol(final char currencySymbol) {
-       getContext().setCurrencySymbol(currencySymbol);
-   }
-
-   /**
-    * @return the NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false
-    */
-   public boolean isNSymbolDbcs() {
-       return getContext().isNSymbolDbcs();
-   }
-
-   /**
-    * @param nSymbolDbcs the NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false
-    */
-   public void setNSymbolDbcs(final boolean nSymbolDbcs) {
-       getContext().setNSymbolDbcs(nSymbolDbcs);
-   }
-
-   /**
-    * @return whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)
-    */
-   public boolean decimalPointIsComma() {
-       return getContext().decimalPointIsComma();
-   }
-
-   /**
-    * @param decimalPointIsComma whether comma is the decimal point
-    *  (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)
-    */
-   public void setDecimalPointIsComma(final boolean decimalPointIsComma) {
-       getContext().setDecimalPointIsComma(decimalPointIsComma);
-   }
-
-   /**
-    * @return whether we should generate COBOL/JAXB annotations
-    */
-   public boolean addLegStarAnnotations() {
-       return getContext().addLegStarAnnotations();
-   }
-
-   /**
-    * @param addLegStarAnnotations whether we should generate COBOL/JAXB annotations
-    */
-   public void setAddLegStarAnnotations(final boolean addLegStarAnnotations) {
-       getContext().setAddLegStarAnnotations(addLegStarAnnotations);
-   }
-
-   /**
-    * @return the JAXB package name for generated Java classes
-    */
-   public String getJaxbPackageName() {
-       return getContext().getJaxbPackageName();
-   }
-
-   /**
-    * @return the JAXB type name prefix (generated JAXB class names will have this suffix)
-    */
-   public String getJaxbTypeClassesSuffix() {
-       return getContext().getJaxbTypeClassesSuffix();
-   }
-
-   /**
-    * @param jaxbPackageName the JAXB package name for generated Java classes
-    */
-   public void setJaxbPackageName(final String jaxbPackageName) {
-       getContext().setJaxbPackageName(jaxbPackageName);
-   }
-
-   /**
-    * @param jaxbTypeClassesSuffix the JAXB type name prefix (generated JAXB class names will have this suffix)
-    */
-   public void setJaxbTypeClassesSuffix(final String jaxbTypeClassesSuffix) {
-       getContext().setJaxbTypeClassesSuffix(jaxbTypeClassesSuffix);
-   }
-
-   /**
-    * @return the target namespace for generated XML schema
-    */
-   public String getTargetNamespace() {
-       return getContext().getTargetNamespace();
-   }
-
-   /**
-    * @param targetNamespace the target namespace for generated XML schema
-    */
-   public void setTargetNamespace(final String targetNamespace) {
-       getContext().setTargetNamespace(targetNamespace);
-   }
-
-   /**
-    * @return whether COBOL conditions (level 88) should be mapped to facets. Facets 
-    * restrict the content which might not be desirable
-    */
-   public boolean mapConditionsToFacets() {
-       return getContext().mapConditionsToFacets();
-   }
-
-   /**
-    * @param mapConditionsToFacets Whether COBOL conditions (level 88) should be mapped to facets. Facets 
-    * restrict the content which might not be desirable
-    */
-   public void setMapConditionsToFacets(final boolean mapConditionsToFacets) {
-       getContext().setMapConditionsToFacets(mapConditionsToFacets);
-   }
-
-   /**
-    * @return an optional XSLT transform for XML schema customization
-    */
-   public File getCustomXslt() {
-       return getContext().getCustomXslt();
-   }
-
-   /**
-    * @param customXslt an optional XSLT transform for XML schema customization
-    */
-   public void setCustomXslt(final File customXslt) {
-       getContext().setCustomXslt(customXslt);
-   }
 
 }
