@@ -13,7 +13,9 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- Change type from xsd:string to xsd:hexBinary -->
+    <!-- ===============================================================================
+        Change type from xsd:string to xsd:hexBinary and cobol type to OCTET_STREAM_ITEM
+      -->
     <xsl:template match="*/xsd:restriction[../..//cb:cobolElement/@cobolName='S-BINARY']">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
@@ -21,8 +23,16 @@
             <xsl:copy-of select="node()"/>
         </xsl:copy>
     </xsl:template>
+    <xsl:template match="*/cb:cobolElement[@cobolName='S-BINARY']">
+        <xsl:copy>
+            <xsl:copy-of select="@*"/>
+            <xsl:attribute name="type">OCTET_STREAM_ITEM</xsl:attribute>
+        </xsl:copy>
+    </xsl:template>
 
-    <!--  Select a custom choice strategy for unmarshaling -->
+    <!-- ===============================================================================
+        Select a custom choice strategy for unmarshaling
+      -->
     <xsl:template match="*/cb:cobolElement[@cobolName='LS-FILES-DATA']">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
@@ -30,7 +40,9 @@
         </xsl:copy>
     </xsl:template>
 
-    <!--  Flag an element as a custom variable (made available to custom choice strategies ) -->
+    <!-- ===============================================================================
+        Flag an element as a custom variable (made available to custom choice strategies)
+      -->
     <xsl:template match="*/cb:cobolElement[@cobolName='LS-REQUEST-TYPE']">
         <xsl:copy>
             <xsl:copy-of select="@*"/>

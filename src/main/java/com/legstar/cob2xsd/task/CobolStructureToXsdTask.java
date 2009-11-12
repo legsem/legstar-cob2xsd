@@ -272,6 +272,23 @@ public class CobolStructureToXsdTask extends Task {
     }
 
     /**
+     * @return true if XSD element names should start with an uppercase 
+     * (compatible with LegStar 1.2)
+     */
+    public boolean elementNamesStartWithUppercase() {
+        return getContext().elementNamesStartWithUppercase();
+    }
+
+    /**
+     * @param elementNamesStartWithUppercase true if XSD element names should start with an uppercase 
+     * (compatible with LegStar 1.2)
+     */
+    public void setElementNamesStartWithUppercase(
+            final boolean elementNamesStartWithUppercase) {
+        getContext().setElementNamesStartWithUppercase(elementNamesStartWithUppercase);
+    }
+
+    /**
      * @return a new FileSet
      */
     public FileSet createFileset() {

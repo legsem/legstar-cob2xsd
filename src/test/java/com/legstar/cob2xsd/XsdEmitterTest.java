@@ -78,7 +78,6 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
                 + "<element name=\"num1\">"
                 + "<simpleType>"
                 + "<restriction base=\"unsignedShort\">"
-                + "<totalDigits value=\"2\"/>"
                 + "</restriction>"
                 + "</simpleType>"
                 + "</element>"
@@ -156,14 +155,14 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
      */
     public void testUnsignedLong() {
         CobolDataItem struct = new CobolDataItem();
-        struct.getChildren().add(getACobolElementaryItem("NUM1", "9(12)", Usage.NATIVEBINARY));
+        struct.getChildren().add(getACobolElementaryItem("NUM1", "9(12)", Usage.BINARY));
         emitAndCheck(
                 "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"num1\">"
                 + "<simpleType>"
                 + "<restriction base=\"unsignedLong\">"
-                + "<totalDigits value=\"12\"/>"
+                + "<maxInclusive value=\"999999999999\"/>"
                 + "</restriction>"
                 + "</simpleType>"
                 + "</element>"

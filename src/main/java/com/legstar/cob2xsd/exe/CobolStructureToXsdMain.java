@@ -105,9 +105,16 @@ public class CobolStructureToXsdMain {
         "folder receiving the translated XML schema");
         options.addOption(output);
 
+        /* -------------------------------------------------------------------
+         * XML Schema related options
+         * */
         Option targetNamespace = new Option("t", "targetNamespace", true,
         "Target namespace for generated XML schema");
         options.addOption(targetNamespace);
+
+        Option elementNamesStartWithUppercase = new Option("u", "elementNamesStartWithUppercase", false,
+        "Whether XSD element names should start with an uppercase (compatible with LegStar 1.2)");
+        options.addOption(elementNamesStartWithUppercase);
 
         Option mapConditionsToFacets = new Option("m", "mapConditionsToFacets", false,
                 "Whether COBOL conditions (level 88) should be mapped to facets."
@@ -119,6 +126,13 @@ public class CobolStructureToXsdMain {
                 + " (otherwise, the COBOL source line will be appended)");
         options.addOption(nameConflictPrependParentName);
 
+        Option customXslt = new Option("x", "customXslt", true,
+        "Optional XSLT transform stylesheet for XML schema customization");
+        options.addOption(customXslt);
+
+        /* -------------------------------------------------------------------
+         * LegStar annotations related options
+         * */
         Option addLegStarAnnotations = new Option("a", "addLegStarAnnotations", false,
         "Whether we should generate COBOL/JAXB annotations");
         options.addOption(addLegStarAnnotations);
@@ -131,21 +145,24 @@ public class CobolStructureToXsdMain {
         "The JAXB type name prefix (generated JAXB class names will have this suffix)");
         options.addOption(jaxbTypeClassesSuffix);
 
+        /* -------------------------------------------------------------------
+         * COBOL compiler related options
+         * */
         Option decimalPointIsComma = new Option("decimalPointIsComma",
         "Whether COBOL comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)");
         options.addOption(decimalPointIsComma);
-
-        Option isNSymbolDbcs = new Option("isNSymbolDbcs",
-        "The COBOL NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false");
-        options.addOption(isNSymbolDbcs);
 
         Option currencySymbol = new Option("currencySymbol", true,
         "The COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)");
         options.addOption(currencySymbol);
 
-        Option customXslt = new Option("x", "customXslt", true,
-        "Optional XSLT transform stylesheet for XML schema customization");
-        options.addOption(customXslt);
+        Option isNSymbolDbcs = new Option("isNSymbolDbcs",
+        "The COBOL NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false");
+        options.addOption(isNSymbolDbcs);
+
+        Option quoteIsQuote = new Option("quoteIsQuote",
+        "The COBOL QUOTE|APOST compiler option. False means APOST");
+        options.addOption(quoteIsQuote);
 
         return options;
     }
@@ -165,42 +182,6 @@ public class CobolStructureToXsdMain {
             produceHelp(options);
             return false;
         }
-        if (line.hasOption("targetNamespace")) {
-            getContext().setTargetNamespace(line.getOptionValue("targetNamespace").trim());
-        }
-        if (line.hasOption("addLegStarAnnotations")) {
-            getContext().setAddLegStarAnnotations(true);
-        }
-        if (line.hasOption("nameConflictPrependParentName")) {
-            getContext().setNameConflictPrependParentName(true);
-        }
-        if (line.hasOption("mapConditionsToFacets")) {
-            getContext().setMapConditionsToFacets(true);
-        }
-        if (line.hasOption("jaxbPackageName")) {
-            getContext().setJaxbPackageName(line.getOptionValue("jaxbPackageName").trim());
-        }
-        if (line.hasOption("jaxbTypeClassesSuffix")) {
-            getContext().setJaxbTypeClassesSuffix(line.getOptionValue("jaxbTypeClassesSuffix").trim());
-        }
-        if (line.hasOption("decimalPointIsComma")) {
-            getContext().setDecimalPointIsComma(true);
-        }
-        if (line.hasOption("isNSymbolDbcs")) {
-            getContext().setNSymbolDbcs(true);
-        }
-        if (line.hasOption("currencySymbol")) {
-            getContext().setCurrencySymbol(line.getOptionValue("currencySymbol").trim().charAt(0));
-        }
-
-        if (line.hasOption("customXslt")) {
-            String customXslt = line.getOptionValue("customXslt").trim();
-            File customXsltFile = new File(customXslt);
-            if (!customXsltFile.exists() || !customXsltFile.isFile()) {
-                return false;
-            }
-        }
-
         if (line.hasOption("input")) {
             String input = line.getOptionValue("input").trim();
             if (!setInput(input)) {
@@ -213,6 +194,59 @@ public class CobolStructureToXsdMain {
                 return false;
             }
         }
+        /* -------------------------------------------------------------------
+         * XML Schema related options
+         * */
+        if (line.hasOption("targetNamespace")) {
+            getContext().setTargetNamespace(line.getOptionValue("targetNamespace").trim());
+        }
+        if (line.hasOption("addLegStarAnnotations")) {
+            getContext().setAddLegStarAnnotations(true);
+        }
+        if (line.hasOption("elementNamesStartWithUppercase")) {
+            getContext().setElementNamesStartWithUppercase(true);
+        }
+        if (line.hasOption("mapConditionsToFacets")) {
+            getContext().setMapConditionsToFacets(true);
+        }
+        if (line.hasOption("customXslt")) {
+            String customXslt = line.getOptionValue("customXslt").trim();
+            File customXsltFile = new File(customXslt);
+            if (!customXsltFile.exists() || !customXsltFile.isFile()) {
+                return false;
+            }
+        }
+
+
+        /* -------------------------------------------------------------------
+         * LegStar annotations related options
+         * */
+        if (line.hasOption("nameConflictPrependParentName")) {
+            getContext().setNameConflictPrependParentName(true);
+        }
+        if (line.hasOption("jaxbPackageName")) {
+            getContext().setJaxbPackageName(line.getOptionValue("jaxbPackageName").trim());
+        }
+        if (line.hasOption("jaxbTypeClassesSuffix")) {
+            getContext().setJaxbTypeClassesSuffix(line.getOptionValue("jaxbTypeClassesSuffix").trim());
+        }
+
+        /* -------------------------------------------------------------------
+         * COBOL compiler related options
+         * */
+        if (line.hasOption("decimalPointIsComma")) {
+            getContext().setDecimalPointIsComma(true);
+        }
+        if (line.hasOption("currencySymbol")) {
+            getContext().setCurrencySymbol(line.getOptionValue("currencySymbol").trim().charAt(0));
+        }
+        if (line.hasOption("isNSymbolDbcs")) {
+            getContext().setNSymbolDbcs(true);
+        }
+        if (line.hasOption("quoteIsQuote")) {
+            getContext().setQuoteIsQuote(true);
+        }
+
         return true;
     }
 

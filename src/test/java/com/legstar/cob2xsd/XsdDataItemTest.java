@@ -23,14 +23,18 @@ public class XsdDataItemTest extends TestCase {
      * Test XML element name derived from COBOL name.
      */
     public void testFormatElementName() {
+        Cob2XsdContext context = new Cob2XsdContext();
 
-        assertEquals("", XsdDataItem.formatElementName(new CobolDataItem("")));
-        assertEquals("a", XsdDataItem.formatElementName(new CobolDataItem("A")));
-        assertEquals("ab", XsdDataItem.formatElementName(new CobolDataItem("AB")));
-        assertEquals("ab9C", XsdDataItem.formatElementName(new CobolDataItem("AB9C")));
-        assertEquals("ab9Cd", XsdDataItem.formatElementName(new CobolDataItem("AB9CD")));
-        assertEquals("ab9CdE", XsdDataItem.formatElementName(new CobolDataItem("AB9CD-E")));
-        assertEquals("ab9CdEf", XsdDataItem.formatElementName(new CobolDataItem("AB9CD-EF")));
+        assertEquals("", XsdDataItem.formatElementName(new CobolDataItem(""), context));
+        assertEquals("a", XsdDataItem.formatElementName(new CobolDataItem("A"), context));
+        assertEquals("ab", XsdDataItem.formatElementName(new CobolDataItem("AB"), context));
+        assertEquals("ab9C", XsdDataItem.formatElementName(new CobolDataItem("AB9C"), context));
+        assertEquals("ab9Cd", XsdDataItem.formatElementName(new CobolDataItem("AB9CD"), context));
+        assertEquals("ab9CdE", XsdDataItem.formatElementName(new CobolDataItem("AB9CD-E"), context));
+        assertEquals("ab9CdEf", XsdDataItem.formatElementName(new CobolDataItem("AB9CD-EF"), context));
+        
+        context.setElementNamesStartWithUppercase(true);
+        assertEquals("Ab9CdEf", XsdDataItem.formatElementName(new CobolDataItem("AB9CD-EF"), context));
 
     }
 
@@ -40,19 +44,22 @@ public class XsdDataItemTest extends TestCase {
     public void testFormatTypeName() {
 
         List < String > nonUniqueCobolNames = new ArrayList < String >();
+        Cob2XsdContext context = new Cob2XsdContext();
 
         /* Test name conflict resolution (append srce line) */
         nonUniqueCobolNames.add("AB9CD-EF");
         CobolDataItem cobolDataItem = new CobolDataItem("AB9CD-EF");
         cobolDataItem.setSrceLine(18);
         assertEquals("Ab9CdEf18", XsdDataItem.formatTypeName(
-                "ab9CdEf", cobolDataItem, nonUniqueCobolNames, false, null));
+                "ab9CdEf", cobolDataItem, nonUniqueCobolNames, context, null));
 
         /* Test name conflict resolution (prepend parent type name) */
+        context.setNameConflictPrependParentName(true);
+        
         CobolDataItem cobolParent = new CobolDataItem("COBOL-PARENT");
         XsdDataItem xsdParent = new XsdDataItem(cobolParent, _context, null, nonUniqueCobolNames);
         assertEquals("CobolParentAb9CdEf", XsdDataItem.formatTypeName(
-                "ab9CdEf", cobolDataItem, nonUniqueCobolNames, true, xsdParent));
+                "ab9CdEf", cobolDataItem, nonUniqueCobolNames, context, xsdParent));
     }
 
     /**

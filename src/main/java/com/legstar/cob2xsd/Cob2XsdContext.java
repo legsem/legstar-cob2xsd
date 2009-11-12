@@ -8,30 +8,15 @@ import java.io.File;
  */
 public class Cob2XsdContext {
 
-    /** Default Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
-    public static final char DEFAULT_CURRENCY_SYMBOL = '$';
-
-    /** Default NSYMBOL(DBCS) COBOL compiler option. */
-    public static final boolean DEFAULT_NSYMBOLDBCS = false;
-
-    /** Default Whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES). */
-    public static final boolean DEFAULT_DECIMALPOINTISCOMMA = false;
-    
     /** Default target namespace. */
     public static final String DEFAULT_TARGET_NAMESPACE = "http://www.acme.com/test";
 
     /** Default JAXB package name. */
     public static final String DEFAULT_JAXB_PACKAGE_NAME = "com.acme.test";
     
+    /** Default Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
+    public static final char DEFAULT_CURRENCY_SYMBOL = '$';
 
-    /** Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
-    private char _currencySymbol = DEFAULT_CURRENCY_SYMBOL;
-    
-    /** NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false.*/
-    private boolean _nSymbolDbcs = DEFAULT_NSYMBOLDBCS;
-    
-    /** Whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES). */
-    private boolean _decimalPointIsComma = DEFAULT_DECIMALPOINTISCOMMA;
 
     /** Target namespace for generated XML schema.*/
     private String _targetNamespace = DEFAULT_TARGET_NAMESPACE;
@@ -54,7 +39,23 @@ public class Cob2XsdContext {
     
     /** True if parent complex type name should be prepended in case of name conflict
      * (otherwise, the COBOL source line will be appended). */
-    private boolean _nameConflictPrependParentName;
+    private boolean _nameConflictPrependParentName = false;
+    
+    /** True if XSD element names should start with an uppercase 
+     * (compatible with LegStar 1.2).*/
+    private boolean _elementNamesStartWithUppercase = false;
+    
+    /** Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
+    private char _currencySymbol = DEFAULT_CURRENCY_SYMBOL;
+    
+    /** Whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES). */
+    private boolean _decimalPointIsComma = false;
+
+    /** COBOL NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false.*/
+    private boolean _nSymbolDbcs = false;
+    
+    /** COBOL QUOTE|APOST compiler option. False means APOST.*/
+    private boolean _quoteIsQuote = true;
     
     /**
      * @return the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
@@ -200,6 +201,37 @@ public class Cob2XsdContext {
     public void setNameConflictPrependParentName(
             final boolean nameConflictPrependParentName) {
         _nameConflictPrependParentName = nameConflictPrependParentName;
+    }
+
+    /**
+     * @return true if XSD element names should start with an uppercase 
+     * (compatible with LegStar 1.2)
+     */
+    public boolean elementNamesStartWithUppercase() {
+        return _elementNamesStartWithUppercase;
+    }
+
+    /**
+     * @param elementNamesStartWithUppercase true if XSD element names should start with an uppercase 
+     * (compatible with LegStar 1.2)
+     */
+    public void setElementNamesStartWithUppercase(
+            final boolean elementNamesStartWithUppercase) {
+        _elementNamesStartWithUppercase = elementNamesStartWithUppercase;
+    }
+
+    /**
+     * @return the COBOL QUOTE|APOST compiler option. False means APOST
+     */
+    public boolean quoteIsQuote() {
+        return _quoteIsQuote;
+    }
+
+    /**
+     * @param quoteIsQuote the COBOL QUOTE|APOST compiler option. False means APOST
+     */
+    public void setQuoteIsQuote(final boolean quoteIsQuote) {
+        _quoteIsQuote = quoteIsQuote;
     }
 
 

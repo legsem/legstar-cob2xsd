@@ -105,10 +105,9 @@ public class XsdDataItem {
 
         _cobolDataItem = cobolDataItem;
         _parent = parent;
-        _xsdElementName = formatElementName(cobolDataItem);
-        _xsdTypeName = formatTypeName(
-                _xsdElementName, cobolDataItem, nonUniqueCobolNames,
-                context.nameConflictPrependParentName(), parent);
+        _xsdElementName = formatElementName(cobolDataItem, context);
+        _xsdTypeName = formatTypeName(_xsdElementName, cobolDataItem,
+                nonUniqueCobolNames, context, parent);
 
         switch (cobolDataItem.getDataEntryType()) {
         case DATA_DESCRIPTION:
@@ -458,8 +457,7 @@ public class XsdDataItem {
      * @param cobolDataItem the COBOL data item
      * @param elementName the element name built from the COBOL name
      * @param nonUniqueCobolNames a list of non unique COBOL names
-     * @param nameConflictPrependParentName true if parent name should be prepended in case
-     *  of name conflict (otherwise, the COBOL source line will be appended).
+     * @param context the translator options
      * @param parent used to resolve potential name conflict
      * @return a nice XML type name
      */
@@ -467,7 +465,7 @@ public class XsdDataItem {
             final String elementName,
             final CobolDataItem cobolDataItem,
             final List < String > nonUniqueCobolNames,
-            final boolean nameConflictPrependParentName,
+            final Cob2XsdContext context,
             final XsdDataItem parent) {
 
         StringBuilder sb = new StringBuilder();
@@ -475,7 +473,7 @@ public class XsdDataItem {
         sb.append(elementName.substring(1));
         
         if (nonUniqueCobolNames.contains(cobolDataItem.getCobolName())) {
-            if (nameConflictPrependParentName) {
+            if (context.nameConflictPrependParentName()) {
                 if (parent != null) {
                     sb.insert(0, parent.getXsdTypeName());
                 }
@@ -508,9 +506,12 @@ public class XsdDataItem {
      * same parent group. So what we do is systematically append the COBOL source line
      * number so that these become unique names.
      * @param cobolDataItem the original COBOL data item
+     * @param context the translator options
      * @return an XML schema element name
      */
-    public static String formatElementName(final CobolDataItem cobolDataItem) {
+    public static String formatElementName(
+            final CobolDataItem cobolDataItem,
+            final Cob2XsdContext context) {
         
         String cobolName = cobolDataItem.getCobolName();
         if (cobolName.equalsIgnoreCase("FILLER")) {
@@ -518,7 +519,7 @@ public class XsdDataItem {
         }
         
         StringBuilder sb = new StringBuilder();
-        boolean wordBreaker = false;
+        boolean wordBreaker = (context.elementNamesStartWithUppercase()) ? true : false;
         for (int i = 0; i < cobolName.length(); i++) {
             char c = cobolName.charAt(i);
             if (c != '-') {

@@ -58,11 +58,8 @@ public class XsdAnnotationEmitter {
     /** True if properly initialized.*/
     private boolean _initialized = false;
 
-    /** The JAXB package name (appears in schema annotations).*/
-    private String _jaxbPackageName;
-
-    /** JAXB appends this suffix to all generated types.*/
-    private String _jaxbTypeClassesSuffix;
+    /** The translator options in effect.*/
+    private Cob2XsdContext _context;
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
@@ -75,17 +72,14 @@ public class XsdAnnotationEmitter {
      * no exceptions are raised. Rather, the class disables itself and no annotations
      * are produced.
      * @param xsd the XML Schema to be populated.
-     * @param jaxbPackageName JAXB generates all classes in that package
-     * @param jaxbTypeClassesSuffix JAXB appends this suffix to all generated types
+     * @param context the translator options in effect
      */
     public XsdAnnotationEmitter(
             final XmlSchema xsd,
-            final String jaxbPackageName,
-            final String jaxbTypeClassesSuffix) {
+            final Cob2XsdContext context) {
         try {
             _xsd = xsd;
-            _jaxbPackageName = jaxbPackageName;
-            _jaxbTypeClassesSuffix = jaxbTypeClassesSuffix;
+            _context = context;
 
             InputStream is =
                 XsdAnnotationEmitter.class.getResourceAsStream(ANNOTATIONS_FILE_NAME);
@@ -225,18 +219,55 @@ public class XsdAnnotationEmitter {
      * @return a value suitable for XML
      */
     protected String cleanValue(final XsdDataItem xsdDataItem) {
-        return resolveFigurative(xsdDataItem);
+
+        String value = xsdDataItem.getValues().get(0);
+        if (value == null) {
+            return null;
+        }
+
+        String resolved = resolveFigurative(value, xsdDataItem.getLength());
+        if (resolved != null) {
+            return resolved;
+        }
+
+        /* 
+         * All is a special case where a value is used to fill the
+         * data item. That value normally follows in the values list.
+         * The following value can also be a figurative constant.
+         */
+        if (value.toUpperCase(Locale.getDefault()).matches("^ALL$")
+                && xsdDataItem.getValues().size() > 1) {
+            String allValue = xsdDataItem.getValues().get(1);
+            resolved = resolveFigurative(allValue, xsdDataItem.getLength());
+            allValue = (resolved != null) ? resolved : allValue;
+            if (allValue != null && allValue.length() > 0) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < (xsdDataItem.getLength() / allValue.length()); i++) {
+                    sb.append(allValue);
+                }
+                return sb.toString();
+            }
+        }
+
+        /* This is not a figurative constant. Just make sure there are no
+         * delimiters left.*/
+        return stripDelimiters(value);
     }
 
     /**
-     * COBOL figurative constants are translated to values that will
-     * be used by the COBOL binder downstream to initialize fields.
-     * @param xsdDataItem COBOL data item decorated with XSD attributes
-     * @return a translated value or the value itself if it is not a
-     *  figurative constant
+     * Translate individual figurative constants.
+     * @param value a potential figurative constant value
+     * @param length the target data item length
+     * @return a translated value or null if it is not a  figurative constant
      */
-    protected String resolveFigurative(final XsdDataItem xsdDataItem) {
-        String value = xsdDataItem.getValues().get(0);
+    protected String resolveFigurative(
+            final String value,
+            final int length) {
+
+        if (value == null) {
+            return value;
+        }
+
         if (value.toUpperCase(Locale.getDefault()).matches("^ZERO(S|ES)?$")) {
             return "0";
         }
@@ -248,41 +279,26 @@ public class XsdAnnotationEmitter {
         }
 
         if (value.toUpperCase(Locale.getDefault()).matches("^QUOTES?$")) {
-            return "\"";
+            return getContext().quoteIsQuote() ? "\"" : "\'";
         }
         if (value.toUpperCase(Locale.getDefault()).matches("^APOST$")) {
             return "\'";
         }
 
-
         /* For binary content, we use pseudo hexadecimal representation
          * This is understood downstream by the COBOL binder. */
         if (value.toUpperCase(Locale.getDefault()).matches("^HIGH-VALUES?$")) {
-            return fillHex("FF", xsdDataItem.getLength());
+            return fillHex("FF", length);
         }
         if (value.toUpperCase(Locale.getDefault()).matches("^LOW-VALUES?$")) {
-            return fillHex("00", xsdDataItem.getLength());
+            return fillHex("00", length);
         }
         /* Nulls are treated like low-value. */
         if (value.toUpperCase(Locale.getDefault()).matches("^NULLS?$")) {
-            return fillHex("00", xsdDataItem.getLength());
+            return fillHex("00", length);
         }
 
-        /* All is a special case where a value is used to fill the
-         * data item. That value normally follows in the values list.*/
-        if (value.toUpperCase(Locale.getDefault()).matches("^ALL$")
-                && xsdDataItem.getValues().size() > 1) {
-            String allValue = xsdDataItem.getValues().get(1);
-            if (allValue != null && allValue.length() > 0) {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < (xsdDataItem.getLength() / allValue.length()); i++) {
-                    sb.append(allValue);
-                }
-                return sb.toString();
-            }
-        }
-
-        return value;
+        return null;
 
     }
 
@@ -305,6 +321,26 @@ public class XsdAnnotationEmitter {
         return sb.toString();
     }
 
+
+    /**
+     * The parser does not strip delimiters from literal strings so we
+     * do it here if necessary.
+     * @param value a potential literal string
+     * @return the literal without delimiters
+     */
+    protected String stripDelimiters(final String value) {
+        if (value != null && value.length() > 1) {
+            if (value.charAt(0) == value.charAt(value.length() - 1)
+                    && (value.charAt(0) == '\'')) {
+                return value.substring(1, value.length() - 1);
+            }
+            if (value.charAt(0) == value.charAt(value.length() - 1)
+                    && (value.charAt(0) == '\"')) {
+                return value.substring(1, value.length() - 1);
+            }
+        }
+        return value;
+    }
 
     /**
      * Adds the JAXB and COXB namespaces and associated prefixes to the
@@ -368,13 +404,13 @@ public class XsdAnnotationEmitter {
         Element el = doc.createElementNS(getJAXBNamespace(), getJAXBElementsElement());
         Element elsb = doc.createElementNS(getJAXBNamespace(), getJAXBSchemaBindingsElement());
         Element elpk = doc.createElementNS(getJAXBNamespace(), getJAXBPackageElement());
-        elpk.setAttribute(getJAXBPackageNameAttribute(), getJaxbPackageName());
+        elpk.setAttribute(getJAXBPackageNameAttribute(), getContext().getJaxbPackageName());
         elsb.appendChild(elpk);
 
-        if (getJaxbTypeClassesSuffix() != null) {
+        if (getContext().getJaxbTypeClassesSuffix() != null) {
             Element eltr = doc.createElementNS(getJAXBNamespace(), getJAXBNameXmlTransformElement());
             Element eltn = doc.createElementNS(getJAXBNamespace(), getJAXBTypeNameElement());
-            eltn.setAttribute(getJAXBTypeNameSuffixAttribute(), getJaxbTypeClassesSuffix());
+            eltn.setAttribute(getJAXBTypeNameSuffixAttribute(), getContext().getJaxbTypeClassesSuffix());
             eltr.appendChild(eltn);
             elsb.appendChild(eltr);
         }
@@ -508,24 +544,17 @@ public class XsdAnnotationEmitter {
     }
 
     /**
-     * @return the JAXB package name (appears in schema annotations)
-     */
-    public String getJaxbPackageName() {
-        return _jaxbPackageName;
-    }
-
-    /**
-     * @return the suffix that JAXB appends to all generated types
-     */
-    public String getJaxbTypeClassesSuffix() {
-        return _jaxbTypeClassesSuffix;
-    }
-
-    /**
      * @return the XML Schema being built
      */
     public XmlSchema getXsd() {
         return _xsd;
+    }
+
+    /**
+     * @return the translator options in effect
+     */
+    public Cob2XsdContext getContext() {
+        return _context;
     }
 
 }

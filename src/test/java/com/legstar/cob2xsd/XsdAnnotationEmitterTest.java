@@ -19,8 +19,10 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
      * Check that we load the annotations properly.
      */
     public void testInstantiation() {
+        Cob2XsdContext context = new Cob2XsdContext();
+        context.setJaxbPackageName("jaxb.package.name");
         XmlSchema xsd = getXmlSchema();
-        new XsdAnnotationEmitter(xsd, "jaxb.package.name", null);
+        new XsdAnnotationEmitter(xsd, context);
         check(
                 "<annotation>"
                 + "<appinfo>"
@@ -36,8 +38,11 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
      * Test with a JAXB type suffix parameter.
      */
     public void testInstantiationWithTypeSuffix() {
+        Cob2XsdContext context = new Cob2XsdContext();
+        context.setJaxbPackageName("jaxb.package.name");
+        context.setJaxbTypeClassesSuffix("Type");
         XmlSchema xsd = getXmlSchema();
-        new XsdAnnotationEmitter(xsd, "jaxb.package.name", "Type");
+        new XsdAnnotationEmitter(xsd, context);
         check(
                 "<annotation>"
                 + "<appinfo>"
@@ -351,6 +356,22 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     }
 
     /**
+     * Test an item with value ALL applied to a figurative constant.
+     */
+    public void testValueALLFigurative() {
+        CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
+        dataItem.setPicture("X(3)");
+        dataItem.addValue("ALL");
+        dataItem.addValue("QUOTE");
+        emitAnnotationAndCheck(dataItem,
+                "<cb:cobolElement cobolName=\"COBOL-NAME\""
+                + " levelNumber=\"1\""
+                + " picture=\"X(3)\""
+                + " value=\"&quot;&quot;&quot;\""
+                + " type=\"ALPHANUMERIC_ITEM\""
+                + "/>");
+    }
+    /**
      * Test an item with a numeric.
      */
     public void testValueNumeric() {
@@ -369,7 +390,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     /**
      * Test an item with a alpha escaped.
      */
-    public void testValueEspcaped() {
+    public void testValueEscaped() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setPicture("X(3)");
         dataItem.addValue("<A>");
@@ -378,6 +399,22 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
                 + " levelNumber=\"1\""
                 + " picture=\"X(3)\""
                 + " value=\"&lt;A&gt;\""
+                + " type=\"ALPHANUMERIC_ITEM\""
+                + "/>");
+    }
+
+    /**
+     * Test an item with a value that is a delimited literal.
+     */
+    public void testValueDelimitedLiteral() {
+        CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
+        dataItem.setPicture("X(3)");
+        dataItem.addValue("\"ABD\"");
+        emitAnnotationAndCheck(dataItem,
+                "<cb:cobolElement cobolName=\"COBOL-NAME\""
+                + " levelNumber=\"1\""
+                + " picture=\"X(3)\""
+                + " value=\"ABD\""
                 + " type=\"ALPHANUMERIC_ITEM\""
                 + "/>");
     }
@@ -391,8 +428,9 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     private void emitAnnotationAndCheck(final CobolDataItem dataItem, final String expected) {
         Cob2XsdContext context = new Cob2XsdContext();
         context.setAddLegStarAnnotations(true);
+        context.setJaxbPackageName("jaxb.package.name");
         XmlSchema xsd = getXmlSchema();
-        XsdAnnotationEmitter emitter = new XsdAnnotationEmitter(xsd, "jaxb.package.name", null);
+        XsdAnnotationEmitter emitter = new XsdAnnotationEmitter(xsd, context);
         XsdDataItem xsdDataItem = new XsdDataItem(
                 dataItem, context, null, new ArrayList < String >());
         XmlSchemaAnnotation annotation = emitter.createLegStarAnnotation(xsdDataItem);

@@ -22,6 +22,7 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 import com.legstar.cob2xsd.XsdDataItem.XsdType;
 import com.legstar.cobol.model.CobolDataItem.DataEntryType;
 import com.legstar.cobol.model.CobolDataItem.Range;
+import com.legstar.coxb.CobolType;
 
 /**
  * Populates an XML Schema from COBOL data items.
@@ -54,10 +55,7 @@ public class XsdEmitter {
         _xsd = xsd;
         _context = context;
         if (_context.addLegStarAnnotations()) {
-            _annotationEmitter = new XsdAnnotationEmitter(
-                    xsd,
-                    _context.getJaxbPackageName(),
-                    _context.getJaxbTypeClassesSuffix());
+            _annotationEmitter = new XsdAnnotationEmitter(xsd, context);
         }
     }
 
@@ -220,7 +218,8 @@ public class XsdEmitter {
     /**
      * Create a simple type for an numeric type.
      * <p/>
-     * These fields have totaDigits and fractionDigits facets.
+     * Numeric elements might have totaDigits, fractionDigits, minInclusive or
+     * maxInclusive facets.
      * @param xsdDataItem COBOL data item decorated with XSD attributes
      * @param xsdTypeName the XML schema built-in type name to use as a restriction
      * @return an XML schema simple type
@@ -229,13 +228,31 @@ public class XsdEmitter {
             final XsdDataItem xsdDataItem, final String xsdTypeName) {
 
         XmlSchemaSimpleTypeRestriction restriction = createRestriction(xsdTypeName);
-        if (xsdDataItem.getTotalDigits() > -1) {
-            restriction.getFacets().add(createTotalDigitsFacet(xsdDataItem.getTotalDigits()));
+
+        /* COBOL native binary are special because even though they have a
+         * totalDigits attribute, it is not used enforce a restriction. */
+        if (xsdDataItem.getCobolType() != CobolType.NATIVE_BINARY_ITEM
+                && xsdDataItem.getTotalDigits() > -1) {
+
+            /* Due to a bug in JAXB (see JAXB issue 715), unsignedLong may end up
+             * being mapped to BigInteger instead of Long when totalDigits is
+             * used instead of maxInclusive. So for now, we keep maxInclusive. */
+            if (xsdDataItem.getXsdType() == XsdType.ULONG) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < xsdDataItem.getTotalDigits(); i++) {
+                    sb.append("9");
+                }
+                restriction.getFacets().add(createMaxInclusiveFacet(sb.toString()));
+            } else {
+                restriction.getFacets().add(createTotalDigitsFacet(xsdDataItem.getTotalDigits()));
+            }
         }
+
         /* fractionDigits is a fixed facet for most numerics so be careful */
         if (xsdDataItem.getFractionDigits() > 0) {
             restriction.getFacets().add(createFractionDigitsFacet(xsdDataItem.getFractionDigits()));
         }
+
         /* For xsd:decimal and xsd:integer, we further constrain if the
          * numeric needs to be positive (unsigned).*/
         if (xsdDataItem.getXsdType() == XsdType.INTEGER
