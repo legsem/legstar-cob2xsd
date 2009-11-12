@@ -3,7 +3,7 @@
     <groupId>com.legsem.legstar.test</groupId>
     <artifactId>legstar-cob2xsd</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.3</version>
+    <version>0.0.4-SNAPSHOT</version>
     <name>LegStar COBOL to XML schema translator</name>
     <description>legstar-cob2xsd is a COBOL structure to XML Schema translator</description>
     <url>http://code.google.com/p/legstar-cob2xsd</url>
@@ -14,9 +14,9 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:svn:http://legstar-cob2xsd.googlecode.com/svn/tags/legstar-cob2xsd-0.0.3</connection>
-        <developerConnection>scm:svn:https://legstar-cob2xsd.googlecode.com/svn/tags/legstar-cob2xsd-0.0.3</developerConnection>
-        <url>http://legstar-cob2xsd.googlecode.com/svn/tags/legstar-cob2xsd-0.0.3</url>
+        <connection>scm:svn:http://legstar-cob2xsd.googlecode.com/svn/trunk/</connection>
+        <developerConnection>scm:svn:https://legstar-cob2xsd.googlecode.com/svn/trunk/</developerConnection>
+        <url>http://legstar-cob2xsd.googlecode.com/svn/trunk/</url>
     </scm>
 
     <mailingLists>
