@@ -1,0 +1,73 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:cb="http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="http://legstar.com/test/coxb/doublmix" elementFormDefault="qualified" xmlns:ns0="http://java.sun.com/xml/ns/jaxb" ns0:extensionBindingPrefixes="cb" targetNamespace="http://legstar.com/test/coxb/doublmix" xmlns:ns1="http://java.sun.com/xml/ns/jaxb" ns1:version="2.0">
+    <annotation>
+        <appinfo>
+            <jaxb:schemaBindings>
+                <jaxb:package name="com.legstar.test.coxb.doublmix"/>
+            </jaxb:schemaBindings>
+        </appinfo>
+    </annotation>
+    <complexType name="Dfhcommarea">
+        <sequence>
+            <element name="CDouble1234">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="C-DOUBLE-1234" levelNumber="5" srceLine="21" type="DOUBLE_FLOAT_ITEM" usage="COMP-2"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="double"/>
+                </simpleType>
+            </element>
+            <element name="CDouble0">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="C-DOUBLE-0" levelNumber="5" srceLine="22" type="DOUBLE_FLOAT_ITEM" usage="COMP-2"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="double"/>
+                </simpleType>
+            </element>
+            <element name="CDouble1">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="C-DOUBLE-1" levelNumber="5" srceLine="23" type="DOUBLE_FLOAT_ITEM" usage="COMP-2"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="double"/>
+                </simpleType>
+            </element>
+            <element name="CDouble345006P5678">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="C-DOUBLE-345006p5678" levelNumber="5" srceLine="24" type="DOUBLE_FLOAT_ITEM" usage="COMP-2"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="double"/>
+                </simpleType>
+            </element>
+            <element name="CDouble798P20067Em16">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="C-DOUBLE-798p20067em16" levelNumber="5" srceLine="25" type="DOUBLE_FLOAT_ITEM" usage="COMP-2"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="double"/>
+                </simpleType>
+            </element>
+            <element name="CDouble3P40282347Ep38">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="C-DOUBLE-3p40282347ep38" levelNumber="5" srceLine="26" type="DOUBLE_FLOAT_ITEM" usage="COMP-2"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="double"/>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+</schema>

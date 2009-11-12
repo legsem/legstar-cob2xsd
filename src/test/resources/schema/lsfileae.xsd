@@ -1,115 +1,108 @@
-<?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-targetNamespace="http://legstar.com/test/coxb/lsfileae"
-xmlns="http://legstar.com/test/coxb/lsfileae"
-xmlns:xsns="http://legstar.com/test/coxb/lsfileae"
-xmlns:cb="http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd"
-xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-jaxb:version="2.0"
-jaxb:extensionBindingPrefixes="cb"
-elementFormDefault="qualified">
- <xs:annotation><xs:appinfo>
- <jaxb:schemaBindings>
- <jaxb:package  name="com.legstar.test.coxb.lsfileae"/>
- </jaxb:schemaBindings>
- </xs:appinfo></xs:annotation>
- <xs:complexType name="Dfhcommarea">
-    <xs:sequence>
-     <xs:element name="comNumber">
-       <xs:annotation>
-         <xs:appinfo>
-         <cb:cobolElement levelNumber='5' cobolName='COM-NUMBER' type='ZONED_DECIMAL_ITEM' picture='9(6)' signed='false' totalDigits='6' srceLine='32'/>
-         </xs:appinfo>
-       </xs:annotation>
-       <xs:simpleType>
-         <xs:restriction base="xs:unsignedInt">
-         <xs:totalDigits value="6"/>
-         </xs:restriction>
-       </xs:simpleType>
-     </xs:element>
-     <xs:element name="comPersonal" type="xsns:ComPersonal">
-       <xs:annotation>
-         <xs:appinfo>
-         <cb:cobolElement levelNumber='5' cobolName='COM-PERSONAL' type='GROUP_ITEM' srceLine='33'/>
-         </xs:appinfo>
-       </xs:annotation>
-     </xs:element>
-     <xs:element name="comDate">
-       <xs:annotation>
-         <xs:appinfo>
-         <cb:cobolElement levelNumber='5' cobolName='COM-DATE' type='ALPHANUMERIC_ITEM' picture='X(8)' srceLine='37'/>
-         </xs:appinfo>
-       </xs:annotation>
-       <xs:simpleType>
-         <xs:restriction base="xs:string">
-         <xs:maxLength value='8'/>
-         </xs:restriction>
-       </xs:simpleType>
-     </xs:element>
-     <xs:element name="comAmount">
-       <xs:annotation>
-         <xs:appinfo>
-         <cb:cobolElement levelNumber='5' cobolName='COM-AMOUNT' type='ALPHANUMERIC_ITEM' picture='X(8)' srceLine='38'/>
-         </xs:appinfo>
-       </xs:annotation>
-       <xs:simpleType>
-         <xs:restriction base="xs:string">
-         <xs:maxLength value='8'/>
-         </xs:restriction>
-       </xs:simpleType>
-     </xs:element>
-     <xs:element name="comComment">
-       <xs:annotation>
-         <xs:appinfo>
-         <cb:cobolElement levelNumber='5' cobolName='COM-COMMENT' type='ALPHANUMERIC_ITEM' picture='X(9)' srceLine='39'/>
-         </xs:appinfo>
-       </xs:annotation>
-       <xs:simpleType>
-         <xs:restriction base="xs:string">
-         <xs:maxLength value='9'/>
-         </xs:restriction>
-       </xs:simpleType>
-     </xs:element>
-    </xs:sequence>
- </xs:complexType>
- <xs:complexType name="ComPersonal">
-    <xs:sequence>
-     <xs:element name="comName">
-       <xs:annotation>
-         <xs:appinfo>
-         <cb:cobolElement levelNumber='10' cobolName='COM-NAME' type='ALPHANUMERIC_ITEM' picture='X(20)' srceLine='34'/>
-         </xs:appinfo>
-       </xs:annotation>
-       <xs:simpleType>
-         <xs:restriction base="xs:string">
-         <xs:maxLength value='20'/>
-         </xs:restriction>
-       </xs:simpleType>
-     </xs:element>
-     <xs:element name="comAddress">
-       <xs:annotation>
-         <xs:appinfo>
-         <cb:cobolElement levelNumber='10' cobolName='COM-ADDRESS' type='ALPHANUMERIC_ITEM' picture='X(20)' srceLine='35'/>
-         </xs:appinfo>
-       </xs:annotation>
-       <xs:simpleType>
-         <xs:restriction base="xs:string">
-         <xs:maxLength value='20'/>
-         </xs:restriction>
-       </xs:simpleType>
-     </xs:element>
-     <xs:element name="comPhone">
-       <xs:annotation>
-         <xs:appinfo>
-         <cb:cobolElement levelNumber='10' cobolName='COM-PHONE' type='ALPHANUMERIC_ITEM' picture='X(8)' srceLine='36'/>
-         </xs:appinfo>
-       </xs:annotation>
-       <xs:simpleType>
-         <xs:restriction base="xs:string">
-         <xs:maxLength value='8'/>
-         </xs:restriction>
-       </xs:simpleType>
-     </xs:element>
-    </xs:sequence>
- </xs:complexType>
-</xs:schema>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:cb="http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="http://legstar.com/test/coxb/lsfileae" elementFormDefault="qualified" xmlns:ns0="http://java.sun.com/xml/ns/jaxb" ns0:extensionBindingPrefixes="cb" targetNamespace="http://legstar.com/test/coxb/lsfileae" xmlns:ns1="http://java.sun.com/xml/ns/jaxb" ns1:version="2.0">
+    <annotation>
+        <appinfo>
+            <jaxb:schemaBindings>
+                <jaxb:package name="com.legstar.test.coxb.lsfileae"/>
+            </jaxb:schemaBindings>
+        </appinfo>
+    </annotation>
+    <complexType name="Dfhcommarea">
+        <sequence>
+            <element name="ComNumber">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="COM-NUMBER" levelNumber="5" picture="9(6)" signed="false" srceLine="32" totalDigits="6" type="ZONED_DECIMAL_ITEM"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="unsignedInt">
+                        <totalDigits value="6"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="ComPersonal" type="tns:ComPersonal">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="COM-PERSONAL" levelNumber="5" srceLine="33" type="GROUP_ITEM"/>
+                    </appinfo>
+                </annotation>
+            </element>
+            <element name="ComDate">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="COM-DATE" levelNumber="5" picture="X(8)" srceLine="37" type="ALPHANUMERIC_ITEM"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="string">
+                        <maxLength value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="ComAmount">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="COM-AMOUNT" levelNumber="5" picture="X(8)" srceLine="38" type="ALPHANUMERIC_ITEM"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="string">
+                        <maxLength value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="ComComment">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="COM-COMMENT" levelNumber="5" picture="X(9)" srceLine="39" type="ALPHANUMERIC_ITEM"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="string">
+                        <maxLength value="9"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="ComPersonal">
+        <sequence>
+            <element name="ComName">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="COM-NAME" levelNumber="10" picture="X(20)" srceLine="34" type="ALPHANUMERIC_ITEM"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="string">
+                        <maxLength value="20"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="ComAddress">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="COM-ADDRESS" levelNumber="10" picture="X(20)" srceLine="35" type="ALPHANUMERIC_ITEM"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="string">
+                        <maxLength value="20"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="ComPhone">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="COM-PHONE" levelNumber="10" picture="X(8)" srceLine="36" type="ALPHANUMERIC_ITEM"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="string">
+                        <maxLength value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+</schema>

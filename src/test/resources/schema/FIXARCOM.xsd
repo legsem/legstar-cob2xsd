@@ -1,0 +1,48 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:cb="http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="http://legstar.com/test/coxb/fixarcom" elementFormDefault="qualified" xmlns:ns0="http://java.sun.com/xml/ns/jaxb" ns0:extensionBindingPrefixes="cb" targetNamespace="http://legstar.com/test/coxb/fixarcom" xmlns:ns1="http://java.sun.com/xml/ns/jaxb" ns1:version="2.0">
+    <annotation>
+        <appinfo>
+            <jaxb:schemaBindings>
+                <jaxb:package name="com.legstar.test.coxb.fixarcom"/>
+            </jaxb:schemaBindings>
+        </appinfo>
+    </annotation>
+    <complexType name="Dfhcommarea">
+        <sequence>
+            <element maxOccurs="7" minOccurs="7" name="CArray" type="tns:CArray">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="C-ARRAY" levelNumber="5" maxOccurs="7" minOccurs="7" srceLine="23" type="GROUP_ITEM"/>
+                    </appinfo>
+                </annotation>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="CArray">
+        <sequence>
+            <element name="CItem1">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="C-ITEM-1" levelNumber="10" picture="X(5)" srceLine="24" type="ALPHANUMERIC_ITEM"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="string">
+                        <maxLength value="5"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="CItem2">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="C-ITEM-2" levelNumber="10" picture="S9(4)" signed="true" srceLine="25" totalDigits="4" type="BINARY_ITEM" usage="BINARY"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="short">
+                        <totalDigits value="4"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+</schema>

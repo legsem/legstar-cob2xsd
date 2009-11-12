@@ -1,0 +1,48 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:cb="http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="http://legstar.com/test/coxb/arraygrp" elementFormDefault="qualified" xmlns:ns0="http://java.sun.com/xml/ns/jaxb" ns0:extensionBindingPrefixes="cb" targetNamespace="http://legstar.com/test/coxb/arraygrp" xmlns:ns1="http://java.sun.com/xml/ns/jaxb" ns1:version="2.0">
+    <annotation>
+        <appinfo>
+            <jaxb:schemaBindings>
+                <jaxb:package name="com.legstar.test.coxb.arraygrp"/>
+            </jaxb:schemaBindings>
+        </appinfo>
+    </annotation>
+    <complexType name="Dfhcommarea">
+        <sequence>
+            <element maxOccurs="4" minOccurs="4" name="Items" type="tns:Items">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="ITEMS" levelNumber="3" maxOccurs="4" minOccurs="4" srceLine="8" type="GROUP_ITEM"/>
+                    </appinfo>
+                </annotation>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="Items">
+        <sequence>
+            <element name="ItemDesc">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="ITEM-DESC" levelNumber="5" picture="X(10)" srceLine="9" type="ALPHANUMERIC_ITEM"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="string">
+                        <maxLength value="10"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="ItemNumber">
+                <annotation>
+                    <appinfo>
+                        <cb:cobolElement cobolName="ITEM-NUMBER" levelNumber="5" picture="9(9)" signed="false" srceLine="10" totalDigits="9" type="ZONED_DECIMAL_ITEM"/>
+                    </appinfo>
+                </annotation>
+                <simpleType>
+                    <restriction base="unsignedInt">
+                        <totalDigits value="9"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+</schema>

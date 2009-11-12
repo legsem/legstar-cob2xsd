@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:cb="http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="http://legstar.com/test/coxb/redsimpt" xmlns:ns0="http://java.sun.com/xml/ns/jaxb" xmlns:ns1="http://java.sun.com/xml/ns/jaxb" elementFormDefault="qualified" ns0:extensionBindingPrefixes="cb" targetNamespace="http://legstar.com/test/coxb/redsimpt" ns1:version="2.0">
+    <annotation>
+        <appinfo>
+            <jaxb:schemaBindings>
+                <jaxb:package name="com.legstar.test.coxb.redsimpt"/>
+            </jaxb:schemaBindings>
+        </appinfo>
+    </annotation>
+    <complexType name="Dfhcommarea">
+        <sequence>
+            <choice>
+                <element name="CDefinition1">
+                    <annotation>
+                        <appinfo>
+                            <cb:cobolElement cobolName="C-DEFINITION-1" isRedefined="true" levelNumber="5" picture="X(18)" srceLine="21" type="ALPHANUMERIC_ITEM" unmarshalChoiceStrategyClassName="com.legstar.coxb.cust.redsimpt.ChoiceSelector"/>
+                        </appinfo>
+                    </annotation>
+                    <simpleType>
+                        <restriction base="string">
+                            <maxLength value="18"/>
+                        </restriction>
+                    </simpleType>
+                </element>
+                <element name="CDefinition2">
+                    <annotation>
+                        <appinfo>
+                            <cb:cobolElement cobolName="C-DEFINITION-2" levelNumber="5" picture="9(18)" redefines="C-DEFINITION-1" signed="false" srceLine="22" totalDigits="18" type="ZONED_DECIMAL_ITEM"/>
+                        </appinfo>
+                    </annotation>
+                    <simpleType>
+                        <restriction base="unsignedLong">
+                            <maxInclusive value="999999999999999999"/>
+                        </restriction>
+                    </simpleType>
+                </element>
+            </choice>
+        </sequence>
+    </complexType>
+</schema>
