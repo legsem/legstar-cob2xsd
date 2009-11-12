@@ -31,6 +31,13 @@ Assembly descriptor for the full distribution.
             </includes>
         </fileSet>
         <fileSet>
+            <directory>src/main/resources/xslt</directory>
+            <outputDirectory>xslt</outputDirectory>
+            <includes>
+                <include>*.*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>.</directory>
             <outputDirectory>/</outputDirectory>
             <includes>

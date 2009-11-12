@@ -119,7 +119,7 @@ public class XsdEmitter {
     public XmlSchemaComplexType createXmlSchemaComplexType(final XsdDataItem xsdDataItem) {
         XmlSchemaComplexType xmlSchemaComplexType  = new XmlSchemaComplexType(getXsd());
         getXsd().getItems().add(xmlSchemaComplexType);
-        
+
         XmlSchemaChoice xmlSchemaChoice = null;
 
         XmlSchemaSequence xmlSchemaSequence = new XmlSchemaSequence();
@@ -144,7 +144,7 @@ public class XsdEmitter {
                 }
             }
         }
-        
+
         if (xmlSchemaChoice != null) {
             xmlSchemaSequence.getItems().add(xmlSchemaChoice);
             xmlSchemaChoice = null;
@@ -152,7 +152,7 @@ public class XsdEmitter {
 
         xmlSchemaComplexType.setParticle(xmlSchemaSequence);
         xmlSchemaComplexType.setName(xsdDataItem.getXsdTypeName());
-        
+
 
         return xmlSchemaComplexType;
     }
@@ -171,7 +171,7 @@ public class XsdEmitter {
         if (xsdDataItem.getMinOccurs() != 1) {
             element.setMinOccurs(xsdDataItem.getMinOccurs());
         }
-        
+
         /* Create this element schema type, then if its a simple type
          * set it as an anonymous type. Otherwise, it is a named complex type,
          * so reference it by name. */
@@ -214,7 +214,7 @@ public class XsdEmitter {
         addEnumerationFacets(xsdDataItem, restriction);
         return createXmlSchemaSimpleType(restriction);
     }
-    
+
     /**
      * Create a simple type for an numeric type.
      * <p/>
@@ -255,16 +255,15 @@ public class XsdEmitter {
 
         /* For xsd:decimal and xsd:integer, we further constrain if the
          * numeric needs to be positive (unsigned).*/
-        if (xsdDataItem.getXsdType() == XsdType.INTEGER
-                || xsdDataItem.getXsdType() == XsdType.DECIMAL) {
-            if (!xsdDataItem.isSigned()) {
-                restriction.getFacets().add(createMinInclusiveFacet("0"));
-            }
+        if ((xsdDataItem.getXsdType() == XsdType.INTEGER
+                || xsdDataItem.getXsdType() == XsdType.DECIMAL)
+                && !xsdDataItem.isSigned()) {
+            restriction.getFacets().add(createMinInclusiveFacet("0"));
         }
         addEnumerationFacets(xsdDataItem, restriction);
         return createXmlSchemaSimpleType(restriction);
     }
-    
+
     /**
      * If simple type has conditions attached to it, emit enumeration facets.
      * @param xsdDataItem COBOL data item decorated with XSD attributes

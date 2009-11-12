@@ -5,7 +5,8 @@
     <packaging>jar</packaging>
     <version>0.0.3-SNAPSHOT</version>
     <name>LegStar COBOL to XML schema translator</name>
-    <description>Translates COBOL structures to XML schema.</description>
+    <description>legstar-cob2xsd is a COBOL structure to XML Schema translator</description>
+    <url>http://code.google.com/p/legstar-cob2xsd</url>
 
     <issueManagement>
         <system>Google Code Issue Tracking</system>
@@ -60,7 +61,7 @@
         <site>
             <id>local.website</id>
             <name>Local Website</name>
-            <url>file:///${legstar-dev-website-local-dir}/cob2xsd</url>
+            <url>file:///${legstar-dev-website-local-dir}/legstar-cob2xsd</url>
         </site>
         <repository>
             <id>ftp-release-repository</id>
