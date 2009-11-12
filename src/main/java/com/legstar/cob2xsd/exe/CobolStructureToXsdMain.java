@@ -76,7 +76,7 @@ public class CobolStructureToXsdMain {
         }
         produceHelp(options);
     }
-    
+
     /**
      * @param options options available
      */
@@ -110,9 +110,14 @@ public class CobolStructureToXsdMain {
         options.addOption(targetNamespace);
 
         Option mapConditionsToFacets = new Option("m", "mapConditionsToFacets", false,
-        "Whether COBOL conditions (level 88) should be mapped to facets."
+                "Whether COBOL conditions (level 88) should be mapped to facets."
                 + " Facets restrict the content which might not be desirable");
         options.addOption(mapConditionsToFacets);
+
+        Option nameConflictPrependParentName = new Option("n", "nameConflictPrependParentName", false,
+                "Whether parent complex type name should be prepended in case of name conflict"
+                + " (otherwise, the COBOL source line will be appended)");
+        options.addOption(nameConflictPrependParentName);
 
         Option addLegStarAnnotations = new Option("a", "addLegStarAnnotations", false,
         "Whether we should generate COBOL/JAXB annotations");
@@ -165,6 +170,9 @@ public class CobolStructureToXsdMain {
         }
         if (line.hasOption("addLegStarAnnotations")) {
             getContext().setAddLegStarAnnotations(true);
+        }
+        if (line.hasOption("nameConflictPrependParentName")) {
+            getContext().setNameConflictPrependParentName(true);
         }
         if (line.hasOption("mapConditionsToFacets")) {
             getContext().setMapConditionsToFacets(true);
@@ -233,7 +241,7 @@ public class CobolStructureToXsdMain {
         } catch (Exception e) {
             System.err.println("Exception caught: " + e.getMessage());
         }
-        
+
     }
 
     /**

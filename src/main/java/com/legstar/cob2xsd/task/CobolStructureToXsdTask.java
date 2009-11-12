@@ -255,6 +255,23 @@ public class CobolStructureToXsdTask extends Task {
     }
 
     /**
+     * @return true if parent complex type name should be prepended in case of name conflict
+     * (otherwise, the COBOL source line will be appended)
+     */
+    public boolean nameConflictPrependParentName() {
+        return getContext().nameConflictPrependParentName();
+    }
+
+    /**
+     * @param nameConflictPrependParentName true if parent complex type name should be prepended
+     * in case of name conflict (otherwise, the COBOL source line will be appended)
+     */
+    public void setNameConflictPrependParentName(
+            final boolean nameConflictPrependParentName) {
+        getContext().setNameConflictPrependParentName(nameConflictPrependParentName);
+    }
+
+    /**
      * @return a new FileSet
      */
     public FileSet createFileset() {

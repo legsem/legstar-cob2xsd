@@ -314,7 +314,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
                 + " picture=\"X(3)\""
-                + " value=\"&amp;quot;\""
+                + " value=\"&quot;\""
                 + " type=\"ALPHANUMERIC_ITEM\""
                 + "/>");
     }
@@ -329,7 +329,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
                 + " picture=\"X(3)\""
-                + " value=\"&amp;apos;\""
+                + " value=\"&apos;\""
                 + " type=\"ALPHANUMERIC_ITEM\""
                 + "/>");
     }
@@ -377,7 +377,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
                 + " picture=\"X(3)\""
-                + " value=\"&amp;lt;A&amp;gt;\""
+                + " value=\"&lt;A&gt;\""
                 + " type=\"ALPHANUMERIC_ITEM\""
                 + "/>");
     }

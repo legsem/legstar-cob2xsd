@@ -19,6 +19,7 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.XmlSchemaTotalDigitsFacet;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
+import com.legstar.cob2xsd.XsdDataItem.XsdType;
 import com.legstar.cobol.model.CobolDataItem.DataEntryType;
 import com.legstar.cobol.model.CobolDataItem.Range;
 
@@ -234,6 +235,14 @@ public class XsdEmitter {
         /* fractionDigits is a fixed facet for most numerics so be careful */
         if (xsdDataItem.getFractionDigits() > 0) {
             restriction.getFacets().add(createFractionDigitsFacet(xsdDataItem.getFractionDigits()));
+        }
+        /* For xsd:decimal and xsd:integer, we further constrain if the
+         * numeric needs to be positive (unsigned).*/
+        if (xsdDataItem.getXsdType() == XsdType.INTEGER
+                || xsdDataItem.getXsdType() == XsdType.DECIMAL) {
+            if (!xsdDataItem.isSigned()) {
+                restriction.getFacets().add(createMinInclusiveFacet("0"));
+            }
         }
         addEnumerationFacets(xsdDataItem, restriction);
         return createXmlSchemaSimpleType(restriction);

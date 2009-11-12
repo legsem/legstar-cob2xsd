@@ -95,23 +95,24 @@ public class XsdDataItem {
      * @param cobolDataItem the COBOL elementary data item
      * @param context the translator options in effect
      * @param parent the parent data item or null if root
-     * @param uniqueXsdTypeNames a list of unique type names used to detect name collisions
+     * @param nonUniqueCobolNames a list of non unique COBOL names used to detect name collisions
      */
     public XsdDataItem(
             final CobolDataItem cobolDataItem,
             final Cob2XsdContext context,
             final XsdDataItem parent,
-            final List < String > uniqueXsdTypeNames) {
+            final List < String > nonUniqueCobolNames) {
 
         _cobolDataItem = cobolDataItem;
         _parent = parent;
-        _xsdTypeName = formatTypeName(cobolDataItem, uniqueXsdTypeNames);
-        _xsdElementName = Character.toLowerCase(_xsdTypeName.charAt(0))
-        + _xsdTypeName.substring(1);
+        _xsdElementName = formatElementName(cobolDataItem);
+        _xsdTypeName = formatTypeName(
+                _xsdElementName, cobolDataItem, nonUniqueCobolNames,
+                context.nameConflictPrependParentName(), parent);
 
         switch (cobolDataItem.getDataEntryType()) {
         case DATA_DESCRIPTION:
-            setDataDescription(cobolDataItem, context, uniqueXsdTypeNames);
+            setDataDescription(cobolDataItem, context, nonUniqueCobolNames);
             break;
         case RENAMES:
            /* COBOL renames don't map to an XSD type. */
@@ -136,12 +137,12 @@ public class XsdDataItem {
      * Setup a regular data description entry, elementary data items and groups.
      * @param cobolDataItem the COBOL elementary data item
      * @param context the translator options in effect
-     * @param uniqueXsdTypeNames a list of unique type names used to detect name collisions
+     * @param nonUniqueCobolNames a list of non unique COBOL names used to detect name collisions
      */
     protected void setDataDescription(
             final CobolDataItem cobolDataItem,
             final Cob2XsdContext context,
-            final List < String > uniqueXsdTypeNames) {
+            final List < String > nonUniqueCobolNames) {
 
         if (cobolDataItem.getUsage() != null) {
             setFromUsage(cobolDataItem.getUsage());
@@ -184,7 +185,7 @@ public class XsdDataItem {
 
         /* Create the list of children by decorating the COBOL item children */
         for (CobolDataItem child : cobolDataItem.getChildren()) {
-            _children.add(new XsdDataItem(child, context, this, uniqueXsdTypeNames));
+            _children.add(new XsdDataItem(child, context, this, nonUniqueCobolNames));
         }
 
     }
@@ -443,42 +444,83 @@ public class XsdDataItem {
     }
 
     /**
-     * Turn a COBOL name to an XSD type name.
+     * Turn a COBOL name to a unique XSD type name.
      * <p/>
-     * This is not strictly necessary as the only requirement for an XML schema element
-     * name is to be an NCName (non columnized name) which is a superset of valid
-     * COBOL names.
+     * Complex type names customarily start with an uppercase character.
+     * <p/>
+     * The proposed name might be conflicting with another so we disambiguate xsd type
+     * names with one of 2 options:
+     * <ul>
+     * <li>Appending the COBOL source line number (compatible with legstar-schemagen)</li>
+     * <li>Appending the parent XSD type name</li>
+     * </ul>
+     * 
+     * @param cobolDataItem the COBOL data item
+     * @param elementName the element name built from the COBOL name
+     * @param nonUniqueCobolNames a list of non unique COBOL names
+     * @param nameConflictPrependParentName true if parent name should be prepended in case
+     *  of name conflict (otherwise, the COBOL source line will be appended).
+     * @param parent used to resolve potential name conflict
+     * @return a nice XML type name
+     */
+    public static String formatTypeName(
+            final String elementName,
+            final CobolDataItem cobolDataItem,
+            final List < String > nonUniqueCobolNames,
+            final boolean nameConflictPrependParentName,
+            final XsdDataItem parent) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(Character.toUpperCase(elementName.charAt(0)));
+        sb.append(elementName.substring(1));
+        
+        if (nonUniqueCobolNames.contains(cobolDataItem.getCobolName())) {
+            if (nameConflictPrependParentName) {
+                if (parent != null) {
+                    sb.insert(0, parent.getXsdTypeName());
+                }
+            } else {
+                sb.append(cobolDataItem.getSrceLine());
+            }
+        }
+
+        return sb.toString();
+    }
+    
+    /**
+     * Turn a COBOL name to an XSD element name.
+     * <p/>
+     * This is not strictly necessary if there is no name conflict as the only requirement
+     * for an XML schema element name is to be an NCName (non columnized name) which is
+     * a superset of valid COBOL names.
      * <p/>
      * COBOL names look ugly in XML schema though. They are often uppercased and use
      * hyphens extensively. XML schema names they will have to be transformed later
-     * to java identifiers so we try to get as close as possible to naming convention
-     * to suits XML Schema as well as Java.
+     * to java identifiers so we try to get as close as possible to a naming convention
+     * that suits XML Schema as well as Java.
      * <p>
      * So we remove hyphens.
      * We lower case all characters which are not word breakers. Word breakers are
      * hyphens and numerics. This creates Camel style names.
-     * Complex type names customarily start with an uppercase character.
+     * Element names customarily start with a lowercase character.
      * <p/>
-     * The proposed name might be conflicting with another so we disambiguate xsd type
-     * names by appending the source line number.
-     * We also do that same disambiguation for all COBOL anonymous FILLER data items.
-     * 
-     * @param dataItem the original COBOL data item
-     * @param uniqueXsdTypeNames a list of unique type names
-     * @return a nice XML type name
+     * COBOL FILLERs are a particular case because there might be more than one in the
+     * same parent group. So what we do is systematically append the COBOL source line
+     * number so that these become unique names.
+     * @param cobolDataItem the original COBOL data item
+     * @return an XML schema element name
      */
-    public static String formatTypeName(
-            final CobolDataItem dataItem,
-            final List < String > uniqueXsdTypeNames) {
-
-        if (dataItem.getCobolName().equalsIgnoreCase("FILLER")) {
-            return "Filler" + dataItem.getSrceLine();
+    public static String formatElementName(final CobolDataItem cobolDataItem) {
+        
+        String cobolName = cobolDataItem.getCobolName();
+        if (cobolName.equalsIgnoreCase("FILLER")) {
+            return "filler" + cobolDataItem.getSrceLine();
         }
         
         StringBuilder sb = new StringBuilder();
-        boolean wordBreaker = true;
-        for (int i = 0; i < dataItem.getCobolName().length(); i++) {
-            char c = dataItem.getCobolName().charAt(i);
+        boolean wordBreaker = false;
+        for (int i = 0; i < cobolName.length(); i++) {
+            char c = cobolName.charAt(i);
             if (c != '-') {
                 if (Character.isDigit(c)) {
                     sb.append(c);
@@ -495,11 +537,6 @@ public class XsdDataItem {
                 wordBreaker = true;
             }
         }
-
-        if (uniqueXsdTypeNames.contains(sb.toString())) {
-            sb.append(dataItem.getSrceLine());
-        }
-        uniqueXsdTypeNames.add(sb.toString());
         return sb.toString();
     }
 

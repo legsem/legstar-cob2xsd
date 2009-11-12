@@ -216,6 +216,29 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
     }
 
     /**
+     * An unsigned decimal numeric item.
+     */
+    public void testUnsignedDecimal() {
+        CobolDataItem struct = new CobolDataItem();
+        struct.getChildren().add(getACobolElementaryItem("NUM1", "9(8)V99", Usage.PACKEDDECIMAL));
+        emitAndCheck(
+                "<complexType name=\"Filler0\">"
+                + "<sequence>"
+                + "<element name=\"num1\">"
+                + "<simpleType>"
+                + "<restriction base=\"decimal\">"
+                + "<totalDigits value=\"10\"/>"
+                + "<fractionDigits value=\"2\"/>"
+                + "<minInclusive value=\"0\"/>"
+                + "</restriction>"
+                + "</simpleType>"
+                + "</element>"
+                + "</sequence>"
+                + "</complexType>",
+                struct);
+    }
+
+    /**
      * A float numeric item.
      */
     public void testFloat() {

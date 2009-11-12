@@ -218,16 +218,62 @@ public class CobolStructureToXsd {
             debug("Emitting XSD from: ", cobolDataItems.toString());
         }
         XmlSchema xsd = getNewXmlSchema();
-        List < String > uniqueXsdTypeNames = new ArrayList < String >();
+        List < String > nonUniqueCobolNames = getNonUniqueCobolNames(cobolDataItems);
         XsdEmitter emitter = new XsdEmitter(xsd, getContext());
         for (CobolDataItem cobolDataItem : cobolDataItems) {
             if (cobolDataItem.getChildren().size() > 0) {
                 XsdDataItem xsdDataItem = new XsdDataItem(
-                        cobolDataItem, getContext(), null, uniqueXsdTypeNames);
+                        cobolDataItem, getContext(), null, nonUniqueCobolNames);
                 emitter.createXmlSchemaType(xsdDataItem);
             }
         }
         return xsd;
+    }
+    
+    /**
+     * Create a list of COBOL names which are not unique.
+     * This is useful when we build complex type names from the COBOL names.
+     * Complex type names need to be unique within a target namespace.
+     * @param cobolDataItems a list of root data items
+     * @return a list of COBOL names which are not unique
+     */
+    protected List < String > getNonUniqueCobolNames(final List < CobolDataItem > cobolDataItems) {
+        List < String > cobolNames = new ArrayList < String >();
+        List < String > nonUniqueCobolNames = new ArrayList < String >();
+        for (CobolDataItem cobolDataItem : cobolDataItems) {
+            getNonUniqueCobolNames(cobolDataItem, cobolNames, nonUniqueCobolNames);
+        }
+        return nonUniqueCobolNames;
+    }
+    
+    /**
+     * If data item COBOL name is already used, we add it to the non unique list.
+     * This recurse to the item children.
+     * <p/>
+     * We don't add COBOL FILLERs as they are always considered non unique.
+     * 
+     * @param cobolDataItem a COBOL data item
+     * @param cobolNames the list of all COBOL names used so far
+     * @param nonUniqueCobolNames the list of non unique COBOL names
+     */
+    protected void getNonUniqueCobolNames(
+            final CobolDataItem cobolDataItem,
+            final List < String > cobolNames,
+            final List < String > nonUniqueCobolNames) {
+
+        String cobolName = cobolDataItem.getCobolName();
+        if (!cobolName.equalsIgnoreCase("FILLER")) {
+            if (cobolNames.contains(cobolName)) {
+                if (!nonUniqueCobolNames.contains(cobolName)) {
+                    nonUniqueCobolNames.add(cobolName);
+                }
+            } else {
+                cobolNames.add(cobolName);
+            }
+        }
+        for (CobolDataItem child : cobolDataItem.getChildren()) {
+            getNonUniqueCobolNames(child, cobolNames, nonUniqueCobolNames);
+        }
     }
     
     /**

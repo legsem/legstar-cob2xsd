@@ -121,11 +121,6 @@
             <artifactId>commons-io</artifactId>
             <version>1.4</version>
         </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.4</version>
-        </dependency>
         <!-- Apache Xml Schema -->    
         <dependency>
             <groupId>org.apache.ws.commons.schema</groupId>

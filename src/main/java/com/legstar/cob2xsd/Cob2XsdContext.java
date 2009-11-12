@@ -52,6 +52,10 @@ public class Cob2XsdContext {
     /** An optional XSLT transform for XML schema customization. */
     private File _customXslt;
     
+    /** True if parent complex type name should be prepended in case of name conflict
+     * (otherwise, the COBOL source line will be appended). */
+    private boolean _nameConflictPrependParentName;
+    
     /**
      * @return the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
      */
@@ -179,6 +183,23 @@ public class Cob2XsdContext {
      */
     public void setCustomXslt(final File customXslt) {
         _customXslt = customXslt;
+    }
+
+    /**
+     * @return true if parent complex type name should be prepended in case of name conflict
+     * (otherwise, the COBOL source line will be appended)
+     */
+    public boolean nameConflictPrependParentName() {
+        return _nameConflictPrependParentName;
+    }
+
+    /**
+     * @param nameConflictPrependParentName true if parent complex type name should be prepended
+     * in case of name conflict (otherwise, the COBOL source line will be appended)
+     */
+    public void setNameConflictPrependParentName(
+            final boolean nameConflictPrependParentName) {
+        _nameConflictPrependParentName = nameConflictPrependParentName;
     }
 
 

@@ -70,6 +70,8 @@ Assembly descriptor for the full distribution.
             <!-- Only need to distribute the antlr runtime -->
             <excludes>
                 <exclude>org.antlr:antlr</exclude>
+                <exclude>antlr:antlr</exclude>
+                <exclude>org.antlr:stringtemplate</exclude>
             </excludes>
         </dependencySet>
      </dependencySets>

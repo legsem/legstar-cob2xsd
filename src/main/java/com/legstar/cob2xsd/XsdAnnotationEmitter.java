@@ -13,7 +13,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -221,14 +220,12 @@ public class XsdAnnotationEmitter {
 
     /**
      * COBOL values may be figurative constants with no meaning in the
-     * XML/java world. They might also contain characters that are invalid
-     * in XML and need to be escaped. So we do all that cleanup here.
+     * XML/java world.
      * @param xsdDataItem COBOL data item decorated with XSD attributes
      * @return a value suitable for XML
      */
     protected String cleanValue(final XsdDataItem xsdDataItem) {
-        String resolvedValue = resolveFigurative(xsdDataItem);
-        return StringEscapeUtils.escapeXml(resolvedValue);
+        return resolveFigurative(xsdDataItem);
     }
 
     /**

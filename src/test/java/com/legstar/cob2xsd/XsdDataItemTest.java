@@ -15,30 +15,46 @@ import junit.framework.TestCase;
  *
  */
 public class XsdDataItemTest extends TestCase {
-    
+
     /** Translator options. */
     private Cob2XsdContext _context = new Cob2XsdContext();
-    
+
     /**
      * Test XML element name derived from COBOL name.
      */
-    public void testFormatName() {
-        
-        List < String > uniqueXsdTypeNames = new ArrayList < String >();
-        assertEquals("", XsdDataItem.formatTypeName(new CobolDataItem(""), uniqueXsdTypeNames));
-        assertEquals("A", XsdDataItem.formatTypeName(new CobolDataItem("A"), uniqueXsdTypeNames));
-        assertEquals("Ab", XsdDataItem.formatTypeName(new CobolDataItem("AB"), uniqueXsdTypeNames));
-        assertEquals("Ab9C", XsdDataItem.formatTypeName(new CobolDataItem("AB9C"), uniqueXsdTypeNames));
-        assertEquals("Ab9Cd", XsdDataItem.formatTypeName(new CobolDataItem("AB9CD"), uniqueXsdTypeNames));
-        assertEquals("Ab9CdE", XsdDataItem.formatTypeName(new CobolDataItem("AB9CD-E"), uniqueXsdTypeNames));
-        assertEquals("Ab9CdEf", XsdDataItem.formatTypeName(new CobolDataItem("AB9CD-EF"), uniqueXsdTypeNames));
-        
-        /* Test name conflict resolution */
+    public void testFormatElementName() {
+
+        assertEquals("", XsdDataItem.formatElementName(new CobolDataItem("")));
+        assertEquals("a", XsdDataItem.formatElementName(new CobolDataItem("A")));
+        assertEquals("ab", XsdDataItem.formatElementName(new CobolDataItem("AB")));
+        assertEquals("ab9C", XsdDataItem.formatElementName(new CobolDataItem("AB9C")));
+        assertEquals("ab9Cd", XsdDataItem.formatElementName(new CobolDataItem("AB9CD")));
+        assertEquals("ab9CdE", XsdDataItem.formatElementName(new CobolDataItem("AB9CD-E")));
+        assertEquals("ab9CdEf", XsdDataItem.formatElementName(new CobolDataItem("AB9CD-EF")));
+
+    }
+
+    /**
+     * Test XML complex type name derived from COBOL name.
+     */
+    public void testFormatTypeName() {
+
+        List < String > nonUniqueCobolNames = new ArrayList < String >();
+
+        /* Test name conflict resolution (append srce line) */
+        nonUniqueCobolNames.add("AB9CD-EF");
         CobolDataItem cobolDataItem = new CobolDataItem("AB9CD-EF");
         cobolDataItem.setSrceLine(18);
-        assertEquals("Ab9CdEf18", XsdDataItem.formatTypeName(cobolDataItem, uniqueXsdTypeNames));
-        
+        assertEquals("Ab9CdEf18", XsdDataItem.formatTypeName(
+                "ab9CdEf", cobolDataItem, nonUniqueCobolNames, false, null));
+
+        /* Test name conflict resolution (prepend parent type name) */
+        CobolDataItem cobolParent = new CobolDataItem("COBOL-PARENT");
+        XsdDataItem xsdParent = new XsdDataItem(cobolParent, _context, null, nonUniqueCobolNames);
+        assertEquals("CobolParentAb9CdEf", XsdDataItem.formatTypeName(
+                "ab9CdEf", cobolDataItem, nonUniqueCobolNames, true, xsdParent));
     }
+
     /**
      * Test group items.
      */
@@ -121,7 +137,7 @@ public class XsdDataItemTest extends TestCase {
         assertEquals("STRING", mapper.getXsdType().toString());
 
     }
-    
+
     /**
      * Test deriving type from picture clause.
      */
@@ -132,43 +148,43 @@ public class XsdDataItemTest extends TestCase {
         XsdDataItem mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
         assertEquals("ALPHABETIC_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
-        
+
         dataItem.setPicture("X");
         mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
         assertEquals("ALPHANUMERIC_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
-        
+
         dataItem.setPicture("X9");
         mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
         assertEquals("ALPHANUMERIC_EDITED_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
-        
+
         dataItem.setPicture("G");
         mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
         assertEquals("DBCS_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
-        
+
         dataItem.setPicture("N");
         mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
         assertEquals("NATIONAL_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
-        
+
         dataItem.setPicture("E");
         mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
         assertEquals("EXTERNAL_FLOATING_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
-        
+
         dataItem.setPicture("BZ0,+-CRDB$");
         mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
         assertEquals("NUMERIC_EDITED_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
-        
+
         dataItem.setPicture("99");
         mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
         assertEquals("ZONED_DECIMAL_ITEM", mapper.getCobolType().toString());
         assertEquals("USHORT", mapper.getXsdType().toString());
     }
-    
+
     /**
      * Test setting numeric attributes from usage and picture.
      */
@@ -216,7 +232,7 @@ public class XsdDataItemTest extends TestCase {
         assertEquals(11, mapper.getTotalDigits());
         assertEquals(0, mapper.getFractionDigits());
     }
-    
+
     /**
      * Test what happens when the ODOObject is not found.
      */
@@ -224,14 +240,14 @@ public class XsdDataItemTest extends TestCase {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         CobolDataItem child1 = new CobolDataItem("DEPENDON-NAME");
         child1.setDependingOn("ODO-OBJECT-NAME");
-        
+
         dataItem.getChildren().add(child1);
-        
+
         new XsdDataItem(
                 dataItem, _context, null, new ArrayList < String >());
-        
+
     }
-    
+
     /**
      * Test with ODO object in direct parent.
      */
@@ -241,19 +257,19 @@ public class XsdDataItemTest extends TestCase {
         CobolDataItem child1 = new CobolDataItem("ODO-OBJECT-NAME");
         CobolDataItem child2 = new CobolDataItem("DEPENDON-NAME");
         child2.setDependingOn("ODO-OBJECT-NAME");
-        
+
         dataItem.getChildren().add(child0);
         dataItem.getChildren().add(child1);
         dataItem.getChildren().add(child2);
-        
+
         XsdDataItem xsdDataItem = new XsdDataItem(
                 dataItem, _context, null, new ArrayList < String >());
         assertFalse(xsdDataItem.getChildren().get(0).isODOObject());
         assertTrue(xsdDataItem.getChildren().get(1).isODOObject());
         assertFalse(xsdDataItem.getChildren().get(2).isODOObject());
-        
+
     }
-    
+
     /**
      * Test with ODO object in ancestor.
      */
@@ -268,12 +284,12 @@ public class XsdDataItemTest extends TestCase {
         parent.getChildren().add(dep);
 
         grandParent.getChildren().add(parent);
-        
+
         XsdDataItem xsdGrandParent = new XsdDataItem(
                 grandParent, _context, null, new ArrayList < String >());
-        
+
         assertTrue(xsdGrandParent.getChildren().get(0).isODOObject());
-        
+
     }
 
     /**
@@ -290,12 +306,12 @@ public class XsdDataItemTest extends TestCase {
         parent.getChildren().add(redefining);
 
         grandParent.getChildren().add(parent);
-        
+
         XsdDataItem xsdGrandParent = new XsdDataItem(
                 grandParent, _context, null, new ArrayList < String >());
-        
+
         assertTrue(xsdGrandParent.getChildren().get(0).isRedefined());
-        
+
     }
 
     /**
@@ -304,23 +320,23 @@ public class XsdDataItemTest extends TestCase {
     public void testRenames() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-RENAME");
         dataItem.setDataEntryType(DataEntryType.RENAMES);
-        
+
         XsdDataItem xsdDataItem = new XsdDataItem(
                 dataItem, _context, null, new ArrayList < String >());
         assertTrue(xsdDataItem.getXsdType() == null);
-        
+
     }
-    
+
     /**
      * Test a CONDITION data entry.
      */
     public void testCondition() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-RENAME");
         dataItem.setDataEntryType(DataEntryType.CONDITION);
-        
+
         XsdDataItem xsdDataItem = new XsdDataItem(
                 dataItem, _context, null, new ArrayList < String >());
         assertEquals(XsdType.ENUM, xsdDataItem.getXsdType());
-        
+
     }
 }

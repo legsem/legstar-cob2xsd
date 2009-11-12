@@ -95,6 +95,9 @@ public class CobolStructureToXsdTest extends XMLTestCase {
             MyDifferenceListener listener = new MyDifferenceListener();
             d.overrideDifferenceListener(listener);
             assertTrue("expected pieces to be similar, " + d.toString(), d.similar());
+//            if (!d.similar()) {
+//                _log.error("expected pieces to be similar, " + d.toString());
+//            }
         } finally {
             XMLUnit.setIgnoreWhitespace(oldIgnore);
         }

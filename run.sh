@@ -16,4 +16,4 @@ JVM_ARGS=
 ##   JVM_ARGS="$JVM_ARGS -Dlog4j.configuration=log4j.debug.properties"
 
 
-java $JVM_ARGS -jar legstar-pli2cob-${project.version}-exe.jar -i$INPUT -o$OUTPUT "$@"
+java $JVM_ARGS -jar legstar-cob2xsd-${project.version}-exe.jar -i$INPUT -o$OUTPUT "$@"
