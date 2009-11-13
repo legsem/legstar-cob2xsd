@@ -66,9 +66,12 @@ public class CobolStructureToXsdTask extends Task {
      *  Check parameters and produce XSD files.
      */
     public final void execute() {
-        _log.info("Translating COBOL files");
+        _log.info("Started translation from COBOL to XML Schema");
 
         checkParameters();
+        _log.info("Taking COBOL from   : " + _fileSets);
+        _log.info("Output XML Schema to: " + getTargetDir());
+        _log.info(getContext().toString());
 
         try {
             CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getContext());
@@ -81,7 +84,9 @@ public class CobolStructureToXsdTask extends Task {
                 String[] files = scanner.getIncludedFiles();
                 for (int i = 0; i < files.length; i++) {
                     File cobolFile = new File(fileset.getDir(getProject()), files[i]);
-                    cob2xsd.translate(cobolFile, getTargetDir());
+                    _log.info("Translation started for: " + cobolFile);
+                    File xmlSchemaFile = cob2xsd.translate(cobolFile, getTargetDir());
+                    _log.info("Result XML Schema is   : " + xmlSchemaFile);
                 }
             }
         } catch (IllegalStateException e) {
@@ -89,6 +94,7 @@ public class CobolStructureToXsdTask extends Task {
         } catch (CobolStructureToXsdException e) {
             throw (new BuildException(e));
         }
+        _log.info("Finished translation");
     }
 
     /**
@@ -144,7 +150,7 @@ public class CobolStructureToXsdTask extends Task {
      * @return the NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false
      */
     public boolean isNSymbolDbcs() {
-        return getContext().isNSymbolDbcs();
+        return getContext().nSymbolDbcs();
     }
 
     /**

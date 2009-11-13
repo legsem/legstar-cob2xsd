@@ -32,13 +32,15 @@ import com.legstar.coxb.CobolType;
 /**
  * This class is used to generate LegStar annotations to be included
  * in an XML schema.
- * There are 2 namespaces involved, JAXB and LegStar. LegStar being a JAXB plugin,
- * it is important that both be present.
+ * <p/>
  * There are 2 levels of annotations:
  * <ul>
  * <li>At the schema level. It is mainly the JAXB package name for generated classes</li>
  * <li>At the element level. These are the COBOL annotations per se.</li>
  * </ul>
+ * There are 2 XML namespaces involved, JAXB and LegStar. LegStar being a JAXB plugin,
+ * it is important that both be present.
+ * <p/>
  * We expect elementFormDefault="qualified" and attributeFormDefault="unqualified"
  */
 public class XsdAnnotationEmitter {

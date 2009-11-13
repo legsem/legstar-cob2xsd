@@ -12,6 +12,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.legstar.cob2xsd.Cob2XsdContext;
 import com.legstar.cob2xsd.CobolStructureToXsd;
@@ -44,6 +46,9 @@ public class CobolStructureToXsdMain {
 
     /** Line separator (OS specific).*/
     public static final String LS = System.getProperty("line.separator");
+
+    /** Logger. */
+    private final Log _log = LogFactory.getLog(getClass());
 
     /**
      * @param args translator options. Provides help if no arguments passed.
@@ -109,59 +114,59 @@ public class CobolStructureToXsdMain {
          * XML Schema related options
          * */
         Option targetNamespace = new Option("t", "targetNamespace", true,
-        "Target namespace for generated XML schema");
+        "target namespace for generated XML schema");
         options.addOption(targetNamespace);
 
         Option elementNamesStartWithUppercase = new Option("u", "elementNamesStartWithUppercase", false,
-        "Whether XSD element names should start with an uppercase (compatible with LegStar 1.2)");
+        "whether XSD element names should start with an uppercase (compatible with LegStar 1.2)");
         options.addOption(elementNamesStartWithUppercase);
 
         Option mapConditionsToFacets = new Option("m", "mapConditionsToFacets", false,
-                "Whether COBOL conditions (level 88) should be mapped to facets."
+                "whether COBOL conditions (level 88) should be mapped to facets."
                 + " Facets restrict the content which might not be desirable");
         options.addOption(mapConditionsToFacets);
 
         Option nameConflictPrependParentName = new Option("n", "nameConflictPrependParentName", false,
-                "Whether parent complex type name should be prepended in case of name conflict"
+                "whether parent complex type name should be prepended in case of name conflict"
                 + " (otherwise, the COBOL source line will be appended)");
         options.addOption(nameConflictPrependParentName);
 
         Option customXslt = new Option("x", "customXslt", true,
-        "Optional XSLT transform stylesheet for XML schema customization");
+        "optional XSLT transform stylesheet for XML schema customization");
         options.addOption(customXslt);
 
         /* -------------------------------------------------------------------
          * LegStar annotations related options
          * */
         Option addLegStarAnnotations = new Option("a", "addLegStarAnnotations", false,
-        "Whether we should generate COBOL/JAXB annotations");
+        "whether we should generate LegStar COBOL/JAXB annotations");
         options.addOption(addLegStarAnnotations);
 
         Option jaxbPackageName = new Option("p", "jaxbPackageName", true,
-        "the JAXB package name for generated Java classes");
+        "the package name for JAXB generated Java classes");
         options.addOption(jaxbPackageName);
 
         Option jaxbTypeClassesSuffix = new Option("s", "jaxbTypeClassesSuffix", true,
-        "The JAXB type name prefix (generated JAXB class names will have this suffix)");
+        "the JAXB type name prefix (generated JAXB class names will have this suffix)");
         options.addOption(jaxbTypeClassesSuffix);
 
         /* -------------------------------------------------------------------
          * COBOL compiler related options
          * */
         Option decimalPointIsComma = new Option("decimalPointIsComma",
-        "Whether COBOL comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)");
+        "whether COBOL comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)");
         options.addOption(decimalPointIsComma);
 
         Option currencySymbol = new Option("currencySymbol", true,
-        "The COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)");
+        "the COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)");
         options.addOption(currencySymbol);
 
         Option isNSymbolDbcs = new Option("isNSymbolDbcs",
-        "The COBOL NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false");
+        "the COBOL NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false");
         options.addOption(isNSymbolDbcs);
 
         Option quoteIsQuote = new Option("quoteIsQuote",
-        "The COBOL QUOTE|APOST compiler option. False means APOST");
+        "the COBOL QUOTE|APOST compiler option. False means APOST");
         options.addOption(quoteIsQuote);
 
         return options;
@@ -257,15 +262,23 @@ public class CobolStructureToXsdMain {
      * @param targetDir the output folder where XML schema file must go
      */
     protected void execute(final File input, final File targetDir) {
+        _log.info("Started translation from COBOL to XML Schema");
+        _log.info("Taking COBOL from   : " + input);
+        _log.info("Output XML Schema to: " + targetDir);
+        _log.info(getContext().toString());
         try {
             CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getContext());
             if (_input != null && _output != null) {
                 if (input.isFile()) {
-                    cob2xsd.translate(input, targetDir);
+                    _log.info("Translation started for: " + input);
+                    File xmlSchemaFile = cob2xsd.translate(input, targetDir);
+                    _log.info("Result XML Schema is   : " + xmlSchemaFile);
                 } else {
                     for (File cobolFile : input.listFiles()) {
                         if (cobolFile.isFile()) {
-                            cob2xsd.translate(cobolFile, targetDir);
+                            _log.info("Translation started for: " + cobolFile);
+                            File xmlSchemaFile = cob2xsd.translate(cobolFile, targetDir);
+                            _log.info("Result XML Schema is   : " + xmlSchemaFile);
                         }
                     }
                 }
@@ -275,6 +288,7 @@ public class CobolStructureToXsdMain {
         } catch (Exception e) {
             System.err.println("Exception caught: " + e.getMessage());
         }
+        _log.info("Finished translation");
 
     }
 

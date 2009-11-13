@@ -16,9 +16,11 @@ import com.legstar.coxb.CobolType;
 
 /**
  * XML Schema attributes derived from a COBOL data item.
- * Acts as a facade to the CobolDataItem type.
- * This class is constructed from a CobolDataItem. All XSD attributes
+ * <p/>
+ * Acts as a facade to the {@link CobolDataItem} type.
+ * This class is constructed from a CobolDataItem. All XML Schema attributes
  * are derived at construction time.
+ * <p/>
  * The isODOObject and isRedefined properties are the only ones that
  * are not set at construction time (And therefore have setters).
  * This is because these members can be set only when some data item
@@ -151,7 +153,7 @@ public class XsdDataItem {
                     cobolDataItem.getPicture(),
                     cobolDataItem.isSignSeparate(),
                     context.getCurrencySymbol(),
-                    context.isNSymbolDbcs(),
+                    context.nSymbolDbcs(),
                     context.decimalPointIsComma());
         }
 

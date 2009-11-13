@@ -25,10 +25,14 @@ import com.legstar.cobol.model.CobolDataItem.Range;
 import com.legstar.coxb.CobolType;
 
 /**
- * Populates an XML Schema from COBOL data items.
+ * Populates an XML Schema from COBOL data items (COBOL Model).
+ * <p/>
  * Uses the {@link XsdDataItem} facade to CobolDataItem. This will have all 
  * XSD attributes ready.
+ * <p/>
  * This class uses Apache XmlSchema to produce the XML schema.
+ * <p/>
+ * All execution parameters are bundled in {@link Cob2XsdContext}.
  *
  */
 public class XsdEmitter {

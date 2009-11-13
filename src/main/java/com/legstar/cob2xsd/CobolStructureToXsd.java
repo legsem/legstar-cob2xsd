@@ -40,8 +40,9 @@ import com.legstar.cobol.CobolStructureParser.cobdata_return;
 import com.legstar.cobol.model.CobolDataItem;
 
 /**
- * Implements a COBOL Structure to XML Schema translator.
- * This is the API made available to programmatically invoke the COBOL to XML Schema translator.
+ * Implements the COBOL Structure to XML Schema translator.
+ * This is the API made available to invoke the COBOL to XML Schema translator
+ *  from your own java code.
  * <p/>
  * There are 6 steps involved:
  * <ul>
@@ -89,6 +90,9 @@ public class CobolStructureToXsd {
      */
     public String translate(
             final String cobolSource) throws CobolStructureToXsdException {
+        if (_log.isDebugEnabled()) {
+            _log.debug(getContext().toString());
+        }
         return customize(emitXsd(emitModel(parse(lexify(clean(cobolSource))))));
     }
 
@@ -103,13 +107,17 @@ public class CobolStructureToXsd {
             final File cobolSourceFile,
             final File targetDir) throws CobolStructureToXsdException {
         try {
-            _log.info("Translating COBOL file: " + cobolSourceFile);
+            if (_log.isDebugEnabled()) {
+                _log.debug("Translating COBOL file: " + cobolSourceFile);
+            }
             String xsdString = translate(
                     FileUtils.readFileToString(cobolSourceFile));
             String xsdFileName = cobolSourceFile.getName() + ".xsd";
             File xsdFile = new File(targetDir, xsdFileName);
             FileUtils.writeStringToFile(xsdFile, xsdString);
-            _log.info("Created XSD file: " + xsdFile);
+            if (_log.isDebugEnabled()) {
+                _log.debug("Created XSD file: " + xsdFile);
+            }
             return xsdFile;
         } catch (IOException e) {
             throw (new CobolStructureToXsdException(e));
