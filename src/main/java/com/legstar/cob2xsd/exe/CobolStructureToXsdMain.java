@@ -113,6 +113,11 @@ public class CobolStructureToXsdMain {
         /* -------------------------------------------------------------------
          * XML Schema related options
          * */
+
+        Option xsdEncoding = new Option("e", "xsdEncoding", true,
+        "character set used to encode the generated XML Schema");
+        options.addOption(xsdEncoding);
+
         Option targetNamespace = new Option("t", "targetNamespace", true,
         "target namespace for generated XML schema");
         options.addOption(targetNamespace);
@@ -202,6 +207,9 @@ public class CobolStructureToXsdMain {
         /* -------------------------------------------------------------------
          * XML Schema related options
          * */
+        if (line.hasOption("xsdEncoding")) {
+            getContext().setXsdEncoding(line.getOptionValue("xsdEncoding").trim());
+        }
         if (line.hasOption("targetNamespace")) {
             getContext().setTargetNamespace(line.getOptionValue("targetNamespace").trim());
         }

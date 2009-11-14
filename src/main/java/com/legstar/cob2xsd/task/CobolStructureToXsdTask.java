@@ -132,89 +132,22 @@ public class CobolStructureToXsdTask extends Task {
         return _context;
     }
 
+    /* -------------------------------------------------------------------
+     * XML Schema related options
+     * */
+
     /**
-     * @return the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     * @return the character set used to encode the output XML Schema
      */
-    public char getCurrencySymbol() {
-        return getContext().getCurrencySymbol();
+    public String getXsdEncoding() {
+        return getContext().getXsdEncoding();
     }
 
     /**
-     * @param currencySymbol the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     * @param xsdEncoding the character set used to encode the output XML Schema to set
      */
-    public void setCurrencySymbol(final char currencySymbol) {
-        getContext().setCurrencySymbol(currencySymbol);
-    }
-
-    /**
-     * @return the NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false
-     */
-    public boolean isNSymbolDbcs() {
-        return getContext().nSymbolDbcs();
-    }
-
-    /**
-     * @param nSymbolDbcs the NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false
-     */
-    public void setNSymbolDbcs(final boolean nSymbolDbcs) {
-        getContext().setNSymbolDbcs(nSymbolDbcs);
-    }
-
-    /**
-     * @return whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)
-     */
-    public boolean decimalPointIsComma() {
-        return getContext().decimalPointIsComma();
-    }
-
-    /**
-     * @param decimalPointIsComma whether comma is the decimal point
-     *  (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)
-     */
-    public void setDecimalPointIsComma(final boolean decimalPointIsComma) {
-        getContext().setDecimalPointIsComma(decimalPointIsComma);
-    }
-
-    /**
-     * @return whether we should generate COBOL/JAXB annotations
-     */
-    public boolean addLegStarAnnotations() {
-        return getContext().addLegStarAnnotations();
-    }
-
-    /**
-     * @param addLegStarAnnotations whether we should generate COBOL/JAXB annotations
-     */
-    public void setAddLegStarAnnotations(final boolean addLegStarAnnotations) {
-        getContext().setAddLegStarAnnotations(addLegStarAnnotations);
-    }
-
-    /**
-     * @return the JAXB package name for generated Java classes
-     */
-    public String getJaxbPackageName() {
-        return getContext().getJaxbPackageName();
-    }
-
-    /**
-     * @return the JAXB type name prefix (generated JAXB class names will have this suffix)
-     */
-    public String getJaxbTypeClassesSuffix() {
-        return getContext().getJaxbTypeClassesSuffix();
-    }
-
-    /**
-     * @param jaxbPackageName the JAXB package name for generated Java classes
-     */
-    public void setJaxbPackageName(final String jaxbPackageName) {
-        getContext().setJaxbPackageName(jaxbPackageName);
-    }
-
-    /**
-     * @param jaxbTypeClassesSuffix the JAXB type name prefix (generated JAXB class names will have this suffix)
-     */
-    public void setJaxbTypeClassesSuffix(final String jaxbTypeClassesSuffix) {
-        getContext().setJaxbTypeClassesSuffix(jaxbTypeClassesSuffix);
+    public void setXsdEncoding(final String xsdEncoding) {
+        getContext().setXsdEncoding(xsdEncoding);
     }
 
     /**
@@ -292,6 +225,99 @@ public class CobolStructureToXsdTask extends Task {
     public void setElementNamesStartWithUppercase(
             final boolean elementNamesStartWithUppercase) {
         getContext().setElementNamesStartWithUppercase(elementNamesStartWithUppercase);
+    }
+
+    /* -------------------------------------------------------------------
+     * LegStar annotations related options
+     * */
+
+    /**
+     * @return whether we should generate COBOL/JAXB annotations
+     */
+    public boolean addLegStarAnnotations() {
+        return getContext().addLegStarAnnotations();
+    }
+
+    /**
+     * @param addLegStarAnnotations whether we should generate COBOL/JAXB annotations
+     */
+    public void setAddLegStarAnnotations(final boolean addLegStarAnnotations) {
+        getContext().setAddLegStarAnnotations(addLegStarAnnotations);
+    }
+
+    /**
+     * @return the JAXB package name for generated Java classes
+     */
+    public String getJaxbPackageName() {
+        return getContext().getJaxbPackageName();
+    }
+
+    /**
+     * @return the JAXB type name prefix (generated JAXB class names will have this suffix)
+     */
+    public String getJaxbTypeClassesSuffix() {
+        return getContext().getJaxbTypeClassesSuffix();
+    }
+
+    /**
+     * @param jaxbPackageName the JAXB package name for generated Java classes
+     */
+    public void setJaxbPackageName(final String jaxbPackageName) {
+        getContext().setJaxbPackageName(jaxbPackageName);
+    }
+
+    /**
+     * @param jaxbTypeClassesSuffix the JAXB type name prefix (generated JAXB class names will have this suffix)
+     */
+    public void setJaxbTypeClassesSuffix(final String jaxbTypeClassesSuffix) {
+        getContext().setJaxbTypeClassesSuffix(jaxbTypeClassesSuffix);
+    }
+
+    /* -------------------------------------------------------------------
+     * COBOL compiler related options
+     * */
+
+    /**
+     * @return the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     */
+    public char getCurrencySymbol() {
+        return getContext().getCurrencySymbol();
+    }
+
+    /**
+     * @param currencySymbol the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     */
+    public void setCurrencySymbol(final char currencySymbol) {
+        getContext().setCurrencySymbol(currencySymbol);
+    }
+
+    /**
+     * @return the NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false
+     */
+    public boolean isNSymbolDbcs() {
+        return getContext().nSymbolDbcs();
+    }
+
+    /**
+     * @param nSymbolDbcs the NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false
+     */
+    public void setNSymbolDbcs(final boolean nSymbolDbcs) {
+        getContext().setNSymbolDbcs(nSymbolDbcs);
+    }
+
+    /**
+     * @return whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)
+     */
+    public boolean decimalPointIsComma() {
+        return getContext().decimalPointIsComma();
+    }
+
+    /**
+     * @param decimalPointIsComma whether comma is the decimal point
+     *  (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)
+     */
+    public void setDecimalPointIsComma(final boolean decimalPointIsComma) {
+        getContext().setDecimalPointIsComma(decimalPointIsComma);
     }
 
     /**

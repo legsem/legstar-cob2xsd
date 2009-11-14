@@ -212,6 +212,19 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
     }
 
     /**
+     * A string literal with characters from ISO-8859-1.
+     */
+    public void testIso8859LiteralString() {
+        lexAndCheck(
+                "       1 A value \"יאחש\"" + LS
+                , "[@0,7:7='1',<DATA_ITEM_LEVEL>,1:7]"
+                + "[@1,9:9='A',<DATA_NAME>,1:9]"
+                + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
+                + "[@3,17:22='\"יאחש\"',<ALPHANUM_LITERAL_STRING>,1:17]");
+    }
+
+
+    /**
      * The case insensitive char reader should allow keywords to
      * be mixed case without impact on lexer grammar.
      */

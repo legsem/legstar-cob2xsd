@@ -8,12 +8,15 @@ import java.io.File;
  */
 public class Cob2XsdContext {
 
+    /** The default character set used to encode the XML Schema.*/
+    public static final String DEFAULT_XSD_ENCODING = "UTF-8";
+
     /** Default target namespace. */
     public static final String DEFAULT_TARGET_NAMESPACE = "http://www.acme.com/test";
 
     /** Default JAXB package name. */
     public static final String DEFAULT_JAXB_PACKAGE_NAME = "com.acme.test";
-    
+
     /** Default Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
     public static final char DEFAULT_CURRENCY_SYMBOL = '$';
 
@@ -21,24 +24,28 @@ public class Cob2XsdContext {
     /* -------------------------------------------------------------------
      * XML Schema related options
      * */
+    
+    /** Character set used to encode the output XML Schema.*/
+    private String _xsdEncoding = DEFAULT_XSD_ENCODING;
+    
     /** Target namespace for generated XML schema.*/
     private String _targetNamespace = DEFAULT_TARGET_NAMESPACE;
 
     /** Whether COBOL conditions (level 88) should be mapped to facets. Facets 
      * restrict the content which might not be desirable. */
     private boolean _mapConditionsToFacets = false;
-    
+
     /** True if parent complex type name should be prepended in case of name conflict
      * (otherwise, the COBOL source line will be appended). */
     private boolean _nameConflictPrependParentName = false;
-    
+
     /** True if XSD element names should start with an uppercase 
      * (compatible with LegStar 1.2).*/
     private boolean _elementNamesStartWithUppercase = false;
-    
+
     /** An optional XSLT transform for XML schema customization. */
     private File _customXslt;
-    
+
 
     /* -------------------------------------------------------------------
      * LegStar annotations related options
@@ -46,13 +53,13 @@ public class Cob2XsdContext {
 
     /** Whether we should generate COBOL/JAXB annotations. */
     private boolean _addLegStarAnnotations = false;
-    
+
     /** The JAXB package name (appears in schema annotations).*/
     private String _jaxbPackageName = DEFAULT_JAXB_PACKAGE_NAME;
 
     /** JAXB appends this suffix to all generated types.*/
     private String _jaxbTypeClassesSuffix;
-    
+
 
     /* -------------------------------------------------------------------
      * COBOL compiler related options
@@ -60,21 +67,35 @@ public class Cob2XsdContext {
 
     /** Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
     private char _currencySymbol = DEFAULT_CURRENCY_SYMBOL;
-    
+
     /** Whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES). */
     private boolean _decimalPointIsComma = false;
 
     /** COBOL NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false.*/
     private boolean _nSymbolDbcs = false;
-    
+
     /** COBOL QUOTE|APOST compiler option. False means APOST.*/
     private boolean _quoteIsQuote = true;
-    
+
 
     /* -------------------------------------------------------------------
      * XML Schema related options
      * */
-    
+
+    /**
+     * @return the character set used to encode the output XML Schema
+     */
+    public String getXsdEncoding() {
+        return _xsdEncoding;
+    }
+
+    /**
+     * @param xsdEncoding the character set used to encode the output XML Schema to set
+     */
+    public void setXsdEncoding(final String xsdEncoding) {
+        _xsdEncoding = xsdEncoding;
+    }
+
     /**
      * The target namespace for generated XML schema.
      * @return the target namespace for generated XML schema
@@ -272,11 +293,12 @@ public class Cob2XsdContext {
     public void setQuoteIsQuote(final boolean quoteIsQuote) {
         _quoteIsQuote = quoteIsQuote;
     }
-    
+
     /** {@inheritDoc}*/
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Options in effect:\n");
+        sb.append("xsdEncoding                    : " + getXsdEncoding() + "\n");
         sb.append("targetNamespace                : " + getTargetNamespace() + "\n");
         sb.append("mapConditionsToFacets          : " + mapConditionsToFacets() + "\n");
         sb.append("nameConflictPrependParentName  : " + nameConflictPrependParentName() + "\n");

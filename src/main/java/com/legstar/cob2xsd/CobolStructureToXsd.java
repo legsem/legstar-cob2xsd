@@ -1,19 +1,21 @@
 package com.legstar.cob2xsd;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -51,7 +53,7 @@ import com.legstar.cobol.model.CobolDataItem;
  * <li>Parsing keywords to extract meaningful COBOL statements</li>
  * <li>Emitting a COBOL model (a set of java classes) from the Abstract Syntax Tree</li>
  * <li>Emitting XSD from the COBOL model</li>
- * <li>Optionally applying a customization XSLT to the XML Schema</li>
+ * <li>Writing the XML Schema, optionally applying a customization XSLT</li>
  * </ul>
  * <p/>
  * To invoke the translator, you normally call one of {@link #translate(String)} or
@@ -67,7 +69,7 @@ public class CobolStructureToXsd {
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
-
+    
     /**
      * Default constructor.
      */
@@ -76,7 +78,7 @@ public class CobolStructureToXsd {
     }
 
     /**
-     * @param context execution parameters for the COBOL to XSD utility
+     * @param context execution parameters for the COBOL to XML Schema utility
      */
     public CobolStructureToXsd(final Cob2XsdContext context) {
         _context = context;
@@ -93,30 +95,45 @@ public class CobolStructureToXsd {
         if (_log.isDebugEnabled()) {
             _log.debug(getContext().toString());
         }
-        return customize(emitXsd(emitModel(parse(lexify(clean(cobolSource))))));
+        return write(emitXsd(emitModel(parse(lexify(clean(cobolSource))))));
     }
 
     /**
-     * Execute the translation from COBOL to COBOL.
+     * Execute the translation from COBOL to XML Schema.
      * @param cobolSourceFile the COBOL source code
-     * @param targetDir folder where XSD result is to be written
-     * @return the COBOL source code
+     * @param targetDir folder where XML schema result is to be written
+     * @return the XML Schema
      * @throws CobolStructureToXsdException if XML schema generation process fails
      */
     public File translate(
             final File cobolSourceFile,
+            final File targetDir) throws CobolStructureToXsdException {
+        return translate(cobolSourceFile, null, targetDir);
+    }
+
+    /**
+     * Execute the translation from COBOL to XML Schema.
+     * @param cobolSourceFile the COBOL source code (platform encoding by default)
+     * @param cobolSourceEncoding the character set used to encode the COBOL source
+     * @param targetDir folder where XML schema result is to be written
+     * @return the XML Schema
+     * @throws CobolStructureToXsdException if XML schema generation process fails
+     */
+    public File translate(
+            final File cobolSourceFile,
+            final String cobolSourceEncoding,
             final File targetDir) throws CobolStructureToXsdException {
         try {
             if (_log.isDebugEnabled()) {
                 _log.debug("Translating COBOL file: " + cobolSourceFile);
             }
             String xsdString = translate(
-                    FileUtils.readFileToString(cobolSourceFile));
+                    FileUtils.readFileToString(cobolSourceFile, cobolSourceEncoding));
             String xsdFileName = cobolSourceFile.getName() + ".xsd";
             File xsdFile = new File(targetDir, xsdFileName);
-            FileUtils.writeStringToFile(xsdFile, xsdString);
+            FileUtils.writeStringToFile(xsdFile, xsdString, getContext().getXsdEncoding());
             if (_log.isDebugEnabled()) {
-                _log.debug("Created XSD file: " + xsdFile);
+                _log.debug("Created XML schema file: " + xsdFile);
             }
             return xsdFile;
         } catch (IOException e) {
@@ -221,11 +238,12 @@ public class CobolStructureToXsd {
      * @param cobolDataItems a list of COBOL data items
      * @return the XML schema
      */
-    public XmlSchema emitXsd(final List < CobolDataItem > cobolDataItems) {
+    public XmlSchema emitXsd(
+            final List < CobolDataItem > cobolDataItems) {
         if (_log.isDebugEnabled()) {
             debug("Emitting XSD from: ", cobolDataItems.toString());
         }
-        XmlSchema xsd = getNewXmlSchema();
+        XmlSchema xsd = createXmlSchema(getContext().getXsdEncoding());
         List < String > nonUniqueCobolNames = getNonUniqueCobolNames(cobolDataItems);
         XsdEmitter emitter = new XsdEmitter(xsd, getContext());
         for (CobolDataItem cobolDataItem : cobolDataItems) {
@@ -285,40 +303,43 @@ public class CobolStructureToXsd {
     }
     
     /**
+     * Serialize the XML Schema to a string.
+     * <p/>
      * If we are provided with an XSLT customization file then we
      * transform the XMLSchema.
      * @param xsd the XML Schema before customization
      * @return a string serialization of the customized XML Schema
      * @throws CobolStructureToXsdException if customization fails
      */
-    public String customize(final XmlSchema xsd) throws CobolStructureToXsdException {
-        if (_log.isDebugEnabled()) {
-            StringWriter logWriter = new StringWriter();
-            xsd.write(logWriter);
-            debug("Customizing XML Schema:\n", logWriter.toString());
-        }
+    public String write(final XmlSchema xsd) throws CobolStructureToXsdException {
+        
         String errorMessage = "Customizing XML Schema failed.";
         try {
-            StringWriter writer = new StringWriter();
-            if (getContext().getCustomXslt() == null) {
-                xsd.write(writer);
-            } else {
-                TransformerFactory tFactory = TransformerFactory.newInstance();
-                Source xslSource = new StreamSource(getContext().getCustomXslt());
-                Transformer transformer = tFactory.newTransformer(xslSource);
-                StreamResult result = new StreamResult(writer);
-                
-                /* Attempt to pass the XmlSchema as a DOM directly to
-                 * transformer fail. This is more expensive but works.*/
-                File temp = File.createTempFile("genSchema", ".xsd");
-                temp.deleteOnExit();
-                FileWriter tempWriter = new FileWriter(temp);
-                xsd.write(tempWriter);
-                
-                transformer.transform(
-                        new StreamSource(temp),
-                        result);
+            TransformerFactory tFactory = TransformerFactory.newInstance();
+            try {
+                tFactory.setAttribute("indent-number", "4");
+            } catch (IllegalArgumentException e) {
+                _log.warn("Unable to set indent-number on transfomer factory", e);
             }
+            StringWriter writer = new StringWriter();
+            Source source = new DOMSource(xsd.getAllSchemas()[0]);
+            Result result = new StreamResult(writer);
+            Transformer transformer;
+            if (getContext().getCustomXslt() == null) {
+                transformer = tFactory.newTransformer();
+            } else {
+                Source xslSource = new StreamSource(getContext().getCustomXslt());
+                transformer = tFactory.newTransformer(xslSource);
+            }
+            transformer.setOutputProperty(OutputKeys.ENCODING,
+                    getContext().getXsdEncoding());
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.STANDALONE, "no");
+
+            transformer.transform(source, result);
+            writer.flush();
+           
             return writer.toString();
         } catch (TransformerConfigurationException e) {
             _log.error(errorMessage, e);
@@ -329,20 +350,20 @@ public class CobolStructureToXsd {
         } catch (TransformerException e) {
             _log.error(errorMessage, e);
             throw new CobolStructureToXsdException(e);
-        } catch (IOException e) {
-            _log.error(errorMessage, e);
-            throw new CobolStructureToXsdException(e);
         }
     }
 
     /**
+     * Create an empty XML Schema.
+     * @param encoding the character set used to encode this XML Schema
      * @return a new empty XML schema using the context 
      */
-    protected XmlSchema getNewXmlSchema() {
+    protected XmlSchema createXmlSchema(final String encoding) {
         XmlSchema xsd = new XmlSchema(
                 getContext().getTargetNamespace(), new XmlSchemaCollection());
         xsd.setElementFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
         xsd.setAttributeFormDefault(null);
+        xsd.setInputEncoding(encoding);
         return xsd;
     }
 
