@@ -16,6 +16,8 @@ import org.antlr.runtime.RecognizerSharedState;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.legstar.antlr.RecognizerErrorHandler;
+
 /**
  * Overrides some of the ANTLR generated lexer methods so that the resulting
  * java class behaves like other LegStar classes, particularly for logging purposes.
@@ -23,6 +25,9 @@ import org.apache.commons.logging.LogFactory;
  * This code could be imbedded in the lexer grammar as well but its harder to
  * debug using ANTLRWorks because this code might have dependencies on jars which
  * are not naturally in ANTLRWorks classpath.
+ * <p/>
+ * This is associated with a grammar that has filter=true therefore there are no
+ * lexer errors, all unrecognized tokens are simply dropped.
  *
  */
 public class CobolStructureKeywordsLexerImpl extends CobolStructureKeywordsLexer {
@@ -40,7 +45,8 @@ public class CobolStructureKeywordsLexerImpl extends CobolStructureKeywordsLexer
      * Construct from a character stream.
      * @param input the character stream
      */
-    public CobolStructureKeywordsLexerImpl(final CharStream input) {
+    public CobolStructureKeywordsLexerImpl(
+            final CharStream input) {
         this(input, new RecognizerSharedState());
     }
     
@@ -49,13 +55,16 @@ public class CobolStructureKeywordsLexerImpl extends CobolStructureKeywordsLexer
      * @param input the character stream
      * @param state the shared state
      */
-    public CobolStructureKeywordsLexerImpl(final CharStream input, final RecognizerSharedState state) {
+    public CobolStructureKeywordsLexerImpl(
+            final CharStream input,
+            final RecognizerSharedState state) {
         super(input, state);
-
     }
+
     /** {@inheritDoc} */
     public String getErrorMessage(final RecognitionException e, final String[] tokenNames) {
-        return ErrorHelper.getErrorMessage(_log, this, e, super.getErrorMessage(e, tokenNames));
+        return RecognizerErrorHandler.getErrorMessage(
+                _log, this, e, super.getErrorMessage(e, tokenNames), tokenNames);
     }
     
 

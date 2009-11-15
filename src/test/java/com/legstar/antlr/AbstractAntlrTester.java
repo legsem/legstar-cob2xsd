@@ -28,8 +28,15 @@ public abstract class AbstractAntlrTester extends TestCase {
      * @param source original source
      * @param expected expected result
      */
-    public void cleanAndCheck(final String source, final String expected) {
-        assertEquals(expected, clean(source));
+    public void cleanAndCheck(
+            final String source,
+            final String expected) {
+        try {
+            assertEquals(expected, clean(source));
+        } catch (RecognizerException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
         
     }
 
@@ -40,12 +47,17 @@ public abstract class AbstractAntlrTester extends TestCase {
      * @param expected the expected token stream
      */
     public void lexAndCheck(final String source, final String expected) {
-        CommonTokenStream ts = lex(source);
-        StringBuilder sb = new StringBuilder();
-        for (Object token : ts.getTokens()) {
-            sb.append(toString((Token) token));
+        try {
+            CommonTokenStream ts = lex(source);
+            StringBuilder sb = new StringBuilder();
+            for (Object token : ts.getTokens()) {
+                sb.append(toString((Token) token));
+            }
+            assertEquals(expected, sb.toString());
+        } catch (RecognizerException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
         }
-        assertEquals(expected, sb.toString());
     }
 
     /**
@@ -54,11 +66,16 @@ public abstract class AbstractAntlrTester extends TestCase {
      * @param expected the expected sub graph
      */
     public void parseAndCheck(final String source, final String expected) {
-        CommonTree ast = parse(source);
-        if (_log.isDebugEnabled()) {
-            _log.debug(getGraph(ast).toString());
+        try {
+            CommonTree ast = parse(source);
+            if (_log.isDebugEnabled()) {
+                _log.debug(getGraph(ast).toString());
+            }
+            assertEquals(expected, (ast == null) ? "" : ast.toStringTree());
+        } catch (RecognizerException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
         }
-        assertEquals(expected, (ast == null) ? "" : ast.toStringTree());
     }
 
     /**
@@ -104,30 +121,33 @@ public abstract class AbstractAntlrTester extends TestCase {
      * Perform initial source cleanup to keep ANLR grammar simple.
      * @param source original source code
      * @return cleaned up source code
+     * @throws RecognizerException if source cannot be read
      */
-    public abstract String clean(final String source);
+    public abstract String clean(final String source) throws RecognizerException;
 
     /**
      * Apply the lexer to produce a token stream from source.
      * @param source the source code
      * @return an antlr token stream
-     */
-    public abstract CommonTokenStream lex(final String source);
+      * @throws RecognizerException if lexer fails
+    */
+    public abstract CommonTokenStream lex(final String source) throws RecognizerException;
     
     /**
      * Apply Lexer + Parser to produce an abstract syntax tree from source. 
      * @param source the source code
      * @return an antlr abstract syntax tree
+      * @throws RecognizerException if parser fails
      */
-    public abstract CommonTree parse(final String source);
+    public abstract CommonTree parse(final String source) throws RecognizerException;
 
     /**
      * Apply Lexer + Parser + Emitter to produce some translated content. 
      * @param source the source code
      * @return a translated result
-     * @throws Exception if emit fails
+     * @throws RecognizerException if emit fails
      */
-    public abstract String emit(final String source) throws Exception;
+    public abstract String emit(final String source) throws RecognizerException;
 
     /**
      * @return the parser token names (nicer looking than integer types)

@@ -15,6 +15,9 @@ import org.apache.commons.logging.LogFactory;
 
 import com.legstar.antlr.ANTLRNoCaseReaderStream;
 import com.legstar.antlr.AbstractAntlrTester;
+import com.legstar.antlr.CleanerException;
+import com.legstar.antlr.RecognizerErrorHandler;
+import com.legstar.antlr.RecognizerException;
 import com.legstar.cobol.CobolStructureParser.cobdata_return;
 import com.legstar.cobol.model.CobolDataItem;
 
@@ -27,10 +30,14 @@ public abstract class AbstractCobolTester extends AbstractAntlrTester {
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
 
+    /** Handles error messages.*/
+    private RecognizerErrorHandler _errorHandler = new RecognizerErrorHandler();
+
     /**
      * {@inheritDoc}
+     * @throws CleanerException 
      */
-    public String clean(final String source) {
+    public String clean(final String source) throws CleanerException {
         CobolSourceCleaner cleaner = new CobolSourceCleaner();
         return cleaner.execute(source);
     }
@@ -38,12 +45,13 @@ public abstract class AbstractCobolTester extends AbstractAntlrTester {
     /**
      * {@inheritDoc}
      */
-    public CommonTokenStream lex(final String source) {
+    public CommonTokenStream lex(final String source) throws RecognizerException {
         try {
             CobolStructureLexer lex = new CobolStructureLexerImpl(
                     new ANTLRNoCaseReaderStream(
                             new StringReader(
-                                    clean(source))));
+                                    clean(source))),
+                                    getErrorHandler());
             CommonTokenStream tokens = new CommonTokenStream(lex);
             if (lex.getNumberOfSyntaxErrors() > 0) {
                 _log.warn(lex.getNumberOfSyntaxErrors() + " lex errors");
@@ -51,21 +59,18 @@ public abstract class AbstractCobolTester extends AbstractAntlrTester {
             assertTrue(tokens != null);
             return tokens;
         } catch (IOException e) {
-            _log.error("test failed", e);
-            fail(e.toString());
+            throw new RecognizerException(e);
         }
-        return null;
     }
     
     /**
-     * Apply Lexer + Parser to produce an abstract syntax tree from source. 
-     * @param source the source code
-     * @return an antlr abstract syntax tree
+     * {@inheritDoc}
      */
-    public CommonTree parse(final String source) {
+    public CommonTree parse(final String source) throws RecognizerException {
         try {
             CommonTokenStream tokens = lex(source);
-            CobolStructureParser parser = new CobolStructureParserImpl(tokens);
+            CobolStructureParser parser = new CobolStructureParserImpl(
+                    tokens, getErrorHandler());
             cobdata_return parserResult = parser.cobdata();
             if (parser.getNumberOfSyntaxErrors() > 0) {
                 _log.warn(parser.getNumberOfSyntaxErrors() + " parse errors");
@@ -73,28 +78,31 @@ public abstract class AbstractCobolTester extends AbstractAntlrTester {
             assertTrue(parserResult != null);
             return (CommonTree) parserResult.getTree();
         } catch (RecognitionException e) {
-            _log.error("test failed", e);
-            fail(e.toString());
+            throw new RecognizerException(e);
         }
-        return null;
     }
 
     /**
      * Starting from a COBOL source fragment translates to XML Schema.
      * @param source COBOL source fragment.
      * @return an XML Schema
-     * @throws Exception if emit fails
+     * @throws RecognizerException if emit fails
      */
-    public String emit(final String source) throws Exception {
-        CommonTree ast = parse(source);
-        if (_log.isDebugEnabled()) {
-            _log.debug(ast.toStringTree());
+    public String emit(final String source)  throws RecognizerException {
+        try {
+            CommonTree ast = parse(source);
+            if (_log.isDebugEnabled()) {
+                _log.debug(ast.toStringTree());
+            }
+            TreeNodeStream nodes = new CommonTreeNodeStream(ast);
+            CobolStructureEmitter emitter = new CobolStructureEmitterImpl(
+                    nodes, getErrorHandler());
+            List < CobolDataItem > dataEntries = new ArrayList < CobolDataItem >();
+            emitter.cobdata(dataEntries);
+            return dataEntries.toString();
+        } catch (RecognitionException e) {
+            throw new RecognizerException(e);
         }
-        TreeNodeStream nodes = new CommonTreeNodeStream(ast);
-        CobolStructureEmitter emitter = new CobolStructureEmitter(nodes);
-        List < CobolDataItem > dataEntries = new ArrayList < CobolDataItem >();
-        emitter.cobdata(dataEntries);
-        return dataEntries.toString();
     }
 
     /**
@@ -104,4 +112,10 @@ public abstract class AbstractCobolTester extends AbstractAntlrTester {
         return CobolStructureParser.tokenNames;
     }
 
+    /**
+     * @return the error messages handler
+     */
+    public RecognizerErrorHandler getErrorHandler() {
+        return _errorHandler;
+    }
 }

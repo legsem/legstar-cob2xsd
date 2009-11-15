@@ -10,9 +10,9 @@
  ******************************************************************************/
 package com.legstar.cobol;
 
-import org.antlr.runtime.CharStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.RecognizerSharedState;
+import org.antlr.runtime.tree.TreeNodeStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,47 +25,45 @@ import com.legstar.antlr.RecognizerErrorHandler;
  * This code could be imbedded in the lexer grammar as well but its harder to
  * debug using ANTLRWorks because this code might have dependencies on jars which
  * are not naturally in ANTLRWorks classpath.
- *
  */
-public class CobolStructureLexerImpl extends CobolStructureLexer {
+public class CobolStructureEmitterImpl extends CobolStructureEmitter {
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
-    
+
     /** Handles error messages.*/
     private RecognizerErrorHandler _errorHandler;
 
     /**
-     * Construct from a character stream.
-     * @param input the character stream
+     * Construct from a tree nodes stream.
+     * @param input the tree nodes stream
      * @param errorHandler handles error messages
      */
-    public CobolStructureLexerImpl(
-            final CharStream input,
+    public CobolStructureEmitterImpl(
+            final TreeNodeStream input,
             final RecognizerErrorHandler errorHandler) {
         this(input, new RecognizerSharedState(), errorHandler);
     }
-    
+
     /**
-     * Construct from a character stream and a shared state.
-     * @param input the character stream
+     * Construct from a tree nodes stream and a shared state.
+     * @param input the tree nodes stream
      * @param state the shared state
      * @param errorHandler handles error messages
      */
-    public CobolStructureLexerImpl(
-            final CharStream input,
+    public CobolStructureEmitterImpl(
+            final TreeNodeStream input,
             final RecognizerSharedState state,
             final RecognizerErrorHandler errorHandler) {
         super(input, state);
         _errorHandler = errorHandler;
-
     }
+    
     /** {@inheritDoc} */
     public String getErrorMessage(final RecognitionException e, final String[] tokenNames) {
         return RecognizerErrorHandler.getErrorMessage(
                 _log, this, e, super.getErrorMessage(e, tokenNames), tokenNames);
     }
-    
 
     /** {@inheritDoc} */
     public void emitErrorMessage(final String msg) {

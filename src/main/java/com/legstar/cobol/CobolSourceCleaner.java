@@ -16,8 +16,7 @@ import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.legstar.antlr.CleanerException;
 
 /**
  * In order to reduce the lexer/parser grammar complexity, this class will remove
@@ -31,9 +30,6 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class CobolSourceCleaner {
-
-    /** Logger. */
-    private final Log _log = LogFactory.getLog(getClass());
 
     /** Line separator (OS specific).*/
     public static final String LS = System.getProperty("line.separator");
@@ -56,8 +52,9 @@ public class CobolSourceCleaner {
      * to preserve original line numbering.
      * @param cobolSource the raw COBOL source
      * @return the source cleaned up
+     * @throws CleanerException if source cannot be read
      */
-    public String execute(final String cobolSource) {
+    public String execute(final String cobolSource) throws CleanerException {
         if (cobolSource != null) {
             BufferedReader reader = new BufferedReader(
                     new StringReader(cobolSource));
@@ -72,14 +69,17 @@ public class CobolSourceCleaner {
                     }
                     cleanedSource.append(LS);
                 }
+                if (cleanedSource.length() <= LS.length()) {
+                    throw new CleanerException(
+                            "No data descriptions between columns 6 and 72. Are you sure this is COBOL source?");
+                }
                 return cleanedSource.toString();
             } catch (IOException e) {
-                _log.warn("Unable to read COBOL source", e);
+                throw new CleanerException(e);
             }
         } else {
-            _log.warn("COBOL source was null");
+            throw new CleanerException("COBOL source was null");
         }
-        return null;
     }
 
     /**

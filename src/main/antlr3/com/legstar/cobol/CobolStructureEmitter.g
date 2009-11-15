@@ -5,7 +5,6 @@ tree grammar CobolStructureEmitter;
 options {
     tokenVocab = CobolStructureParser;
     ASTLabelType=CommonTree;
-    superClass=AbstractCobolStructureEmitter;
 }
 
 /*------------------------------------------------------------------

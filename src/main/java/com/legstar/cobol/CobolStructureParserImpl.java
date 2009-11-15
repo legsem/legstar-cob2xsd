@@ -15,8 +15,9 @@ import org.apache.commons.logging.LogFactory;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.RecognizerSharedState;
-import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
+
+import com.legstar.antlr.RecognizerErrorHandler;
 
 /**
  * Overrides some of the ANTLR generated parser methods so that the resulting
@@ -32,41 +33,50 @@ public class CobolStructureParserImpl extends CobolStructureParser {
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
 
+    /** Handles error messages.*/
+    private RecognizerErrorHandler _errorHandler;
+
     /**
      * Construct from a token stream.
      * @param input the token stream
+     * @param errorHandler handles error messages
      */
-    public CobolStructureParserImpl(final TokenStream input) {
+    public CobolStructureParserImpl(
+            final TokenStream input,
+            final RecognizerErrorHandler errorHandler) {
         super(input);
+        _errorHandler = errorHandler;
     }
 
     /**
      * Construct from a token stream and a shared state.
      * @param input the token stream
      * @param state the shared state
+     * @param errorHandler handles error messages
      */
-    public CobolStructureParserImpl(final TokenStream input, final RecognizerSharedState state) {
+    public CobolStructureParserImpl(
+            final TokenStream input,
+            final RecognizerSharedState state,
+            final RecognizerErrorHandler errorHandler) {
         super(input, state);
-         
+        _errorHandler = errorHandler;
     }
 
     /** {@inheritDoc} */
     public String getErrorMessage(final RecognitionException e, final String[] tokenNames) {
-        return ErrorHelper.getErrorMessage(_log, this, e, super.getErrorMessage(e, tokenNames));
-    }
-
-    /** {@inheritDoc} */
-    public String getTokenErrorDisplay(final Token t) {
-        if (_log.isDebugEnabled()) {
-            return ErrorHelper.toString(t, getTokenNames());
-        } else {
-            return super.getTokenErrorDisplay(t);
-        }
+        return RecognizerErrorHandler.getErrorMessage(
+                _log, this, e, super.getErrorMessage(e, tokenNames), tokenNames);
     }
 
     /** {@inheritDoc} */
     public void emitErrorMessage(final String msg) {
-        _log.warn(msg);
+        getErrorHandler().addMessageToHistory(msg);
     }
 
+    /**
+     * @return the error messages handler
+     */
+    public RecognizerErrorHandler getErrorHandler() {
+        return _errorHandler;
+    }
 }

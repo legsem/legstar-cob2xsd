@@ -1,5 +1,7 @@
 package com.legstar.cobol;
 
+import com.legstar.antlr.RecognizerException;
+
 
 
 /**
@@ -8,6 +10,32 @@ package com.legstar.cobol;
  */
 public class CobolSourceCleanerTest extends AbstractCobolTester {
 
+    
+    /**
+     * Null input case.
+     */
+    public void testNull() {
+        try {
+            clean(null);
+            fail();
+        } catch (RecognizerException e) {
+            assertEquals("COBOL source was null", e.getMessage());
+        }
+    }
+    
+    /**
+     * Empty input case.
+     */
+    public void testEmpty() {
+        try {
+            clean("");
+            fail();
+        } catch (RecognizerException e) {
+            assertEquals("No data descriptions between columns 6 and 72."
+                    + " Are you sure this is COBOL source?", e.getMessage());
+        }
+    }
+    
     /**
      * Check that special characters are removed.
      */
@@ -53,9 +81,9 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
         
         CobolSourceCleaner.CleaningContext context = new CobolSourceCleaner.CleaningContext();
 
-        cleanAndCheck(" 01 A PIC 9.9.", " 01 A PIC 9.9.", context);
+        removeExtraneousCharactersAndCheck(" 01 A PIC 9.9.", " 01 A PIC 9.9.", context);
         assertTrue(context.isLookingForLevel());
-        cleanAndCheck(" 01 A PIC X. ", " 01 A PIC X. ", context);
+        removeExtraneousCharactersAndCheck(" 01 A PIC X. ", " 01 A PIC X. ", context);
         assertTrue(context.isLookingForLevel());
     }
 
@@ -66,22 +94,22 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
         
         CobolSourceCleaner.CleaningContext context = new CobolSourceCleaner.CleaningContext();
 
-        cleanAndCheck("", "", context);
-        cleanAndCheck(" 01.", " 01.", context);
+        removeExtraneousCharactersAndCheck("", "", context);
+        removeExtraneousCharactersAndCheck(" 01.", " 01.", context);
         assertTrue(context.isLookingForLevel());
-        cleanAndCheck(" 01", " 01", context);
+        removeExtraneousCharactersAndCheck(" 01", " 01", context);
         assertFalse(context.isLookingForLevel());
-        cleanAndCheck(" .", " .", context);
+        removeExtraneousCharactersAndCheck(" .", " .", context);
         assertTrue(context.isLookingForLevel());
-        cleanAndCheck(" 01 A.", " 01 A.", context);
+        removeExtraneousCharactersAndCheck(" 01 A.", " 01 A.", context);
         assertTrue(context.isLookingForLevel());
-        cleanAndCheck(" 01   A.", " 01   A.", context);
+        removeExtraneousCharactersAndCheck(" 01   A.", " 01   A.", context);
         assertTrue(context.isLookingForLevel());
-        cleanAndCheck(" 01   A  .", " 01   A  .", context);
+        removeExtraneousCharactersAndCheck(" 01   A  .", " 01   A  .", context);
         assertTrue(context.isLookingForLevel());
-        cleanAndCheck("blabla", "", context);
+        removeExtraneousCharactersAndCheck("blabla", "", context);
         assertTrue(context.isLookingForLevel());
-        cleanAndCheck("       01  FILEA.   COPY DFH0CFIL.", "       01  FILEA. ", context);
+        removeExtraneousCharactersAndCheck("       01  FILEA.   COPY DFH0CFIL.", "       01  FILEA. ", context);
         assertTrue(context.isLookingForLevel());
     }
 
@@ -92,10 +120,10 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
         
         CobolSourceCleaner.CleaningContext context = new CobolSourceCleaner.CleaningContext();
 
-        cleanAndCheck(" 01 A. 02 B.", " 01 A. 02 B.", context);
-        cleanAndCheck(" 01 A. 02 B.03 C.", " 01 A. 02 B.03 C.", context);
+        removeExtraneousCharactersAndCheck(" 01 A. 02 B.", " 01 A. 02 B.", context);
+        removeExtraneousCharactersAndCheck(" 01 A. 02 B.03 C.", " 01 A. 02 B.03 C.", context);
         /* Extraneous characters past closed statement should be wiped out*/
-        cleanAndCheck(" 01 A. 02 B. blabla 03 C.", " 01 A. 02 B.        03 C.", context);
+        removeExtraneousCharactersAndCheck(" 01 A. 02 B. blabla 03 C.", " 01 A. 02 B.        03 C.", context);
 
     }
 
@@ -106,13 +134,13 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
         
         CobolSourceCleaner.CleaningContext context = new CobolSourceCleaner.CleaningContext();
 
-        cleanAndCheck(" 01 A", " 01 A", context);
+        removeExtraneousCharactersAndCheck(" 01 A", " 01 A", context);
         assertFalse(context.isLookingForLevel());
         /* Whatever is within the statement should remain untouched */
-        cleanAndCheck("blabla", "blabla", context);
+        removeExtraneousCharactersAndCheck("blabla", "blabla", context);
         assertFalse(context.isLookingForLevel());
         /* Extraneous characters past the closing statement should be wiped out */
-        cleanAndCheck(". blabla", ". ", context);
+        removeExtraneousCharactersAndCheck(". blabla", ". ", context);
         assertTrue(context.isLookingForLevel());
 
     }
@@ -123,7 +151,7 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
      * @param expected expected cleaneup result
      * @param context cleaning context
      */
-    private void cleanAndCheck(
+    private void removeExtraneousCharactersAndCheck(
             final String line,
             final String expected,
             final CobolSourceCleaner.CleaningContext context) {
@@ -135,8 +163,6 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
      */
     public void testCompleteCleaning() {
         
-        cleanAndCheck(null, null);
-        cleanAndCheck("", "");
         /*         0        1         2         3         4         5         6         7  */
         /*         123456789012345678901234567890123456789012345678901234567890123456789012*/
         cleanAndCheck(

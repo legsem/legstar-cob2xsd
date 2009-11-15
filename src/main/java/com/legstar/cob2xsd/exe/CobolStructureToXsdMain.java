@@ -38,6 +38,9 @@ public class CobolStructureToXsdMain {
     /** A file or folder containing COBOL code to translate to XSD. Defaults to cobol relative folder.*/
     private File _input = new File("cobol");
 
+    /** Character set used to encode the input COBOL source files.*/
+    private String _cobolSourceFileEncoding;
+
     /** A folder containing translated XML Schema. Defaults to schema relative folder. */
     private File _output = new File("schema");
 
@@ -72,7 +75,7 @@ public class CobolStructureToXsdMain {
             try {
                 CommandLine line = parser.parse(options, args);
                 if (processLine(line, options)) {
-                    execute(_input, _output);
+                    execute(_input, _cobolSourceFileEncoding,  _output);
                 }
                 return;
             } catch (ParseException e) {
@@ -105,6 +108,10 @@ public class CobolStructureToXsdMain {
         Option input = new Option("i", "input", true,
         "file or folder holding the COBOL code to translate. Name is relative or absolute");
         options.addOption(input);
+
+        Option cobolSourceFileEncoding = new Option("c", "cobolSourceFileEncoding", true,
+        "Character set used for COBOL source files encoding");
+        options.addOption(cobolSourceFileEncoding);
 
         Option output = new Option("o", "output", true,
         "folder receiving the translated XML schema");
@@ -198,6 +205,9 @@ public class CobolStructureToXsdMain {
                 return false;
             }
         }
+        if (line.hasOption("cobolSourceFileEncoding")) {
+            _cobolSourceFileEncoding = line.getOptionValue("cobolSourceFileEncoding").trim();
+        }
         if (line.hasOption("output")) {
             String output = line.getOptionValue("output").trim();
             if (!setOutput(output)) {
@@ -267,25 +277,31 @@ public class CobolStructureToXsdMain {
      * Translate a single file or all files from an input folder.
      * Place results in the output folder.
      * @param input the input COBOL file or folder
+     * @param cobolSourceFileEncoding the input file character set
      * @param targetDir the output folder where XML schema file must go
      */
-    protected void execute(final File input, final File targetDir) {
+    protected void execute(
+            final File input,
+            final String cobolSourceFileEncoding,
+            final File targetDir) {
+
         _log.info("Started translation from COBOL to XML Schema");
-        _log.info("Taking COBOL from   : " + input);
-        _log.info("Output XML Schema to: " + targetDir);
+        _log.info("Taking COBOL from    : " + input);
+        _log.info("COBOL files encoding : " + cobolSourceFileEncoding);
+        _log.info("Output XML Schema to : " + targetDir);
         _log.info(getContext().toString());
         try {
             CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getContext());
             if (_input != null && _output != null) {
                 if (input.isFile()) {
                     _log.info("Translation started for: " + input);
-                    File xmlSchemaFile = cob2xsd.translate(input, targetDir);
+                    File xmlSchemaFile = cob2xsd.translate(input, cobolSourceFileEncoding, targetDir);
                     _log.info("Result XML Schema is   : " + xmlSchemaFile);
                 } else {
                     for (File cobolFile : input.listFiles()) {
                         if (cobolFile.isFile()) {
                             _log.info("Translation started for: " + cobolFile);
-                            File xmlSchemaFile = cob2xsd.translate(cobolFile, targetDir);
+                            File xmlSchemaFile = cob2xsd.translate(cobolFile, cobolSourceFileEncoding, targetDir);
                             _log.info("Result XML Schema is   : " + xmlSchemaFile);
                         }
                     }
@@ -348,6 +364,13 @@ public class CobolStructureToXsdMain {
             }
         }
 
+    }
+
+    /**
+     * @param cobolSourceFileEncoding the character set used to encode the input COBOL source files
+     */
+    public void setCobolSourceFileEncoding(final String cobolSourceFileEncoding) {
+        _cobolSourceFileEncoding = cobolSourceFileEncoding;
     }
 
     /**

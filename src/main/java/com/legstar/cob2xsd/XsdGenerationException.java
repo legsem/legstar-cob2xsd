@@ -14,7 +14,7 @@ package com.legstar.cob2xsd;
  * The generation of the XML schema failed.
  *
  */
-public class CobolStructureToXsdException extends Exception {
+public class XsdGenerationException extends Exception {
 
     /**
      * A serial ID.
@@ -24,14 +24,14 @@ public class CobolStructureToXsdException extends Exception {
     /**
      * @param msg the exception message
      */
-    public CobolStructureToXsdException(final String msg) {
+    public XsdGenerationException(final String msg) {
         super(msg);
     }
 
     /**
      * @param e the exception
      */
-    public CobolStructureToXsdException(final Throwable e) {
+    public XsdGenerationException(final Throwable e) {
         super(e);
     }
 }

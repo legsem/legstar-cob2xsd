@@ -297,7 +297,6 @@ public class Cob2XsdContext {
     /** {@inheritDoc}*/
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Options in effect:\n");
         sb.append("xsdEncoding                    : " + getXsdEncoding() + "\n");
         sb.append("targetNamespace                : " + getTargetNamespace() + "\n");
         sb.append("mapConditionsToFacets          : " + mapConditionsToFacets() + "\n");

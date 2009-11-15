@@ -22,9 +22,10 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 
+import com.legstar.antlr.RecognizerException;
 import com.legstar.cob2xsd.Cob2XsdContext;
 import com.legstar.cob2xsd.CobolStructureToXsd;
-import com.legstar.cob2xsd.CobolStructureToXsdException;
+import com.legstar.cob2xsd.XsdGenerationException;
 
 
 /**
@@ -59,7 +60,10 @@ public class CobolStructureToXsdTask extends Task {
     private File _targetDir;
 
     /** Set of translation options to use.    */
-    private Cob2XsdContext _context = new Cob2XsdContext();;
+    private Cob2XsdContext _context = new Cob2XsdContext();
+    
+    /** Character set used to encode the input COBOL source files.*/
+    private String _cobolSourceFileEncoding;
 
     /**
      *  The ant execution method.
@@ -69,8 +73,9 @@ public class CobolStructureToXsdTask extends Task {
         _log.info("Started translation from COBOL to XML Schema");
 
         checkParameters();
-        _log.info("Taking COBOL from   : " + _fileSets);
-        _log.info("Output XML Schema to: " + getTargetDir());
+        _log.info("Taking COBOL from    : " + _fileSets);
+        _log.info("COBOL files encoding : " + getCobolSourceFileEncoding());
+        _log.info("Output XML Schema to : " + getTargetDir());
         _log.info(getContext().toString());
 
         try {
@@ -85,13 +90,16 @@ public class CobolStructureToXsdTask extends Task {
                 for (int i = 0; i < files.length; i++) {
                     File cobolFile = new File(fileset.getDir(getProject()), files[i]);
                     _log.info("Translation started for: " + cobolFile);
-                    File xmlSchemaFile = cob2xsd.translate(cobolFile, getTargetDir());
+                    File xmlSchemaFile = cob2xsd.translate(
+                            cobolFile, getCobolSourceFileEncoding(), getTargetDir());
                     _log.info("Result XML Schema is   : " + xmlSchemaFile);
                 }
             }
         } catch (IllegalStateException e) {
             throw (new BuildException(e));
-        } catch (CobolStructureToXsdException e) {
+        } catch (XsdGenerationException e) {
+            throw (new BuildException(e));
+        } catch (RecognizerException e) {
             throw (new BuildException(e));
         }
         _log.info("Finished translation");
@@ -341,6 +349,20 @@ public class CobolStructureToXsdTask extends Task {
      */
     public void setTargetDir(final File targetDir) {
         _targetDir = targetDir;
+    }
+
+    /**
+     * @return the character set used to encode the input COBOL source files
+     */
+    public String getCobolSourceFileEncoding() {
+        return _cobolSourceFileEncoding;
+    }
+
+    /**
+     * @param cobolSourceFileEncoding the character set used to encode the input COBOL source files
+     */
+    public void setCobolSourceFileEncoding(final String cobolSourceFileEncoding) {
+        this._cobolSourceFileEncoding = cobolSourceFileEncoding;
     }
 
 }
