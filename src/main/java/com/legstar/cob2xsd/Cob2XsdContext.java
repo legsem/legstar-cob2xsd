@@ -1,12 +1,15 @@
 package com.legstar.cob2xsd;
 
-import java.io.File;
+import java.io.Serializable;
 
 /**
  * This class gathers execution parameters for the COBOL to XML Schema utility.
  *
  */
-public class Cob2XsdContext {
+public class Cob2XsdContext implements Serializable {
+
+    /** serial ID. */
+    private static final long serialVersionUID = 3689777932172778788L;
 
     /** The default character set used to encode the XML Schema.*/
     public static final String DEFAULT_XSD_ENCODING = "UTF-8";
@@ -18,7 +21,7 @@ public class Cob2XsdContext {
     public static final String DEFAULT_JAXB_PACKAGE_NAME = "com.acme.test";
 
     /** Default Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
-    public static final char DEFAULT_CURRENCY_SYMBOL = '$';
+    public static final String DEFAULT_CURRENCY_SYMBOL = "$";
 
 
     /* -------------------------------------------------------------------
@@ -44,7 +47,7 @@ public class Cob2XsdContext {
     private boolean _elementNamesStartWithUppercase = false;
 
     /** An optional XSLT transform for XML schema customization. */
-    private File _customXslt;
+    private String _customXsltFileName;
 
 
     /* -------------------------------------------------------------------
@@ -66,7 +69,7 @@ public class Cob2XsdContext {
      * */
 
     /** Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
-    private char _currencySymbol = DEFAULT_CURRENCY_SYMBOL;
+    private String _currencySymbol = DEFAULT_CURRENCY_SYMBOL;
 
     /** Whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES). */
     private boolean _decimalPointIsComma = false;
@@ -132,15 +135,15 @@ public class Cob2XsdContext {
      * An optional XSLT transform for XML schema customization.
      * @return an optional XSLT transform for XML schema customization
      */
-    public File getCustomXslt() {
-        return _customXslt;
+    public String getCustomXsltFileName() {
+        return _customXsltFileName;
     }
 
     /**
-     * @param customXslt an optional XSLT transform for XML schema customization
+     * @param customXsltFileName an optional XSLT transform for XML schema customization
      */
-    public void setCustomXslt(final File customXslt) {
-        _customXslt = customXslt;
+    public void setCustomXsltFileName(final String customXsltFileName) {
+        _customXsltFileName = customXsltFileName;
     }
 
     /**
@@ -237,14 +240,14 @@ public class Cob2XsdContext {
      * The COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES).
      * @return the COBOL currency symbol used
      */
-    public char getCurrencySymbol() {
+    public String getCurrencySymbol() {
         return _currencySymbol;
     }
 
     /**
      * @param currencySymbol the COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
      */
-    public void setCurrencySymbol(final char currencySymbol) {
+    public void setCurrencySymbol(final String currencySymbol) {
         _currencySymbol = currencySymbol;
     }
 
@@ -297,12 +300,13 @@ public class Cob2XsdContext {
     /** {@inheritDoc}*/
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("Options in effect:\n");
         sb.append("xsdEncoding                    : " + getXsdEncoding() + "\n");
         sb.append("targetNamespace                : " + getTargetNamespace() + "\n");
         sb.append("mapConditionsToFacets          : " + mapConditionsToFacets() + "\n");
         sb.append("nameConflictPrependParentName  : " + nameConflictPrependParentName() + "\n");
         sb.append("elementNamesStartWithUppercase : " + elementNamesStartWithUppercase() + "\n");
-        sb.append("customXslt                     : " + getCustomXslt() + "\n");
+        sb.append("customXslt                     : " + getCustomXsltFileName() + "\n");
         sb.append("\n");
         sb.append("addLegStarAnnotations          : " + addLegStarAnnotations() + "\n");
         sb.append("jaxbPackageName                : " + getJaxbPackageName() + "\n");

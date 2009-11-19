@@ -112,8 +112,7 @@ public class CobolStructureToXsdSpecialTest extends TestCase {
             context.setTargetNamespace("http://www.mycompany.com/test");
             context.setXsdEncoding("ISO-8859-1");
             context.setAddLegStarAnnotations(true);
-            File custmXslt = new File("src/test/resources/xslt", "alltypes.xsl");
-            context.setCustomXslt(custmXslt);
+            context.setCustomXsltFileName("src/test/resources/xslt/alltypes.xsl");
             CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
             String xmlSchema = cob2xsd.translate("       01 A.\n           02 S-BINARY PIC X.");
             assertEquals(

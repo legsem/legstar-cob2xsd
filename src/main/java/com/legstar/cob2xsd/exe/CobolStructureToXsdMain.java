@@ -143,9 +143,9 @@ public class CobolStructureToXsdMain {
                 + " (otherwise, the COBOL source line will be appended)");
         options.addOption(nameConflictPrependParentName);
 
-        Option customXslt = new Option("x", "customXslt", true,
+        Option customXsltFileName = new Option("x", "customXsltFileName", true,
         "optional XSLT transform stylesheet for XML schema customization");
-        options.addOption(customXslt);
+        options.addOption(customXsltFileName);
 
         /* -------------------------------------------------------------------
          * LegStar annotations related options
@@ -173,9 +173,9 @@ public class CobolStructureToXsdMain {
         "the COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)");
         options.addOption(currencySymbol);
 
-        Option isNSymbolDbcs = new Option("isNSymbolDbcs",
+        Option nSymbolDbcs = new Option("nSymbolDbcs",
         "the COBOL NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false");
-        options.addOption(isNSymbolDbcs);
+        options.addOption(nSymbolDbcs);
 
         Option quoteIsQuote = new Option("quoteIsQuote",
         "the COBOL QUOTE|APOST compiler option. False means APOST");
@@ -232,11 +232,13 @@ public class CobolStructureToXsdMain {
         if (line.hasOption("mapConditionsToFacets")) {
             getContext().setMapConditionsToFacets(true);
         }
-        if (line.hasOption("customXslt")) {
-            String customXslt = line.getOptionValue("customXslt").trim();
-            File customXsltFile = new File(customXslt);
+        if (line.hasOption("customXsltFileName")) {
+            String customXsltFileName = line.getOptionValue("customXsltFileName").trim();
+            File customXsltFile = new File(customXsltFileName);
             if (!customXsltFile.exists() || !customXsltFile.isFile()) {
                 return false;
+            } else {
+                getContext().setCustomXsltFileName(customXsltFileName);
             }
         }
 
@@ -261,9 +263,9 @@ public class CobolStructureToXsdMain {
             getContext().setDecimalPointIsComma(true);
         }
         if (line.hasOption("currencySymbol")) {
-            getContext().setCurrencySymbol(line.getOptionValue("currencySymbol").trim().charAt(0));
+            getContext().setCurrencySymbol(line.getOptionValue("currencySymbol").trim());
         }
-        if (line.hasOption("isNSymbolDbcs")) {
+        if (line.hasOption("nSymbolDbcs")) {
             getContext().setNSymbolDbcs(true);
         }
         if (line.hasOption("quoteIsQuote")) {

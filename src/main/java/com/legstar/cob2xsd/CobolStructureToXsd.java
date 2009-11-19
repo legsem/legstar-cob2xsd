@@ -306,10 +306,11 @@ public class CobolStructureToXsd {
             Source source = new DOMSource(xsd.getAllSchemas()[0]);
             Result result = new StreamResult(writer);
             Transformer transformer;
-            if (getContext().getCustomXslt() == null) {
+            if (getContext().getCustomXsltFileName() == null) {
                 transformer = tFactory.newTransformer();
             } else {
-                Source xslSource = new StreamSource(getContext().getCustomXslt());
+                Source xslSource = new StreamSource(
+                        new File(getContext().getCustomXsltFileName()));
                 transformer = tFactory.newTransformer(xslSource);
             }
             transformer.setOutputProperty(OutputKeys.ENCODING,

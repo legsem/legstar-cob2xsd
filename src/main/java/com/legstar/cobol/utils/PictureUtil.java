@@ -26,12 +26,12 @@ public final class PictureUtil {
      * Unlike all other picture symbols, currency symbols are case sensitive.
      * For example, ’D’ and ’d’ specify different currency symbols.
      * @param picture the picture string
-     * @param currencySign the currency sign
+     * @param currencyChar the currency sign
      * @return a map of all characters to search for
      */
     public static Map < Character, Integer > getPictureCharOccurences(
             final String picture,
-            final char currencySign) {
+            final char currencyChar) {
 
         Map < Character, Integer > charNum = new HashMap < Character, Integer >();
         charNum.put('A', 0);
@@ -54,9 +54,9 @@ public final class PictureUtil {
         charNum.put('E', 0);
         charNum.put('S', 0);
         charNum.put('V', 0);
-        charNum.put(currencySign, 0);
+        charNum.put(currencyChar, 0);
         
-        List < PictureSymbol > pictureSymbols = parsePicture(picture, currencySign);
+        List < PictureSymbol > pictureSymbols = parsePicture(picture, currencyChar);
         for (PictureSymbol pictureSymbol : pictureSymbols) {
             Integer number = charNum.get(pictureSymbol.getSymbol());
             if (number != null) {
@@ -77,13 +77,13 @@ public final class PictureUtil {
      * 
      * @param charNum map of all characters in the picture string
      * @param isSignSeparate if sign occupies a separated position (no overpunch)
-     * @param currencySign the currency sign
+     * @param currencyChar the currency sign
      * @return the length, in number of characters, of the data item
      */
     public static int calcLengthFromPicture(
             final Map < Character, Integer > charNum,
             final boolean isSignSeparate,
-            final char currencySign) {
+            final char currencyChar) {
 
         int length = 0;
         
@@ -109,7 +109,7 @@ public final class PictureUtil {
         charLen.put('E', 1);
         charLen.put('S', (isSignSeparate) ? 1 : 0);
         charLen.put('V', 0);
-        charLen.put(currencySign, 1);
+        charLen.put(currencyChar, 1);
         
         for (Map.Entry < Character, Integer > entry : charNum.entrySet()) {
             length += entry.getValue() * charLen.get(entry.getKey());
@@ -123,12 +123,12 @@ public final class PictureUtil {
      * If a picture is not restrictive, for instance PIC X does not impose
      * any restriction, then we return null (no pattern).
      * @param picture the picture clause
-     * @param currencySign the currency sign
+     * @param currencyChar the currency sign
      * @return a regular expression
      */
     public static String getRegexFromPicture(
             final String picture,
-            final char currencySign) {
+            final char currencyChar) {
         StringBuilder result = new StringBuilder();
         result.append('^');
         
@@ -153,9 +153,9 @@ public final class PictureUtil {
         charRegex.put('E', "E");
         charRegex.put('S', "[\\+\\-]");
         charRegex.put('V', "");
-        charRegex.put(currencySign, "[\\" + currencySign + "\\d]");
+        charRegex.put(currencyChar, "[\\" + currencyChar + "\\d]");
         
-        List < PictureSymbol > pictureSymbols = parsePicture(picture, currencySign);
+        List < PictureSymbol > pictureSymbols = parsePicture(picture, currencyChar);
 
         /* If there is only one symbol and it is non restrictive, no pattern*/
         if (pictureSymbols.size() == 1) {
@@ -188,12 +188,14 @@ public final class PictureUtil {
      * <p/>
      * For instance: 9(3)V99XX becomes 4 entries in the list for characters 9, V, 9 and X.
      * First 9 occurs 3 times, V occurs 1 time, 9 occurs 2 and X occurs 2.  
-     * @param currencySign the currency sign
+     * @param currencyChar the currency sign
      * @param picture the COBOL picture clause
      * @return ordered list of symbols appearing in the picture clause with their
      * number of occurrences.
      */
-    public static List < PictureSymbol > parsePicture(final String picture, final char currencySign) {
+    public static List < PictureSymbol > parsePicture(
+            final String picture,
+            final char currencyChar) {
         int factor = 1;
         int factoredNumber = 0;
         boolean factorSequence = false;
@@ -202,7 +204,7 @@ public final class PictureUtil {
         List < PictureSymbol > result = new LinkedList < PictureSymbol >();
         for (int i = 0; i < picture.length(); i++) {
             char c = picture.charAt(i);
-            if (c != currencySign) {
+            if (c != currencyChar) {
                 c = Character.toUpperCase(c);
             }
             if (factorSequence) {

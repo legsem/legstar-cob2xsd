@@ -190,15 +190,15 @@ public class CobolStructureToXsdTask extends Task {
     /**
      * @return an optional XSLT transform for XML schema customization
      */
-    public File getCustomXslt() {
-        return getContext().getCustomXslt();
+    public String getCustomXslt() {
+        return getContext().getCustomXsltFileName();
     }
 
     /**
-     * @param xsltDir an optional XSLT transform for XML schema customization
+     * @param customXsltFileName an optional XSLT transform for XML schema customization
      */
-    public void setCustomXslt(final File xsltDir) {
-        getContext().setCustomXslt(xsltDir);
+    public void setCustomXsltFileName(final String customXsltFileName) {
+        getContext().setCustomXsltFileName(customXsltFileName);
     }
 
     /**
@@ -288,14 +288,14 @@ public class CobolStructureToXsdTask extends Task {
     /**
      * @return the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
      */
-    public char getCurrencySymbol() {
+    public String getCurrencySymbol() {
         return getContext().getCurrencySymbol();
     }
 
     /**
      * @param currencySymbol the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
      */
-    public void setCurrencySymbol(final char currencySymbol) {
+    public void setCurrencySymbol(final String currencySymbol) {
         getContext().setCurrencySymbol(currencySymbol);
     }
 
