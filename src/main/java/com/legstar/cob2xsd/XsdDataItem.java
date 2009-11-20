@@ -152,7 +152,7 @@ public class XsdDataItem {
             setFromPicture(
                     cobolDataItem.getPicture(),
                     cobolDataItem.isSignSeparate(),
-                    context.getCurrencySymbol(),
+                    context.getCurrencySymbol().charAt(0),
                     context.nSymbolDbcs(),
                     context.decimalPointIsComma());
         }
@@ -302,24 +302,24 @@ public class XsdDataItem {
      * Derive XML schema attributes from a COBOL picture.
      * @param picture the picture clause
      * @param isSignSeparate if sign occupies a separated position (no overpunch)
-     * @param currencySign the currency sign
+     * @param currencyChar the currency sign
      * @param nSymbolDbcs true if COBOL compiler option NSYMBOL(DBCS)
      * @param decimalPointIsComma if COBOL compiler option DECIMAL POINT IS COMMA
      */
     private void setFromPicture(
             final String picture,
             final boolean isSignSeparate,
-            final char currencySign,
+            final char currencyChar,
             final boolean nSymbolDbcs,
             final boolean decimalPointIsComma) {
 
         char comma = (decimalPointIsComma) ? '.' : ',';
 
         Map < Character, Integer > charNum =
-            PictureUtil.getPictureCharOccurences(picture, currencySign);
+            PictureUtil.getPictureCharOccurences(picture, currencyChar);
 
-        _length = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, currencySign);
-        _pattern = PictureUtil.getRegexFromPicture(picture, currencySign);
+        _length = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, currencyChar);
+        _pattern = PictureUtil.getRegexFromPicture(picture, currencyChar);
 
         if ((charNum.get('A') + charNum.get('X')) > 0) {
             if ((charNum.get('9') + charNum.get('B') + charNum.get('0') + charNum.get('/')) > 0) {
@@ -368,7 +368,7 @@ public class XsdDataItem {
                 + charNum.get('-')
                 + charNum.get('C')  /* CR */
                 + charNum.get('D')  /* DB */
-                + charNum.get(currencySign)) > 0) {
+                + charNum.get(currencyChar)) > 0) {
             _cobolType = CobolType.NUMERIC_EDITED_ITEM;
             _xsdType = XsdType.STRING;
             return;
@@ -381,7 +381,7 @@ public class XsdDataItem {
         if (_cobolType == null || _cobolType == CobolType.ALPHANUMERIC_ITEM) {
             _cobolType = CobolType.ZONED_DECIMAL_ITEM;
         }
-        setNumericAttributes(picture, currencySign, decimalPointIsComma);
+        setNumericAttributes(picture, currencyChar, decimalPointIsComma);
 
     }
 
@@ -396,12 +396,12 @@ public class XsdDataItem {
      * Once digits are identified we can further refine the choice of
      * XML schema type and a set of associated facets.
      * @param picture a purely numeric picture clause
-     * @param currencySign the currency sign
+     * @param currencyChar the currency sign
      * @param decimalPointIsComma true if decimal point is comma
      */
     private void setNumericAttributes(
             final String picture,
-            final char currencySign,
+            final char currencyChar,
             final boolean decimalPointIsComma) {
         char decimalPoint = (decimalPointIsComma) ? ',' : '.';
 
@@ -414,13 +414,13 @@ public class XsdDataItem {
         Map < Character, Integer > decCharNum;
         if (iV > 0) {
             intCharNum = PictureUtil.getPictureCharOccurences(
-                    picture.substring(0, iV), currencySign);
+                    picture.substring(0, iV), currencyChar);
             decCharNum = PictureUtil.getPictureCharOccurences(
-                    picture.substring(iV), currencySign);
+                    picture.substring(iV), currencyChar);
             _fractionDigits = decCharNum.get('9');
             _totalDigits = intCharNum.get('9') + _fractionDigits;
         } else {
-            intCharNum = PictureUtil.getPictureCharOccurences(picture, currencySign);
+            intCharNum = PictureUtil.getPictureCharOccurences(picture, currencyChar);
             _fractionDigits = 0;
             _totalDigits = intCharNum.get('9');
         }

@@ -68,9 +68,9 @@ public class CobolStructureToXsdTest extends XMLTestCase {
                 String name = cobolFile.getName().toLowerCase();
                 File custmXslt = new File(XSLT_SAMPLES_DIR, name + ".xsl");
                 if (custmXslt.exists()) {
-                    context.setCustomXslt(custmXslt);
+                    context.setCustomXsltFileName(custmXslt.getPath());
                 } else {
-                    context.setCustomXslt(null);
+                    context.setCustomXsltFileName(null);
                 }
                 context.setAddLegStarAnnotations(true);
                 context.setJaxbPackageName("com.legstar.test.coxb." + name);
