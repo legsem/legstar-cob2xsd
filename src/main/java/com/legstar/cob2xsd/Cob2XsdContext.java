@@ -1,5 +1,6 @@
 package com.legstar.cob2xsd;
 
+import java.io.File;
 import java.io.Serializable;
 
 /**
@@ -111,6 +112,9 @@ public class Cob2XsdContext implements Serializable {
      * @param targetNamespace the target namespace for generated XML schema
      */
     public void setTargetNamespace(final String targetNamespace) {
+        if (targetNamespace == null || targetNamespace.length() == 0) {
+            throw new IllegalArgumentException("Target namespace cannot be null or empty");
+        }
         _targetNamespace = targetNamespace;
     }
 
@@ -143,6 +147,12 @@ public class Cob2XsdContext implements Serializable {
      * @param customXsltFileName an optional XSLT transform for XML schema customization
      */
     public void setCustomXsltFileName(final String customXsltFileName) {
+        if (customXsltFileName != null) {
+            File customXsltFile = new File(customXsltFileName);
+            if (!customXsltFile.exists() || !customXsltFile.isFile()) {
+                throw new IllegalArgumentException("Unable to locate " + customXsltFileName);
+            }
+        }
         _customXsltFileName = customXsltFileName;
     }
 
@@ -248,6 +258,9 @@ public class Cob2XsdContext implements Serializable {
      * @param currencySymbol the COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
      */
     public void setCurrencySymbol(final String currencySymbol) {
+        if (currencySymbol == null || currencySymbol.length() == 0) {
+            throw new IllegalArgumentException("Currency symbol cannot be null or empty");
+        }
         _currencySymbol = currencySymbol;
     }
 
@@ -300,22 +313,21 @@ public class Cob2XsdContext implements Serializable {
     /** {@inheritDoc}*/
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Options in effect:\n");
-        sb.append("xsdEncoding                    : " + getXsdEncoding() + "\n");
-        sb.append("targetNamespace                : " + getTargetNamespace() + "\n");
-        sb.append("mapConditionsToFacets          : " + mapConditionsToFacets() + "\n");
-        sb.append("nameConflictPrependParentName  : " + nameConflictPrependParentName() + "\n");
-        sb.append("elementNamesStartWithUppercase : " + elementNamesStartWithUppercase() + "\n");
-        sb.append("customXslt                     : " + getCustomXsltFileName() + "\n");
-        sb.append("\n");
-        sb.append("addLegStarAnnotations          : " + addLegStarAnnotations() + "\n");
-        sb.append("jaxbPackageName                : " + getJaxbPackageName() + "\n");
-        sb.append("jaxbTypeClassesSuffix          : " + getJaxbTypeClassesSuffix() + "\n");
-        sb.append("\n");
-        sb.append("currencySymbol                 : " + getCurrencySymbol() + "\n");
-        sb.append("decimalPointIsComma            : " + decimalPointIsComma() + "\n");
-        sb.append("nSymbolDbcs                    : " + nSymbolDbcs() + "\n");
-        sb.append("quoteIsQuote                   : " + quoteIsQuote() + "\n");
+        sb.append("{");
+        sb.append("xsdEncoding: " + getXsdEncoding() + ", ");
+        sb.append("targetNamespace: " + getTargetNamespace() + ", ");
+        sb.append("mapConditionsToFacets: " + mapConditionsToFacets() + ", ");
+        sb.append("nameConflictPrependParentName: " + nameConflictPrependParentName() + ", ");
+        sb.append("elementNamesStartWithUppercase: " + elementNamesStartWithUppercase() + ", ");
+        sb.append("customXslt: " + getCustomXsltFileName() + ", ");
+        sb.append("addLegStarAnnotations: " + addLegStarAnnotations() + ", ");
+        sb.append("jaxbPackageName: " + getJaxbPackageName() + ", ");
+        sb.append("jaxbTypeClassesSuffix: " + getJaxbTypeClassesSuffix() + ", ");
+        sb.append("currencySymbol: " + getCurrencySymbol() + ", ");
+        sb.append("decimalPointIsComma: " + decimalPointIsComma() + ", ");
+        sb.append("nSymbolDbcs: " + nSymbolDbcs() + ", ");
+        sb.append("quoteIsQuote: " + quoteIsQuote() + ", ");
+        sb.append("}");
         return sb.toString();
     }
 

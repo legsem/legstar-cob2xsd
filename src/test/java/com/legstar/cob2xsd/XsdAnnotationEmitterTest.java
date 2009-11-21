@@ -58,6 +58,25 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     }
 
     /**
+     * Test with an empty JAXB type suffix parameter.
+     */
+    public void testInstantiationWithEmptyTypeSuffix() {
+        Cob2XsdContext context = new Cob2XsdContext();
+        context.setJaxbPackageName("jaxb.package.name");
+        context.setJaxbTypeClassesSuffix("");
+        XmlSchema xsd = getXmlSchema();
+        new XsdAnnotationEmitter(xsd, context);
+        check(
+                "<annotation>"
+                + "<appinfo>"
+                + "<jaxb:schemaBindings>"
+                + "<jaxb:package name=\"jaxb.package.name\"/>"
+                + "</jaxb:schemaBindings>"
+                + "</appinfo>"
+                + "</annotation>"
+                , xsd, true);
+    }
+    /**
      * Test a group item.
      */
     public void testGroupItem() {

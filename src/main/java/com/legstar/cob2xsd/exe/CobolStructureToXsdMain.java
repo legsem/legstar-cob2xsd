@@ -10,13 +10,14 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.legstar.antlr.RecognizerException;
 import com.legstar.cob2xsd.Cob2XsdContext;
 import com.legstar.cob2xsd.CobolStructureToXsd;
+import com.legstar.cob2xsd.XsdGenerationException;
 
 /**
  * COBOL structure to XML schema standalone executable.
@@ -69,28 +70,48 @@ public class CobolStructureToXsdMain {
      * @param args translator options
      */
     public void execute(final String[] args) {
-        Options options = createOptions();
+        try {
+            Options options = createOptions();
+            if (collectOptions(options, args)) {
+                execute(getInput(), getCobolSourceFileEncoding(), getOutput());
+            }
+        } catch (Exception e) {
+            _log.error("Failed COBOL structure translation", e);
+        }
+    }
+    
+    /**
+     * Take arguments received on the command line and setup corresponding
+     * options.
+     * <p/>
+     * No arguments is valid. It means use the defaults.
+     * 
+     * @param options the expected options
+     * @param args the actual arguments received on the command line
+     * @return true if arguments were valid
+     * @throws Exception if something goes wrong while parsing arguments
+     */
+    protected boolean collectOptions(
+            final Options options,
+            final String[] args) throws Exception {
         if (args != null && args.length > 0) {
             CommandLineParser parser = new PosixParser();
-            try {
-                CommandLine line = parser.parse(options, args);
-                if (processLine(line, options)) {
-                    execute(_input, _cobolSourceFileEncoding,  _output);
-                }
-                return;
-            } catch (ParseException e) {
-                System.err.println("Parsing failed.  Reason: " + e.getMessage());
-            }
+            CommandLine line = parser.parse(options, args);
+            return processLine(line, options);
         }
-        produceHelp(options);
+        return true;
     }
 
     /**
      * @param options options available
+     * @throws Exception if help cannot be produced
      */
-    private void produceHelp(final Options options) {
+    protected void produceHelp(final Options options) throws Exception {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("java -jar legstar-cob2xsd-" + getVersion() + "-exe.jar", options);
+        String version = getVersion();
+        formatter.printHelp("java -jar legstar-cob2xsd-"
+                + version.substring(0, version.indexOf(' '))
+                + "-exe.jar followed by:", options);
     }
 
     /**
@@ -165,21 +186,21 @@ public class CobolStructureToXsdMain {
         /* -------------------------------------------------------------------
          * COBOL compiler related options
          * */
-        Option decimalPointIsComma = new Option("decimalPointIsComma",
+        Option decimalPointIsComma = new Option("d", "decimalPointIsComma", false,
         "whether COBOL comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)");
         options.addOption(decimalPointIsComma);
 
-        Option currencySymbol = new Option("currencySymbol", true,
+        Option currencySymbol = new Option("w", "currencySymbol", true,
         "the COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)");
         options.addOption(currencySymbol);
 
-        Option nSymbolDbcs = new Option("nSymbolDbcs",
-        "the COBOL NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false");
+        Option nSymbolDbcs = new Option("z", "nSymbolDbcs", false,
+        "the COBOL NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if unspecified");
         options.addOption(nSymbolDbcs);
 
-        Option quoteIsQuote = new Option("quoteIsQuote",
-        "the COBOL QUOTE|APOST compiler option. False means APOST");
-        options.addOption(quoteIsQuote);
+        Option quoteIsApost = new Option("q", "quoteIsApost", false,
+        "the COBOL APOST compiler option. Assume QUOTE if unspecified");
+        options.addOption(quoteIsApost);
 
         return options;
     }
@@ -189,8 +210,11 @@ public class CobolStructureToXsdMain {
      * @param line the parsed command line
      * @param options available
      * @return false if processing needs to stop, true if its ok to continue
+     * @throws Exception if line cannot be processed
      */
-    protected boolean processLine(final CommandLine line, final Options options) {
+    protected boolean processLine(
+            final CommandLine line,
+            final Options options) throws Exception {
         if (line.hasOption("version")) {
             System.out.println("version " + getVersion());
             return false;
@@ -200,20 +224,15 @@ public class CobolStructureToXsdMain {
             return false;
         }
         if (line.hasOption("input")) {
-            String input = line.getOptionValue("input").trim();
-            if (!setInput(input)) {
-                return false;
-            }
+            setInput(line.getOptionValue("input").trim());
         }
         if (line.hasOption("cobolSourceFileEncoding")) {
-            _cobolSourceFileEncoding = line.getOptionValue("cobolSourceFileEncoding").trim();
+            setCobolSourceFileEncoding(line.getOptionValue("cobolSourceFileEncoding").trim());
         }
         if (line.hasOption("output")) {
-            String output = line.getOptionValue("output").trim();
-            if (!setOutput(output)) {
-                return false;
-            }
+            setOutput(line.getOptionValue("output").trim());
         }
+
         /* -------------------------------------------------------------------
          * XML Schema related options
          * */
@@ -233,16 +252,9 @@ public class CobolStructureToXsdMain {
             getContext().setMapConditionsToFacets(true);
         }
         if (line.hasOption("customXsltFileName")) {
-            String customXsltFileName = line.getOptionValue("customXsltFileName").trim();
-            File customXsltFile = new File(customXsltFileName);
-            if (!customXsltFile.exists() || !customXsltFile.isFile()) {
-                System.err.println("Unable to locate " + customXsltFileName);
-                return false;
-            } else {
-                getContext().setCustomXsltFileName(customXsltFileName);
-            }
+            getContext().setCustomXsltFileName(
+                    line.getOptionValue("customXsltFileName").trim());
         }
-
 
         /* -------------------------------------------------------------------
          * LegStar annotations related options
@@ -269,10 +281,10 @@ public class CobolStructureToXsdMain {
         if (line.hasOption("nSymbolDbcs")) {
             getContext().setNSymbolDbcs(true);
         }
-        if (line.hasOption("quoteIsQuote")) {
-            getContext().setQuoteIsQuote(true);
+        if (line.hasOption("quoteIsApost")) {
+            getContext().setQuoteIsQuote(false);
         }
-
+        
         return true;
     }
 
@@ -282,38 +294,36 @@ public class CobolStructureToXsdMain {
      * @param input the input COBOL file or folder
      * @param cobolSourceFileEncoding the input file character set
      * @param targetDir the output folder where XML schema file must go
+     * @throws XsdGenerationException if XML schema cannot be generated
+     * @throws RecognizerException if COBOL parsing fails
      */
     protected void execute(
             final File input,
             final String cobolSourceFileEncoding,
-            final File targetDir) {
+            final File targetDir) throws RecognizerException, XsdGenerationException {
 
         _log.info("Started translation from COBOL to XML Schema");
-        _log.info("Taking COBOL from    : " + input);
-        _log.info("COBOL files encoding : " + cobolSourceFileEncoding);
-        _log.info("Output XML Schema to : " + targetDir);
-        _log.info(getContext().toString());
-        try {
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getContext());
-            if (_input != null && _output != null) {
-                if (input.isFile()) {
-                    _log.info("Translation started for: " + input);
-                    File xmlSchemaFile = cob2xsd.translate(input, cobolSourceFileEncoding, targetDir);
-                    _log.info("Result XML Schema is   : " + xmlSchemaFile);
-                } else {
-                    for (File cobolFile : input.listFiles()) {
-                        if (cobolFile.isFile()) {
-                            _log.info("Translation started for: " + cobolFile);
-                            File xmlSchemaFile = cob2xsd.translate(cobolFile, cobolSourceFileEncoding, targetDir);
-                            _log.info("Result XML Schema is   : " + xmlSchemaFile);
-                        }
+        _log.info("Taking COBOL from      : " + input);
+        _log.info("COBOL files encoding   : " + cobolSourceFileEncoding);
+        _log.info("Output XML Schema to   : " + targetDir);
+        _log.info("Options in effect      : " + getContext().toString());
+        CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getContext());
+        if (_input != null && _output != null) {
+            if (input.isFile()) {
+                _log.info("Translation started for: " + input);
+                File xmlSchemaFile = cob2xsd.translate(input, cobolSourceFileEncoding, targetDir);
+                _log.info("Result XML Schema is   : " + xmlSchemaFile);
+            } else {
+                for (File cobolFile : input.listFiles()) {
+                    if (cobolFile.isFile()) {
+                        _log.info("Translation started for: " + cobolFile);
+                        File xmlSchemaFile = cob2xsd.translate(cobolFile, cobolSourceFileEncoding, targetDir);
+                        _log.info("Result XML Schema is   : " + xmlSchemaFile);
                     }
                 }
-            } else {
-                System.err.println("No input or output was specified.");
             }
-        } catch (Exception e) {
-            System.err.println("Exception caught: " + e.getMessage());
+        } else {
+            throw new IllegalArgumentException("No input or output was specified.");
         }
         _log.info("Finished translation");
 
@@ -322,51 +332,38 @@ public class CobolStructureToXsdMain {
     /**
      * Pick up the version from the properties file.
      * @return the product version
+     * @throws IOException if version cannot be identified
      */
-    public static String getVersion() {
+    protected String getVersion() throws IOException {
         InputStreamReader stream = null;
         try {
             Properties version = new Properties();
             stream = new InputStreamReader(
-                    CobolStructureToXsdMain.class.getResourceAsStream(
+                    getClass().getResourceAsStream(
                             VERSION_FILE_NAME));
             version.load(stream);
             return  version.getProperty("version");
-        } catch (IOException e) {
-            System.err.println("Unable to locate COBOL reserved word file " + VERSION_FILE_NAME
-                    + ". Will not check for COBOL reserved words");
         } finally {
             if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException e) {
-                    System.err.println("Unable to close stream");
-                }
+                stream.close();
             }
         }
-        return null;
     }
 
     /**
      * Check the input parameter and keep it only if it is valid.
      * @param input a file or folder name (relative or absolute)
-     * @return false if input is invalid
      */
-    public boolean setInput(final String input) {
+    public void setInput(final String input) {
         File file = new File(input);
-        if (!file.exists()) {
-            System.err.println("Input file or folder " + input + " not found");
-            return false;
-        } else {
+        if (file.exists()) {
             if (file.isDirectory() && file.list().length == 0) {
-                System.err.println("Folder " + input + " is empty");
-                return false;
-            } else {
-                _input = file;
-                return true;
+                throw new IllegalArgumentException("Folder " + input + " is empty");
             }
+        } else {
+            throw new IllegalArgumentException("Input file or folder " + input + " not found");
         }
-
+        _input = file;
     }
 
     /**
@@ -379,35 +376,48 @@ public class CobolStructureToXsdMain {
     /**
      * Check the output parameter and keep it only if it is valid.
      * @param output a file or folder name (relative or absolute)
-     * @return false if output is invalid
      */
-    public boolean setOutput(final String output) {
+    public void setOutput(final String output) {
         File file = new File(output);
         if (!file.exists()) {
             if (!file.mkdir()) {
-                System.err.println("Output folder " + output + " cannot be created");
-                return false;
-            } else {
-                _output = file;
-                return true;
+                throw new IllegalArgumentException("Output folder " + output + " cannot be created");
             }
         } else {
             if (!file.isDirectory()) {
-                System.err.println("File " + output + " is not a folder");
-                return false;
-            } else {
-                _output = file;
-                return true;
+                throw new IllegalArgumentException("File " + output + " is not a folder");
             }
         }
+        _output = file;
     }
 
     /**
      * Gather all parameters into a context object.
      * @return a parameter context to be used throughout all code
      */
-    private Cob2XsdContext getContext() {
+    public Cob2XsdContext getContext() {
         return _context;
+    }
+
+    /**
+     * @return the file or folder containing COBOL code to translate to XSD
+     */
+    public File getInput() {
+        return _input;
+    }
+
+    /**
+     * @return the character set used to encode the input COBOL source files
+     */
+    public String getCobolSourceFileEncoding() {
+        return _cobolSourceFileEncoding;
+    }
+
+    /**
+     * @return the folder containing translated XML Schema
+     */
+    public File getOutput() {
+        return _output;
     }
 
 }
