@@ -339,7 +339,7 @@ public class CobolStructureToXsdMain {
         try {
             Properties version = new Properties();
             stream = new InputStreamReader(
-                    getClass().getResourceAsStream(
+                    CobolStructureToXsdMain.class.getResourceAsStream(
                             VERSION_FILE_NAME));
             version.load(stream);
             return  version.getProperty("version");
