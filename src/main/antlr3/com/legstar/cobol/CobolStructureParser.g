@@ -148,6 +148,21 @@ package com.legstar.cobol;
         }
     }
 
+    /**
+     * Detect unbalanced parentheses.
+     * @param string the string to look into (must not be null)
+     * @return true if there are unbalanced parentheses
+     */
+    public boolean unbalancedParentheses(final String string) {
+        int cnt = 0;
+        for (int i = 0; i < string.length(); i++) {
+            switch (string.charAt(i)) {
+                case '(': cnt++; break;
+                case ')': cnt--; break;
+            }
+        }
+        return (cnt == 0) ?  false : true;
+    }
 }
 
 /*------------------------------------------------------------------
@@ -417,6 +432,8 @@ index_clause
  * is an imaginary token, only parser rules can handle it. 
  * At tree construction we concatenate the various parts of the
  * picture string which might have been split by the decimal point.
+ * A picture must not be empty or have unbalanced parentheses so
+ * we fake a predicate check for these conditions.
  *------------------------------------------------------------------*/
 picture_string
 @init {
@@ -426,6 +443,15 @@ picture_string
     {
             for (Object o : $v) {
                 sb.append(((Token) o).getText());
+            }
+            String picture = sb.toString();
+            if (picture.length() == 0) {
+                throw new FailedPredicateException(
+                    input, "picture_string", "Picture empty");
+            }
+            if (unbalancedParentheses(picture)) {
+                throw new FailedPredicateException(
+                    input, "picture_string", "Unbalanced parentheses");
             }
     }
     ->{getTreeAdaptor().create(PICTURESTRING,sb.toString())}

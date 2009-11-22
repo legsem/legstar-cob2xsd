@@ -15,16 +15,24 @@ package com.legstar.cobol;
 import java.io.IOException;
 import java.io.StringReader;
 import com.legstar.antlr.ANTLRNoCaseReaderStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 }
 
 @members {
     /** Keeps track of the last COBOL keyword recognized. This helps
         disambiguate lexing rules. */
     private int lastKeyword = PERIOD;
+    
+    /** True when a picture string is being built (potentially from multiple parts). */
+    private boolean pictureStarted;
 
     /** Secondary lexer specializing in keyword recognition.*/
     private CobolStructureKeywordsLexerImpl keywordLexer
             = new CobolStructureKeywordsLexerImpl();
+
+    /** Pattern that recognizes picture strings. */
+    public static final Pattern PICTURE_PATTERN = Pattern.compile("[ABEGNPSVXZ\\d/,\\+CRD\\-\\*$\\(\\)]+");
 
     /**
      * Asks secondary lexer to check if text is a keyword. If there is a match,
@@ -56,6 +64,10 @@ import com.legstar.antlr.ANTLRNoCaseReaderStream;
                     }
                 }
             }
+            /* Just found a PICTURE keyword, start collecting picture string parts */
+            if (type == PICTURE_KEYWORD) {
+                pictureStarted = true;
+            }
             return type;
 
         } catch (IOException e) {
@@ -78,6 +90,35 @@ import com.legstar.antlr.ANTLRNoCaseReaderStream;
         }
         return text;
     }
+
+    /**
+     * Check that a string is a valid part of a picture string.
+     * <p/>
+     * Check that we are in the context of collecting picture string parts.
+     * <p/>
+     * Check that the string contains only valid picture symbols.
+     * <p/>
+     * When string is a valid picture part, close picture string sequence
+     * if the next character is space or new line.
+     * 
+     * @param string a picture string or part of a picture string
+     * @throws FailedPredicateException if this is not a valid picture string part
+     */
+    public void checkPicture(final String string) throws FailedPredicateException {
+        if (!pictureStarted) {
+            throw new FailedPredicateException(
+                    input, "PICTURE_PART", "Syntax error in last picture clause");
+        }
+        Matcher matcher = PICTURE_PATTERN.matcher(string);
+        if (!matcher.matches()) {
+            throw new FailedPredicateException(
+                    input, "PICTURE_PART", "Contains invalid picture symbols");
+        }
+        if (input.LA(1) == ' ' || input.LA(1) == '\r' || input.LA(1) == '\n' || input.LA(1) == -1) {
+            pictureStarted = false;
+        }
+    }
+
 }
 /*------------------------------------------------------------------
  * Lexer grammar
@@ -111,6 +152,7 @@ PERIOD
 INT :   '0'..'9'+
     {
         if (lastKeyword == PICTURE_KEYWORD) {
+            checkPicture(getText());
             $type = PICTURE_PART;
         }
         if (lastKeyword == PERIOD) {
@@ -130,6 +172,7 @@ SIGNED_INT
     : ('+' | '-') '0'..'9'+
     {
         if (lastKeyword == PICTURE_KEYWORD) {
+            checkPicture(getText());
             $type = PICTURE_PART;
         }
     }
@@ -146,6 +189,7 @@ FLOAT_PART2
     : '0'..'9'+ 'E' ('+' | '-')? '0'..'9'+
     {
         if (lastKeyword == PICTURE_KEYWORD) {
+            checkPicture(getText());
             $type = PICTURE_PART;
         }
     }
@@ -164,6 +208,7 @@ DATE_PATTERN
     {
         if (lastKeyword != DATE_FORMAT_KEYWORD) {
             if (lastKeyword == PICTURE_KEYWORD) {
+                checkPicture(getText());
                 $type = PICTURE_PART;
             } else {
                 $type = DATA_NAME;
@@ -188,6 +233,7 @@ DATA_NAME
         $type = matchKeywords(getText(), $type);
         if ($type == DATA_NAME) {
             if (lastKeyword == PICTURE_KEYWORD) {
+                checkPicture(getText());
                 $type = PICTURE_PART;
             } else {
                 setText(trimSeparator(getText()));
@@ -212,12 +258,14 @@ DATA_NAME
 PICTURE_PART
     : PICTURE_CHAR+
     {
-        if (lastKeyword != PICTURE_KEYWORD) {
-            $type = DATA_NAME;
-        }
         setText(trimSeparator(getText()));
         if (getText().length() == 0) {
             skip();
+        }
+        if (lastKeyword != PICTURE_KEYWORD) {
+            $type = DATA_NAME;
+        } else {
+            checkPicture(getText());
         }
     }
     ;

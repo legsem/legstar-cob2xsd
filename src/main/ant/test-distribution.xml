@@ -22,7 +22,7 @@
         <!-- Distribution zip file   -->
         <property name="zip.file" value="${dist.dir}/${dist.zip}" />
         <!-- Sample generated XSD file full path -->
-        <property name="xsdSampleFilePath" value="${test.dir}/${dist.name}/schema/sample.cbl.xsd"/>
+        <property name="xsdSampleFilePath" value="${test.dir}/${dist.name}/schema/LSFILEAQ.xsd"/>
     
     </target>
 

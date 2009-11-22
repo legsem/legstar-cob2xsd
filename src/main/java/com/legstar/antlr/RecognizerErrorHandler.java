@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.antlr.runtime.BaseRecognizer;
 import org.antlr.runtime.EarlyExitException;
+import org.antlr.runtime.FailedPredicateException;
 import org.antlr.runtime.MismatchedTokenException;
 import org.antlr.runtime.NoViableAltException;
 import org.antlr.runtime.RecognitionException;
@@ -89,6 +90,16 @@ public class RecognizerErrorHandler {
             }
         } else if (e instanceof EarlyExitException) {
             return msg.replace("required (...)+ loop did not match anything", "required tokens not found");
+        } else if (e instanceof FailedPredicateException) {
+            if (msg.contains("picture_string failed predicate: {Unbalanced parentheses}")) {
+                return "Unbalanced parentheses in picture string";
+            }
+            if (msg.contains("PICTURE_PART failed predicate: {Contains invalid picture symbols}")) {
+                return "Picture string contains invalid symbols";
+            }
+            if (msg.contains("PICTURE_PART failed predicate: {Syntax error in last picture clause}")) {
+                return "Syntax error in last picture clause";
+            }
         }
         return msg;
     }

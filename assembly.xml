@@ -24,10 +24,10 @@ Assembly descriptor for the full distribution.
             </includes>
         </fileSet>
         <fileSet>
-            <directory>src/main/cobol</directory>
+            <directory>src/test/resources/cobol</directory>
             <outputDirectory>cobol</outputDirectory>
             <includes>
-                <include>*.*</include>
+                <include>LSFILEAQ</include>
             </includes>
         </fileSet>
         <fileSet>

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
@@ -47,15 +48,12 @@ public abstract class AbstractCobolTester extends AbstractAntlrTester {
      */
     public CommonTokenStream lex(final String source) throws RecognizerException {
         try {
-            CobolStructureLexer lex = new CobolStructureLexerImpl(
+            CobolStructureLexerImpl lex = new CobolStructureLexerImpl(
                     new ANTLRNoCaseReaderStream(
                             new StringReader(
                                     clean(source))),
                                     getErrorHandler());
             CommonTokenStream tokens = new CommonTokenStream(lex);
-            if (lex.getNumberOfSyntaxErrors() > 0) {
-                _log.warn(lex.getNumberOfSyntaxErrors() + " lex errors");
-            }
             assertTrue(tokens != null);
             return tokens;
         } catch (IOException e) {
@@ -64,16 +62,42 @@ public abstract class AbstractCobolTester extends AbstractAntlrTester {
     }
     
     /**
+     * A generic test helper that takes a source fragment and checks the result
+     * when it should be an exception.
+     * @param source the source fragment
+     * @param expected the expected exception
+     */
+    public void lexAndCheck(
+            final String source,
+            final RecognizerException expected) {
+        try {
+            CommonTokenStream ts = lex(source);
+            StringBuilder sb = new StringBuilder();
+            for (Object token : ts.getTokens()) {
+                sb.append(toString((Token) token));
+            }
+            CobolStructureLexerImpl lexer = (CobolStructureLexerImpl) ts.getTokenSource();
+            if (lexer.getErrorHandler().getErrorMessages().size() > 0) {
+                throw new RecognizerException(
+                        lexer.getErrorHandler().getErrorMessages().get(0));
+            }
+            fail();
+        } catch (RecognizerException e) {
+            assertEquals(expected.getMessage(), e.getMessage());
+        }
+    }
+    /**
      * {@inheritDoc}
      */
     public CommonTree parse(final String source) throws RecognizerException {
         try {
             CommonTokenStream tokens = lex(source);
-            CobolStructureParser parser = new CobolStructureParserImpl(
+            CobolStructureParserImpl parser = new CobolStructureParserImpl(
                     tokens, getErrorHandler());
             cobdata_return parserResult = parser.cobdata();
             if (parser.getNumberOfSyntaxErrors() > 0) {
-                _log.warn(parser.getNumberOfSyntaxErrors() + " parse errors");
+                throw new RecognizerException(
+                        parser.getErrorHandler().getErrorMessages().get(0));
             }
             assertTrue(parserResult != null);
             return (CommonTree) parserResult.getTree();

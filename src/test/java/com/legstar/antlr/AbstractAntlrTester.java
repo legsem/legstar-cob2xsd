@@ -68,16 +68,32 @@ public abstract class AbstractAntlrTester extends TestCase {
     public void parseAndCheck(final String source, final String expected) {
         try {
             CommonTree ast = parse(source);
+            assertEquals(expected, (ast == null) ? "" : ast.toStringTree());
             if (_log.isDebugEnabled()) {
                 _log.debug(getGraph(ast).toString());
             }
-            assertEquals(expected, (ast == null) ? "" : ast.toStringTree());
         } catch (RecognizerException e) {
             e.printStackTrace();
             fail(e.getMessage());
         }
     }
 
+    /**
+     * A generic test helper that takes a source fragment and checks the result
+     * when it should be an exception.
+     * @param source the source fragment
+     * @param expected the expected exception
+     */
+    public void parseAndCheck(
+            final String source,
+            final RecognizerException expected) {
+        try {
+            parse(source);
+            fail();
+        } catch (RecognizerException e) {
+            assertEquals(expected.getMessage(), e.getMessage());
+        }
+    }
     /**
      * A generic test helper that takes a source fragment and checks the result.
      * @param source the source fragment
@@ -101,7 +117,7 @@ public abstract class AbstractAntlrTester extends TestCase {
      * @param token a lexer token
      * @return same as Token.toString but with token type label rather than int
      */
-    private String toString(final Token token) {
+    protected String toString(final Token token) {
         return token.toString().replace("<" + token.getType() + ">",
                 "<" + getTokenNames()[token.getType()] + ">");
     }

@@ -1,5 +1,7 @@
 package com.legstar.cobol;
 
+import com.legstar.antlr.RecognizerException;
+
 /**
  * Test the cobol parser.
  *
@@ -763,15 +765,6 @@ public class CobolStructureParserTest extends AbstractCobolTester {
                 "(DATA_ITEM (LEVEL 01) (NAME A) (PICTURE X) (VALUE SPACES))");
     }
 
-    /**
-     * Test a value clause with numeric literals.
-     */
-    public void testDateFormatClauseNumeric() {
-        parseAndCheck(
-                "       01 A DATE FORMAT YYXXXX."
-                ,
-                "(DATA_ITEM (LEVEL 01) (NAME A) (DATEFORMAT YYXXXX))");
-    }
 
     /**
      * Test usage clauses.
@@ -787,4 +780,27 @@ public class CobolStructureParserTest extends AbstractCobolTester {
                 ,
                 "(DATA_ITEM (LEVEL 01) (NAME hisName) (USAGE DISPLAY1))");
     }
+
+    /**
+     * Test a value clause with numeric literals.
+     */
+    public void testDateFormatClauseNumeric() {
+        parseAndCheck(
+                "       01 A DATE FORMAT YYXXXX."
+                ,
+                "(DATA_ITEM (LEVEL 01) (NAME A) (DATEFORMAT YYXXXX))");
+    }
+
+    /**
+     * Test unbalanced parentheses in picture string.
+     */
+    public void testUnbalancedParentheses() {
+        parseAndCheck(
+                "       10 CUSTOM-NAME               PIC X(.\n"
+                + "      10 MAX-REPLIES                 PIC S9(4) COMP. "
+                ,
+                new RecognizerException(
+                        "line 1:42 Unbalanced parentheses in picture string"));
+    }
+
 }

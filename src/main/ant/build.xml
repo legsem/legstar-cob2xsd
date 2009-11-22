@@ -32,7 +32,7 @@
     <target name="cob2xsd" depends="init">
         <cob2xsd targetDir="${xsd.dir}">
             <fileset dir="${cobol.dir}">
-                <include name="*.c*"/>
+                <include name="*"/>
             </fileset>
         </cob2xsd>
     </target>

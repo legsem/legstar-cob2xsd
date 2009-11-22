@@ -1,5 +1,7 @@
 package com.legstar.cobol;
 
+import com.legstar.antlr.RecognizerException;
+
 
 /**
  * Test cases for the cobol Lexer.
@@ -665,4 +667,39 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 + "[@4,27:27='2',<INT>,1:27]"
                 + "[@5,28:28='.',<PERIOD>,1:28]");
     }
- }
+
+    /**
+     * Test a missing period.
+     */
+    public void testMissingPeriod() {
+        lexAndCheck(
+                "       10 CUSTOM-NAME               PIC X(\n"
+                + "      10 MAX-REPLIES                 PIC S9(4) COMP. "
+                ,
+                new RecognizerException(
+                        "line 2:8 Syntax error in last picture clause"));
+    }
+
+    /**
+     * Test an invalid symbol.
+     */
+    public void testSyntaxError() {
+        lexAndCheck(
+                "       10 CUSTOM-NAME               PIC ABEGNPSVXZ0123.456789,+CRD-*$()."
+                ,
+                "[@0,7:8='10',<DATA_ITEM_LEVEL>,1:7]"
+                + "[@1,10:20='CUSTOM-NAME',<DATA_NAME>,1:10]"
+                + "[@2,36:38='PIC',<PICTURE_KEYWORD>,1:36]"
+                + "[@3,40:53='ABEGNPSVXZ0123',<PICTURE_PART>,1:40]"
+                + "[@4,54:54='.',<DECIMAL_POINT>,1:54]"
+                + "[@5,55:60='456789',<PICTURE_PART>,1:55]"
+                + "[@6,61:70=',+CRD-*$()',<PICTURE_PART>,1:61]"
+                + "[@7,71:71='.',<PERIOD>,1:71]");
+
+        lexAndCheck(
+                "       10 CUSTOM-NAME               PIC (z)."
+                ,
+                new RecognizerException(
+                        "line 1:43 Picture string contains invalid symbols"));
+    }
+}
