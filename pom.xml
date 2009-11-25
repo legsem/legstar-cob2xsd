@@ -226,6 +226,7 @@
                     <descriptors>
                         <descriptor>assembly-exe.xml</descriptor>
                         <descriptor>assembly.xml</descriptor>
+                        <descriptor>assembly-full.xml</descriptor>
                     </descriptors>
                     <archive>
                         <manifest>
