@@ -283,7 +283,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="6"/>
-                        <pattern value="^[\+\-\d]?\d{0,5}$"/>
+                        <pattern value="[\+\-\d]?\d{0,5}"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -296,7 +296,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="11"/>
-                        <pattern value="^[\+\-\d]?\d{0,10}$"/>
+                        <pattern value="[\+\-\d]?\d{0,10}"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -309,7 +309,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="21"/>
-                        <pattern value="^[\+\-\d]?\d{0,20}$"/>
+                        <pattern value="[\+\-\d]?\d{0,20}"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -322,7 +322,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="6"/>
-                        <pattern value="^[\+\-\d]?\d{0,5}$"/>
+                        <pattern value="[\+\-\d]?\d{0,5}"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -335,7 +335,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="11"/>
-                        <pattern value="^[\+\-\d]?\d{0,10}$"/>
+                        <pattern value="[\+\-\d]?\d{0,10}"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -348,7 +348,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="21"/>
-                        <pattern value="^[\+\-\d]?\d{0,20}$"/>
+                        <pattern value="[\+\-\d]?\d{0,20}"/>
                     </restriction>
                 </simpleType>
             </element>

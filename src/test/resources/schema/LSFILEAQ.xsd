@@ -127,7 +127,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="8"/>
-                        <pattern value="^[\$\d]?\d{0,4}.?\d{0,2}$"/>
+                        <pattern value="[$\d]?\d{0,4}\.?\d{0,2}"/>
                     </restriction>
                 </simpleType>
             </element>

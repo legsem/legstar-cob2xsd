@@ -18,7 +18,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="5"/>
-                        <pattern value="^[a-zA-Z\s]{0,5}$"/>
+                        <pattern value="[\p{L}\s]{0,5}"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -55,7 +55,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="14"/>
-                        <pattern value="^[a-zA-Z\s]{0,2}.{0,3}/?\d{0,2}0{0,2}\s{0,3}/?$"/>
+                        <pattern value="[\p{L}\s]{0,2}.{0,3}/?\d{0,2}0{0,2}\s{0,3}/?"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -137,7 +137,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="8"/>
-                        <pattern value="^[\d\.]{0,3}0{0,2}\d{0,4}(CR|\s\s)?$"/>
+                        <pattern value="[\d\.]{0,3}0{0,2}\d{0,4}(CR|\s\s)?"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -150,7 +150,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="16"/>
-                        <pattern value="^[\$\d]{0,3}\d{0,4}/?,?\d{0,2}.?\d{0,3}[\+\-\d]?$"/>
+                        <pattern value="[$\d]{0,3}\d{0,4}/?,?\d{0,2}\.?\d{0,3}[\+\-\d]?"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -163,7 +163,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="10"/>
-                        <pattern value="^[1-9\*]{0,4}\d{0,3}.?\d{0,2}$"/>
+                        <pattern value="[1-9\*]{0,4}\d{0,3}\.?\d{0,2}"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -176,7 +176,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="11"/>
-                        <pattern value="^[\+\-\d]?[1-9\s]{0,4}\d{0,2}.?\d{0,3}$"/>
+                        <pattern value="[\+\-\d]?[1-9\s]{0,4}\d{0,2}\.?\d{0,3}"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -229,7 +229,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="10"/>
-                        <pattern value="^[\+\-\d]?\d{0,2}.?\d{0,2}E?[\+\-\d]?\d{0,2}$"/>
+                        <pattern value="[\+\-\d]?\d{0,2}\.?\d{0,2}E?[\+\-\d]?\d{0,2}"/>
                     </restriction>
                 </simpleType>
             </element>

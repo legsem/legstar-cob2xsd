@@ -151,14 +151,20 @@ public class PictureUtilTest extends TestCase {
      * Turns a picture into a regex and then checks that the test value matches.
      * A special case is when regex returned is null (meaning no restriction) in
      * this case the testValue must be null.
+     * <p/>
+     * Because of the difference between XML Schema regex and Java regex there
+     * are some conversions needed before we can actually test.
      * @param picture the COBOL picture clause
      * @param testValue the test value
      * @return true if there is a match
      */
     private boolean checkRegexFromPicture(final String picture, final String testValue) {
-        String regex = PictureUtil.getRegexFromPicture(picture, '$');
-        if (regex != null) {
-            Pattern pattern = Pattern.compile(regex);
+        String xmlsRegex = PictureUtil.getRegexFromPicture(picture, '$');
+        if (xmlsRegex != null) {
+            String javaRegex = '^'
+                + xmlsRegex.replace("$", "\\$").replace("\\p{L}", "a-zA-Z")
+                + '$';
+            Pattern pattern = Pattern.compile(javaRegex);
             Matcher matcher = pattern.matcher(testValue);
             return matcher.find();
         } else {

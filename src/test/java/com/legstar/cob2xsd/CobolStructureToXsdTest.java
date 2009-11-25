@@ -87,24 +87,28 @@ public class CobolStructureToXsdTest extends XMLTestCase {
                 }
                 Document result = getXMLSchemaAsDoc(xsdFile);
                 Document expected = getXMLSchemaAsDoc(new File(XSD_SAMPLES_DIR, name.toLowerCase() + ".xsd"));
-                compare(expected, result);
+                compare(xsdFile.getName(), expected, result);
             }
         }
     }
 
     /**
      * Customization of the XmlUnit assertXMLEqual.
+     * @param xsdFileName XML schema file name
      * @param expected expected result
      * @param result actual result
      */
-    private void compare(final Document expected, final Document result) {
+    private void compare(
+            final String xsdFileName,
+            final Document expected,
+            final Document result) {
         boolean oldIgnore = XMLUnit.getIgnoreWhitespace();
         XMLUnit.setIgnoreWhitespace(true);
         try {
             Diff d = new Diff(expected, result);
             MyDifferenceListener listener = new MyDifferenceListener();
             d.overrideDifferenceListener(listener);
-            assertTrue("expected pieces to be similar, " + d.toString(), d.similar());
+            assertTrue(xsdFileName + ": expected pieces to be similar, " + d.toString(), d.similar());
 //            if (!d.similar()) {
 //                _log.error("expected pieces to be similar, " + d.toString());
 //            }

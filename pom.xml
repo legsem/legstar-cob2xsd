@@ -304,6 +304,28 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>test</classifier>
+                            <classesDirectory>${project.build.directory}/test-classes</classesDirectory>
+                            <includes>
+                                <include>cobol/**</include>
+                                <include>schema/**</include>
+                                <include>xslt/**</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 

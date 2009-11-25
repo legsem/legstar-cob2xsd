@@ -120,8 +120,13 @@ public final class PictureUtil {
     /**
      * Try to infer a regular expression to match a COBOL picture clause.
      * <p/>
+     * The objective is to build a string that would fit the internal representation
+     * of a picture edited COBOL field.
+     * <p/>
      * If a picture is not restrictive, for instance PIC X does not impose
      * any restriction, then we return null (no pattern).
+     * <p/>
+     * Regular expressions in XML Schema are more like PERL than Java regex.
      * @param picture the picture clause
      * @param currencyChar the currency sign
      * @return a regular expression
@@ -130,30 +135,30 @@ public final class PictureUtil {
             final String picture,
             final char currencyChar) {
         StringBuilder result = new StringBuilder();
-        result.append('^');
         
+        /* Table that associate a picture symbol to a regex atom */
         Map < Character, String > charRegex = new HashMap < Character, String >();
-        charRegex.put('A', "[a-zA-Z\\s]");
-        charRegex.put('B', "\\s");
-        charRegex.put('G', ".");
-        charRegex.put('N', ".");
-        charRegex.put('X', ".");
-        charRegex.put('P', "[\\d\\.]");
-        charRegex.put('Z', "[1-9\\s]");
-        charRegex.put('0', "0");
-        charRegex.put('/', "/");
-        charRegex.put('+', "[\\+\\-\\d]");
-        charRegex.put('-', "[\\+\\-\\d]");
-        charRegex.put('*', "[1-9\\*]");
-        charRegex.put('C', "(CR|\\s\\s)");
-        charRegex.put('D', "(DB|\\s\\s)");
-        charRegex.put('.', ".");
-        charRegex.put(',', ",");
-        charRegex.put('9', "\\d");
-        charRegex.put('E', "E");
-        charRegex.put('S', "[\\+\\-]");
-        charRegex.put('V', "");
-        charRegex.put(currencyChar, "[\\" + currencyChar + "\\d]");
+        charRegex.put('A', "[\\p{L}\\s]"); // any letter or space character
+        charRegex.put('B', "\\s"); // space
+        charRegex.put('G', "."); // TODO does not reflect the double byte nature
+        charRegex.put('N', "."); // TODO does not reflect the double byte nature
+        charRegex.put('X', "."); // Any byte
+        charRegex.put('P', "[\\d\\.]"); // Floating decimal point
+        charRegex.put('Z', "[1-9\\s]"); // Numeric or space
+        charRegex.put('0', "0"); // Zero character
+        charRegex.put('/', "/"); // Forward slash character
+        charRegex.put('+', "[\\+\\-\\d]"); // Position can be a sign or a digit
+        charRegex.put('-', "[\\+\\-\\d]"); // Position can be a sign or a digit
+        charRegex.put('*', "[1-9\\*]"); // Position can be an asterisk or a digit
+        charRegex.put('C', "(CR|\\s\\s)"); // Credit or spaces
+        charRegex.put('D', "(DB|\\s\\s)"); // Debit or spaces
+        charRegex.put('.', "\\."); // Decimal point character
+        charRegex.put(',', ","); // Comma character
+        charRegex.put('9', "\\d"); // A digit
+        charRegex.put('E', "E"); // Exponent
+        charRegex.put('S', "[\\+\\-]"); // A numeric sign
+        charRegex.put('V', ""); // A virtual decimal point
+        charRegex.put(currencyChar, "[" + currencyChar + "\\d]");
         
         List < PictureSymbol > pictureSymbols = parsePicture(picture, currencyChar);
 
@@ -164,6 +169,8 @@ public final class PictureUtil {
                 return null;
             }
         }
+        
+        /* Add quantifiers */
         for (PictureSymbol pictureSymbol : pictureSymbols) {
             String regex = charRegex.get(pictureSymbol.getSymbol());
             if (charRegex != null) {
@@ -177,7 +184,6 @@ public final class PictureUtil {
             }
         }
         
-        result.append('$');
         return result.toString();
     }
     

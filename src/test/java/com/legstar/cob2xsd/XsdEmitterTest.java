@@ -293,7 +293,7 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
                 + "<simpleType>"
                 + "<restriction base=\"string\">"
                 + "<maxLength value=\"7\"/>"
-                + "<pattern value=\"^[a-zA-Z\\s]{0,5}\\d{0,2}$\"/>"
+                + "<pattern value=\"[\\p{L}\\s]{0,5}\\d{0,2}\"/>"
                 + "</restriction>"
                 + "</simpleType>"
                 + "</element>"
