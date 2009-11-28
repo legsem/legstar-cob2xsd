@@ -134,7 +134,7 @@
             <element name="WsPs9X18Dis1">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X18-DIS-1" levelNumber="5" picture="+9(18)" srceLine="46" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X18-DIS-1" levelNumber="5" picture="+9(18)" signed="true" srceLine="46" totalDigits="18" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -147,7 +147,7 @@
             <element name="WsPs9X18Dis2">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X18-DIS-2" levelNumber="5" picture="+9(18)" srceLine="47" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X18-DIS-2" levelNumber="5" picture="+9(18)" signed="true" srceLine="47" totalDigits="18" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -160,7 +160,7 @@
             <element name="WsPs9X31Dis1">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X31-DIS-1" levelNumber="5" picture="+9(31)" srceLine="48" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X31-DIS-1" levelNumber="5" picture="+9(31)" signed="true" srceLine="48" totalDigits="31" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -173,7 +173,7 @@
             <element name="WsPs9X31Dis2">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X31-DIS-2" levelNumber="5" picture="+9(31)" srceLine="49" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X31-DIS-2" levelNumber="5" picture="+9(31)" signed="true" srceLine="49" totalDigits="31" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>

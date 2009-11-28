@@ -107,7 +107,7 @@ public class CobolStructureToXsd {
         if (_log.isDebugEnabled()) {
             debug("Translating with options:", getContext().toString());
         }
-        String xmlSchemaString = xsdToString(emitXsd(emitModel(parse(lex(clean(cobolSource))))));
+        String xmlSchemaString = xsdToString(emitXsd(toModel(cobolSource)));
         
         for (String errorMessage : getErrorHistory()) {
             _log.warn(errorMessage);
@@ -158,6 +158,16 @@ public class CobolStructureToXsd {
         } catch (IOException e) {
             throw (new XsdGenerationException(e));
         }
+    }
+    
+    /**
+     * Parses a COBOL source into an in-memory model.
+     * @param cobolSource the COBOL source
+     * @return a list of root COBOL data items
+     * @throws RecognizerException if COBOL recognition fails 
+     */
+    public List < CobolDataItem > toModel(final String cobolSource) throws RecognizerException {
+        return emitModel(parse(lex(clean(cobolSource))));
     }
 
     /**
@@ -230,7 +240,7 @@ public class CobolStructureToXsd {
     /**
      * Generates a model from an Abstract Syntax Tree. 
      * @param ast the abstract syntax tree produced by parser
-     * @return a list of COBOL data items
+     * @return a list of root COBOL data items
      * @throws RecognizerException if tree cannot be walked
      */
     public List < CobolDataItem > emitModel(final CommonTree ast) throws RecognizerException {
@@ -342,7 +352,7 @@ public class CobolStructureToXsd {
      * @param cobolDataItems a list of root data items
      * @return a list of COBOL names which are not unique
      */
-    protected List < String > getNonUniqueCobolNames(final List < CobolDataItem > cobolDataItems) {
+    public static List < String > getNonUniqueCobolNames(final List < CobolDataItem > cobolDataItems) {
         List < String > cobolNames = new ArrayList < String >();
         List < String > nonUniqueCobolNames = new ArrayList < String >();
         for (CobolDataItem cobolDataItem : cobolDataItems) {
@@ -361,7 +371,7 @@ public class CobolStructureToXsd {
      * @param cobolNames the list of all COBOL names used so far
      * @param nonUniqueCobolNames the list of non unique COBOL names
      */
-    protected void getNonUniqueCobolNames(
+    protected static void getNonUniqueCobolNames(
             final CobolDataItem cobolDataItem,
             final List < String > cobolNames,
             final List < String > nonUniqueCobolNames) {

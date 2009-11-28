@@ -190,6 +190,12 @@ public class XsdDataItemTest extends TestCase {
         mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
         assertEquals("ZONED_DECIMAL_ITEM", mapper.getCobolType().toString());
         assertEquals("USHORT", mapper.getXsdType().toString());
+
+        dataItem.setPicture("99.9");
+        mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
+        assertEquals("NUMERIC_EDITED_ITEM", mapper.getCobolType().toString());
+        assertEquals("STRING", mapper.getXsdType().toString());
+
     }
 
     /**
@@ -198,16 +204,25 @@ public class XsdDataItemTest extends TestCase {
     public void testSetNumericAttributes() {
         CobolDataItem dataItem = new CobolDataItem();
 
-        dataItem.setPicture("99.9");
+        dataItem.setPicture("99V9");
         dataItem.setUsage(Usage.DISPLAY);
         XsdDataItem mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
         assertEquals("ZONED_DECIMAL_ITEM", mapper.getCobolType().toString());
         assertEquals("DECIMAL", mapper.getXsdType().toString());
         assertEquals(3, mapper.getTotalDigits());
         assertEquals(1, mapper.getFractionDigits());
+        assertEquals("99V9", mapper.getPicture());
+
+        dataItem.setPicture("99.9");
+        dataItem.setUsage(Usage.DISPLAY);
+        mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
+        assertEquals("NUMERIC_EDITED_ITEM", mapper.getCobolType().toString());
+        assertEquals("STRING", mapper.getXsdType().toString());
+        assertEquals(3, mapper.getTotalDigits());
+        assertEquals(1, mapper.getFractionDigits());
         assertEquals("99.9", mapper.getPicture());
 
-        dataItem.setPicture("S99.9");
+        dataItem.setPicture("S99V9");
         dataItem.setUsage(Usage.PACKEDDECIMAL);
         mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
         assertEquals("PACKED_DECIMAL_ITEM", mapper.getCobolType().toString());
@@ -345,5 +360,174 @@ public class XsdDataItemTest extends TestCase {
                 dataItem, _context, null, new ArrayList < String >());
         assertEquals(XsdType.ENUM, xsdDataItem.getXsdType());
 
+    }
+    
+    /**
+     * Test that storage length is evaluated correctly for elementary data items.
+     */
+    public void testStorageLengthElementary() {
+        CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
+        dataItem.setUsage(Usage.SINGLEFLOAT);
+        XsdDataItem xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(4, xsdDataItem.getMinStorageLength());
+        assertEquals(4, xsdDataItem.getMaxStorageLength());
+        
+        dataItem.setUsage(Usage.DOUBLEFLOAT);
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(8, xsdDataItem.getMinStorageLength());
+        assertEquals(8, xsdDataItem.getMaxStorageLength());
+
+        dataItem.setUsage(Usage.DISPLAY);
+        dataItem.setPicture("X(5)");
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(5, xsdDataItem.getMinStorageLength());
+        assertEquals(5, xsdDataItem.getMaxStorageLength());
+
+        dataItem.setPicture("A(5)G(2)99");
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(11, xsdDataItem.getMinStorageLength());
+        assertEquals(11, xsdDataItem.getMaxStorageLength());
+
+        dataItem.setPicture("G(3)");
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(6, xsdDataItem.getMinStorageLength());
+        assertEquals(6, xsdDataItem.getMaxStorageLength());
+
+        dataItem.setPicture("N(5)");
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(10, xsdDataItem.getMinStorageLength());
+        assertEquals(10, xsdDataItem.getMaxStorageLength());
+
+        dataItem.setPicture("+++99V99$");
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(8, xsdDataItem.getMinStorageLength());
+        assertEquals(8, xsdDataItem.getMaxStorageLength());
+
+        dataItem.setPicture("9(18)V99");
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(20, xsdDataItem.getMinStorageLength());
+        assertEquals(20, xsdDataItem.getMaxStorageLength());
+
+        dataItem.setUsage(Usage.BINARY);
+        dataItem.setPicture("9(4)");
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(2, xsdDataItem.getMinStorageLength());
+        assertEquals(2, xsdDataItem.getMaxStorageLength());
+
+        dataItem.setUsage(Usage.BINARY);
+        dataItem.setPicture("9(8)");
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(4, xsdDataItem.getMinStorageLength());
+        assertEquals(4, xsdDataItem.getMaxStorageLength());
+
+        dataItem.setUsage(Usage.NATIVEBINARY);
+        dataItem.setPicture("S9(18)");
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(8, xsdDataItem.getMinStorageLength());
+        assertEquals(8, xsdDataItem.getMaxStorageLength());
+
+        dataItem.setUsage(Usage.PACKEDDECIMAL);
+        dataItem.setPicture("S9(7)V99");
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(5, xsdDataItem.getMinStorageLength());
+        assertEquals(5, xsdDataItem.getMaxStorageLength());
+
+        dataItem.setMinOccurs(0);
+        dataItem.setMaxOccurs(2);
+        xsdDataItem = new XsdDataItem(
+                dataItem, _context, null, new ArrayList < String >());
+        assertEquals(0, xsdDataItem.getMinStorageLength());
+        assertEquals(10, xsdDataItem.getMaxStorageLength());
+        
+    }
+
+    /**
+     * Test that storage length is evaluated correctly for structure data items.
+     */
+    public void testStorageLengthStructures() {
+        CobolDataItem struct = new CobolDataItem("PARENT");
+        CobolDataItem child0 = new CobolDataItem("CHILD-0");
+        CobolDataItem child1 = new CobolDataItem("CHILD-1");
+        CobolDataItem child2 = new CobolDataItem("CHILD-2");
+        CobolDataItem grandChild0 = new CobolDataItem("GRAND-CHILD-0");
+        CobolDataItem grandChild1 = new CobolDataItem("GRAND-CHILD-1");
+
+        child0.setUsage(Usage.SINGLEFLOAT);
+        struct.getChildren().add(child0);
+
+        grandChild0.setUsage(Usage.SINGLEFLOAT);
+        grandChild1.setUsage(Usage.SINGLEFLOAT);
+        child1.getChildren().add(grandChild0);
+        child1.getChildren().add(grandChild1);
+        struct.getChildren().add(child1);
+
+        child2.setUsage(Usage.SINGLEFLOAT);
+        struct.getChildren().add(child2);
+
+        XsdDataItem xsdDataItem = new XsdDataItem(
+                struct, _context, null, new ArrayList < String >());
+        assertEquals(16, xsdDataItem.getMinStorageLength());
+        assertEquals(16, xsdDataItem.getMaxStorageLength());
+        
+        child1.setMinOccurs(2);
+        child1.setMaxOccurs(5);
+        
+        xsdDataItem = new XsdDataItem(
+                struct, _context, null, new ArrayList < String >());
+        assertEquals(24, xsdDataItem.getMinStorageLength());
+        assertEquals(48, xsdDataItem.getMaxStorageLength());
+        
+        struct.setMaxOccurs(2);
+        xsdDataItem = new XsdDataItem(
+                struct, _context, null, new ArrayList < String >());
+        assertEquals(48, xsdDataItem.getMinStorageLength());
+        assertEquals(96, xsdDataItem.getMaxStorageLength());
+    }
+
+    /**
+     * Test that storage length is evaluated correctly for structure 
+     * containing redefines.
+     */
+    public void testStorageLengthRedfines() {
+        CobolDataItem struct = new CobolDataItem("PARENT");
+
+        CobolDataItem child0 = new CobolDataItem("CHILD-0");
+        child0.setUsage(Usage.SINGLEFLOAT);
+
+        CobolDataItem child1 = new CobolDataItem("CHILD-1");
+        child1.setUsage(Usage.DOUBLEFLOAT);
+        child1.setRedefines("CHILD-0");
+
+        CobolDataItem child2 = new CobolDataItem("CHILD-2");
+        child2.setUsage(Usage.SINGLEFLOAT);
+        CobolDataItem child3 = new CobolDataItem("CHILD-3");
+        child3.setUsage(Usage.DOUBLEFLOAT);
+        child3.setRedefines("CHILD-2");
+        CobolDataItem child4 = new CobolDataItem("CHILD-4");
+        child4.setUsage(Usage.SINGLEFLOAT);
+        child4.setRedefines("CHILD-2");
+        
+        struct.getChildren().add(child0);
+        struct.getChildren().add(child1);
+        struct.getChildren().add(child2);
+        struct.getChildren().add(child3);
+        struct.getChildren().add(child4);
+        
+        XsdDataItem xsdDataItem = new XsdDataItem(
+                struct, _context, null, new ArrayList < String >());
+        assertEquals(16, xsdDataItem.getMinStorageLength());
+        assertEquals(16, xsdDataItem.getMaxStorageLength());
     }
 }

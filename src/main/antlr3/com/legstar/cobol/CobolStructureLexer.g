@@ -32,7 +32,8 @@ import java.util.regex.Pattern;
             = new CobolStructureKeywordsLexerImpl();
 
     /** Pattern that recognizes picture strings. */
-    public static final Pattern PICTURE_PATTERN = Pattern.compile("[ABEGNPSVXZ\\d/,\\+CRD\\-\\*$\\(\\)]+");
+    public static final Pattern PICTURE_PATTERN =
+        Pattern.compile("[ABEGNPSVXZ\\d/,\\+CRD\\-\\*$\\(\\)]+", Pattern.CASE_INSENSITIVE);
 
     /**
      * Asks secondary lexer to check if text is a keyword. If there is a match,

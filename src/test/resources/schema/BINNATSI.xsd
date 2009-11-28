@@ -277,7 +277,7 @@
             <element name="WsPs9X4Dis1">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X4-DIS-1" levelNumber="5" picture="+9(5)" srceLine="60" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X4-DIS-1" levelNumber="5" picture="+9(5)" signed="true" srceLine="60" totalDigits="5" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -290,7 +290,7 @@
             <element name="WsPs9X9Dis1">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X9-DIS-1" levelNumber="5" picture="+9(10)" srceLine="61" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X9-DIS-1" levelNumber="5" picture="+9(10)" signed="true" srceLine="61" totalDigits="10" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -303,7 +303,7 @@
             <element name="WsPs9X18Dis1">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X18-DIS-1" levelNumber="5" picture="+9(20)" srceLine="62" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X18-DIS-1" levelNumber="5" picture="+9(20)" signed="true" srceLine="62" totalDigits="20" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -316,7 +316,7 @@
             <element name="WsPs9X4Dis2">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X4-DIS-2" levelNumber="5" picture="+9(5)" srceLine="63" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X4-DIS-2" levelNumber="5" picture="+9(5)" signed="true" srceLine="63" totalDigits="5" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -329,7 +329,7 @@
             <element name="WsPs9X9Dis2">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X9-DIS-2" levelNumber="5" picture="+9(10)" srceLine="64" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X9-DIS-2" levelNumber="5" picture="+9(10)" signed="true" srceLine="64" totalDigits="10" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -342,7 +342,7 @@
             <element name="WsPs9X18Dis2">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X18-DIS-2" levelNumber="5" picture="+9(20)" srceLine="65" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X18-DIS-2" levelNumber="5" picture="+9(20)" signed="true" srceLine="65" totalDigits="20" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>

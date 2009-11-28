@@ -87,6 +87,12 @@ public class XsdDataItem {
     /** True if some item downstream redefines this data item.*/
     private boolean _isRedefined;
 
+    /** Minimum number of storage bytes occupied by this item in z/OS memory.*/
+    private int _minStorageLength;
+
+    /** Maximum number of storage bytes occupied by this item in z/OS memory.*/
+    private int _maxStorageLength;
+
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
 
@@ -116,7 +122,7 @@ public class XsdDataItem {
             setDataDescription(cobolDataItem, context, nonUniqueCobolNames);
             break;
         case RENAMES:
-           /* COBOL renames don't map to an XSD type. */
+            /* COBOL renames don't map to an XSD type. */
             _log.warn("Unhandled data entry type " + cobolDataItem.toString());
             break;
         case CONDITION:
@@ -152,26 +158,17 @@ public class XsdDataItem {
             setFromPicture(
                     cobolDataItem.getPicture(),
                     cobolDataItem.isSignSeparate(),
+                    cobolDataItem.isBlankWhenZero(),
                     context.getCurrencySymbol().charAt(0),
                     context.nSymbolDbcs(),
                     context.decimalPointIsComma());
         }
+        _maxStorageLength = _minStorageLength;
 
         /* If the xsdType is not set yet, then this is not an elementary data item.*/
         if (_xsdType == null) {
             _xsdType = XsdType.COMPLEX;
             _cobolType = CobolType.GROUP_ITEM;
-        }
-
-        /* Set XSD minOccurs/maxOccurs from COBOL. If no minOccurs set
-         * in COBOL, this is a fixed size array. */
-        if (cobolDataItem.getMaxOccurs() > 0) {
-            _maxOccurs = cobolDataItem.getMaxOccurs();
-            if (cobolDataItem.getMinOccurs() > -1) {
-                _minOccurs = cobolDataItem.getMinOccurs();
-            } else {
-                _minOccurs = cobolDataItem.getMaxOccurs();
-            }
         }
 
         /* Inform object upstream that someone depends on him.*/
@@ -184,9 +181,60 @@ public class XsdDataItem {
             getParent().updateRedefinition(getRedefines());
         }
 
-        /* Create the list of children by decorating the COBOL item children */
+        /* Create the list of children by decorating the COBOL item children. */
         for (CobolDataItem child : cobolDataItem.getChildren()) {
-            _children.add(new XsdDataItem(child, context, this, nonUniqueCobolNames));
+            XsdDataItem xsdChild = new XsdDataItem(child, context, this, nonUniqueCobolNames);
+            _children.add(xsdChild);
+        }
+
+        /* Children contribute their storage length to their parent unless they
+         * are part of a redefine group in which case, the largest child in the 
+         * group is the one contributing) */
+        boolean redefines = false;
+        int minRedefinesStorageLength = 0;
+        int maxRedefinesStorageLength = 0;
+        for (XsdDataItem xsdChild : getChildren()) {
+            if (redefines) {
+                if (xsdChild.getRedefines() == null) {
+                    redefines = false;
+                    _minStorageLength += minRedefinesStorageLength;
+                    _maxStorageLength += maxRedefinesStorageLength;
+                } else {
+                    if (xsdChild.getMinStorageLength() > minRedefinesStorageLength) {
+                        minRedefinesStorageLength = xsdChild.getMinStorageLength();
+                    }
+                    if (xsdChild.getMaxStorageLength() > maxRedefinesStorageLength) {
+                        maxRedefinesStorageLength = xsdChild.getMaxStorageLength();
+                    }
+                }
+            }
+            if (xsdChild.isRedefined()) {
+                redefines = true;
+                minRedefinesStorageLength = xsdChild.getMinStorageLength();
+                maxRedefinesStorageLength = xsdChild.getMaxStorageLength();
+            } else {
+                if (!redefines) {
+                    _minStorageLength += xsdChild.getMinStorageLength();
+                    _maxStorageLength += xsdChild.getMaxStorageLength();
+                }
+            }
+        }
+        if (redefines) {
+            _minStorageLength += minRedefinesStorageLength;
+            _maxStorageLength += maxRedefinesStorageLength;
+        }
+
+        /* Set XSD minOccurs/maxOccurs from COBOL. If no minOccurs set
+         * in COBOL, this is a fixed size array. */
+        if (cobolDataItem.getMaxOccurs() > 0) {
+            _maxOccurs = cobolDataItem.getMaxOccurs();
+            _maxStorageLength = _maxStorageLength * _maxOccurs;
+            if (cobolDataItem.getMinOccurs() > -1) {
+                _minOccurs = cobolDataItem.getMinOccurs();
+            } else {
+                _minOccurs = cobolDataItem.getMaxOccurs();
+            }
+            _minStorageLength = _minStorageLength * _minOccurs;
         }
 
     }
@@ -256,10 +304,12 @@ public class XsdDataItem {
         case SINGLEFLOAT:
             _cobolType = CobolType.SINGLE_FLOAT_ITEM;
             _xsdType = XsdType.FLOAT;
+            _minStorageLength = 4;
             break;
         case DOUBLEFLOAT:
             _cobolType = CobolType.DOUBLE_FLOAT_ITEM;
             _xsdType = XsdType.DOUBLE;
+            _minStorageLength = 8;
             break;
         case PACKEDDECIMAL:
             _cobolType = CobolType.PACKED_DECIMAL_ITEM;
@@ -268,18 +318,22 @@ public class XsdDataItem {
         case INDEX:
             _cobolType = CobolType.INDEX_ITEM;
             _xsdType = XsdType.HEXBINARY;
+            _minStorageLength = 4;
             break;
         case POINTER:
             _cobolType = CobolType.POINTER_ITEM;
             _xsdType = XsdType.HEXBINARY;
+            _minStorageLength = 4;
             break;
         case PROCEDUREPOINTER:
             _cobolType = CobolType.PROC_POINTER_ITEM;
             _xsdType = XsdType.HEXBINARY;
+            _minStorageLength = 8;
             break;
         case FUNCTIONPOINTER:
             _cobolType = CobolType.FUNC_POINTER_ITEM;
             _xsdType = XsdType.HEXBINARY;
+            _minStorageLength = 4;
             break;
         case DISPLAY:
             _cobolType = CobolType.ALPHANUMERIC_ITEM;
@@ -302,6 +356,7 @@ public class XsdDataItem {
      * Derive XML schema attributes from a COBOL picture.
      * @param picture the picture clause
      * @param isSignSeparate if sign occupies a separated position (no overpunch)
+     * @param isBlankWhenZero item contains only spaces when its value is zero
      * @param currencyChar the currency sign
      * @param nSymbolDbcs true if COBOL compiler option NSYMBOL(DBCS)
      * @param decimalPointIsComma if COBOL compiler option DECIMAL POINT IS COMMA
@@ -309,16 +364,19 @@ public class XsdDataItem {
     private void setFromPicture(
             final String picture,
             final boolean isSignSeparate,
+            final boolean isBlankWhenZero,
             final char currencyChar,
             final boolean nSymbolDbcs,
             final boolean decimalPointIsComma) {
 
         char comma = (decimalPointIsComma) ? '.' : ',';
+        char decimalPoint = (decimalPointIsComma) ? ',' : '.';
 
         Map < Character, Integer > charNum =
             PictureUtil.getPictureCharOccurences(picture, currencyChar);
 
-        _length = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, currencyChar);
+        _length = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, currencyChar, false);
+        /* storage is valid only for simple strings at this stage. will be refined later. */
         _pattern = PictureUtil.getRegexFromPicture(picture, currencyChar);
 
         if ((charNum.get('A') + charNum.get('X')) > 0) {
@@ -332,12 +390,14 @@ public class XsdDataItem {
                 }
             }
             _xsdType = XsdType.STRING;
+            _minStorageLength = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, currencyChar, true);
             return;
         }
 
         if (charNum.get('G') > 0) {
             _cobolType = CobolType.DBCS_ITEM;
             _xsdType = XsdType.STRING;
+            _minStorageLength = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, currencyChar, true);
             return;
         }
 
@@ -348,6 +408,7 @@ public class XsdDataItem {
                 _cobolType = CobolType.NATIONAL_ITEM;
             }
             _xsdType = XsdType.STRING;
+            _minStorageLength = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, currencyChar, true);
             return;
         }
 
@@ -355,22 +416,31 @@ public class XsdDataItem {
         if (charNum.get('E') > 0) {
             _cobolType = CobolType.EXTERNAL_FLOATING_ITEM;
             _xsdType = XsdType.STRING;
+            _minStorageLength = _length;
             return;
         }
 
-        if ((charNum.get('/')
+        /* Numeric edited items are identified by their picture clause symbols
+         * or the presence of the BLANK WHEN ZERO clause*/
+        if (((charNum.get('/')
                 + charNum.get('B')
+                + charNum.get('/')
                 + charNum.get('Z')
                 + charNum.get('0')
                 + charNum.get(comma)
+                + charNum.get(decimalPoint)
                 + charNum.get('*')
                 + charNum.get('+')
                 + charNum.get('-')
                 + charNum.get('C')  /* CR */
                 + charNum.get('D')  /* DB */
-                + charNum.get(currencyChar)) > 0) {
+                + charNum.get(currencyChar)) > 0)
+                || isBlankWhenZero) {
             _cobolType = CobolType.NUMERIC_EDITED_ITEM;
             _xsdType = XsdType.STRING;
+            _minStorageLength = _length;
+            /* Adding digits and sign for numeric edited is experimental. */
+            setDigitsAndSign(picture, currencyChar, decimalPointIsComma);
             return;
         }
 
@@ -380,6 +450,7 @@ public class XsdDataItem {
          * numeric not an alphanumeric. */
         if (_cobolType == null || _cobolType == CobolType.ALPHANUMERIC_ITEM) {
             _cobolType = CobolType.ZONED_DECIMAL_ITEM;
+            _minStorageLength = _length;
         }
         setNumericAttributes(picture, currencyChar, decimalPointIsComma);
 
@@ -403,10 +474,68 @@ public class XsdDataItem {
             final String picture,
             final char currencyChar,
             final boolean decimalPointIsComma) {
+        
+        setDigitsAndSign(picture, currencyChar, decimalPointIsComma);
+
+        if (_fractionDigits == 0) {
+            if (_totalDigits < 5) {
+                _xsdType = (_isSigned) ? XsdType.SHORT : XsdType.USHORT;
+            } else if (_totalDigits < 10) {
+                _xsdType = (_isSigned) ? XsdType.INT : XsdType.UINT;
+            } else if (_totalDigits < 20) {
+                _xsdType = (_isSigned) ? XsdType.LONG : XsdType.ULONG;
+            } else {
+                _xsdType = XsdType.INTEGER;
+            }
+
+        } else {
+            _xsdType = XsdType.DECIMAL;
+        }
+
+        switch (_cobolType) {
+        case BINARY_ITEM:
+        case NATIVE_BINARY_ITEM:
+            if (_totalDigits < 5) {
+                _minStorageLength = 2;
+            } else if (_totalDigits < 10) {
+                _minStorageLength = 4;
+            } else {
+                _minStorageLength = 8;
+            }
+            break;
+        case PACKED_DECIMAL_ITEM:
+            _minStorageLength = (_totalDigits / 2) + 1;
+            break;
+        default:
+            break;
+        }
+
+    }
+    
+    /**
+     * Extracts total number of digits, fraction digits and
+     * sign from a picture clause.
+     * <p/>
+     * Works for zoned decimals, binary and packed decimal.
+     * <p/>
+     * TODO This is incomplete for edited numerics.
+     * @param picture a purely numeric picture clause
+     * @param currencyChar the currency sign
+     * @param decimalPointIsComma true if decimal point is comma
+     */
+    protected void setDigitsAndSign(
+            final String picture,
+            final char currencyChar,
+            final boolean decimalPointIsComma) {
+
         char decimalPoint = (decimalPointIsComma) ? ',' : '.';
 
-        /* Look for the integer part (digits before the decimal point)*/
+        /* Look for the integer part (digits before the decimal point)
+         * Decimal point is virtual or not.*/
         int iV = picture.indexOf('V');
+        if (iV == -1) {
+            iV = picture.indexOf('v');
+        }
         if (iV == -1) {
             iV = picture.indexOf(decimalPoint);
         }
@@ -425,22 +554,7 @@ public class XsdDataItem {
             _totalDigits = intCharNum.get('9');
         }
 
-        _isSigned = (intCharNum.get('S') > 0) ? true : false;
-
-        if (_fractionDigits == 0) {
-            if (_totalDigits < 5) {
-                _xsdType = (_isSigned) ? XsdType.SHORT : XsdType.USHORT;
-            } else if (_totalDigits < 10) {
-                _xsdType = (_isSigned) ? XsdType.INT : XsdType.UINT;
-            } else if (_totalDigits < 20) {
-                _xsdType = (_isSigned) ? XsdType.LONG : XsdType.ULONG;
-            } else {
-                _xsdType = XsdType.INTEGER;
-            }
-
-        } else {
-            _xsdType = XsdType.DECIMAL;
-        }
+        _isSigned = ((intCharNum.get('S') + intCharNum.get('+') + intCharNum.get('-')) > 0) ? true : false;
 
     }
 
@@ -473,7 +587,7 @@ public class XsdDataItem {
         StringBuilder sb = new StringBuilder();
         sb.append(Character.toUpperCase(elementName.charAt(0)));
         sb.append(elementName.substring(1));
-        
+
         if (nonUniqueCobolNames.contains(cobolDataItem.getCobolName())) {
             if (context.nameConflictPrependParentName()) {
                 if (parent != null) {
@@ -486,7 +600,7 @@ public class XsdDataItem {
 
         return sb.toString();
     }
-    
+
     /**
      * Turn a COBOL name to an XSD element name.
      * <p/>
@@ -514,12 +628,12 @@ public class XsdDataItem {
     public static String formatElementName(
             final CobolDataItem cobolDataItem,
             final Cob2XsdContext context) {
-        
+
         String cobolName = cobolDataItem.getCobolName();
         if (cobolName.equalsIgnoreCase("FILLER")) {
             return "filler" + cobolDataItem.getSrceLine();
         }
-        
+
         StringBuilder sb = new StringBuilder();
         boolean wordBreaker = (context.elementNamesStartWithUppercase()) ? true : false;
         for (int i = 0; i < cobolName.length(); i++) {
@@ -773,6 +887,13 @@ public class XsdDataItem {
     }
 
     /**
+     * @return the blank when zero clause
+     */
+    public boolean isBlankWhenZero() {
+        return _cobolDataItem.isBlankWhenZero();
+    }
+
+    /**
      * @return the parent data item or null if root
      */
     public XsdDataItem getParent() {
@@ -806,6 +927,20 @@ public class XsdDataItem {
     public void setIsRedefined(final boolean isRedefined) {
         _isRedefined = isRedefined;
     }
+
+    /**
+     * @return the minimum number of storage bytes occupied by this item in z/OS memory
+     */
+    public int getMinStorageLength() {
+        return _minStorageLength;
+    }
+
+    /**
+     * @return the maximumm number of storage bytes occupied by this item in z/OS memory
+     */
+    public int getMaxStorageLength() {
+        return _maxStorageLength;
+    }
     
     /** {@inheritDoc}*/
     public String toString() {
@@ -817,7 +952,7 @@ public class XsdDataItem {
         sb.append(',');
         sb.append(_cobolDataItem.toString());
         return sb.toString();
-        
+
     }
 
 }

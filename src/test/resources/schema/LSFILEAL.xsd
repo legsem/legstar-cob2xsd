@@ -96,7 +96,7 @@
                 </annotation>
                 <simpleType>
                     <restriction base="string">
-                        <maxLength value="1203"/>
+                        <maxLength value="123"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -136,7 +136,7 @@
                 </annotation>
                 <simpleType>
                     <restriction base="string">
-                        <maxLength value="1208"/>
+                        <maxLength value="128"/>
                     </restriction>
                 </simpleType>
             </element>

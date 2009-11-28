@@ -12,7 +12,7 @@
             <element name="WsPs9X4Min">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X4-MIN" levelNumber="5" picture="+9(5)" srceLine="29" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X4-MIN" levelNumber="5" picture="+9(5)" signed="true" srceLine="29" totalDigits="5" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -25,7 +25,7 @@
             <element name="WsPs9X4Max">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X4-MAX" levelNumber="5" picture="+9(5)" srceLine="30" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X4-MAX" levelNumber="5" picture="+9(5)" signed="true" srceLine="30" totalDigits="5" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -38,7 +38,7 @@
             <element name="WsPs9X9Min">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X9-MIN" levelNumber="5" picture="+9(10)" srceLine="31" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X9-MIN" levelNumber="5" picture="+9(10)" signed="true" srceLine="31" totalDigits="10" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -51,7 +51,7 @@
             <element name="WsPs9X9Max">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X9-MAX" levelNumber="5" picture="+9(10)" srceLine="32" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X9-MAX" levelNumber="5" picture="+9(10)" signed="true" srceLine="32" totalDigits="10" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -64,7 +64,7 @@
             <element name="WsPs9X18Min">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X18-MIN" levelNumber="5" picture="+9(19)" srceLine="33" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X18-MIN" levelNumber="5" picture="+9(19)" signed="true" srceLine="33" totalDigits="19" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -77,7 +77,7 @@
             <element name="WsPs9X18Max">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PS9X18-MAX" levelNumber="5" picture="+9(19)" srceLine="34" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="WS-PS9X18-MAX" levelNumber="5" picture="+9(19)" signed="true" srceLine="34" totalDigits="19" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>

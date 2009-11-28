@@ -152,11 +152,11 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
      */
     public void testFractionDigits() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
-        dataItem.setPicture("S99.9");
+        dataItem.setPicture("S99V9");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
-                + " picture=\"S99.9\""
+                + " picture=\"S99V9\""
                 + " type=\"ZONED_DECIMAL_ITEM\""
                 + " totalDigits=\"3\""
                 + " fractionDigits=\"1\""
@@ -169,12 +169,12 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
      */
     public void testSignLeading() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
-        dataItem.setPicture("S99.9");
+        dataItem.setPicture("S99V9");
         dataItem.setSignLeading(true);
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
-                + " picture=\"S99.9\""
+                + " picture=\"S99V9\""
                 + " type=\"ZONED_DECIMAL_ITEM\""
                 + " totalDigits=\"3\""
                 + " fractionDigits=\"1\""
@@ -188,13 +188,13 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
      */
     public void testSignSeparate() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
-        dataItem.setPicture("S99.9");
+        dataItem.setPicture("S99V9");
         dataItem.setSignLeading(true);
         dataItem.setSignSeparate(true);
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
-                + " picture=\"S99.9\""
+                + " picture=\"S99V9\""
                 + " type=\"ZONED_DECIMAL_ITEM\""
                 + " totalDigits=\"3\""
                 + " fractionDigits=\"1\""

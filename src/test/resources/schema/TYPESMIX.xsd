@@ -131,7 +131,7 @@
             <element name="CNumericEdited1">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="C-NUMERIC-EDITED-1" levelNumber="5" picture="PPP009999CR" srceLine="31" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="C-NUMERIC-EDITED-1" levelNumber="5" picture="PPP009999CR" signed="false" srceLine="31" totalDigits="4" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -144,7 +144,7 @@
             <element name="CNumericEdited2">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="C-NUMERIC-EDITED-2" levelNumber="5" picture="$$$9999/,99.999+" srceLine="32" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="C-NUMERIC-EDITED-2" fractionDigits="3" levelNumber="5" picture="$$$9999/,99.999+" signed="false" srceLine="32" totalDigits="9" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -157,7 +157,7 @@
             <element name="CNumericEdited3">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="C-NUMERIC-EDITED-3" levelNumber="5" picture="****999.99" srceLine="33" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="C-NUMERIC-EDITED-3" fractionDigits="2" levelNumber="5" picture="****999.99" signed="false" srceLine="33" totalDigits="5" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -170,7 +170,7 @@
             <element name="CNumericEdited4">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="C-NUMERIC-EDITED-4" levelNumber="5" picture="-ZZZZ99.999" srceLine="34" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="C-NUMERIC-EDITED-4" fractionDigits="3" levelNumber="5" picture="-ZZZZ99.999" signed="true" srceLine="34" totalDigits="5" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>

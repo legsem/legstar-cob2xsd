@@ -72,18 +72,22 @@ public final class PictureUtil {
      * The COBOL picture clause determines the length, in number of characters,
      * for all alphanumeric and numeric-edited data items.
      * <p/>
-     * The length evaluated here is not the byte size of the storage needed on
-     * z/OS for the data item. It is the number of character positions.
+     * The length evaluated here is either not the the number of character positions
+     * (which corresponds to the size constraint on the client side) or the
+     * byte size of the storage needed on z/OS for the data item. You select between
+     * one or the other with the calcStorageLength parameter.
      * 
      * @param charNum map of all characters in the picture string
      * @param isSignSeparate if sign occupies a separated position (no overpunch)
      * @param currencyChar the currency sign
+     * @param calcStorageLength when true the length returned is the z/OS storage length
      * @return the length, in number of characters, of the data item
      */
     public static int calcLengthFromPicture(
             final Map < Character, Integer > charNum,
             final boolean isSignSeparate,
-            final char currencyChar) {
+            final char currencyChar,
+            final boolean calcStorageLength) {
 
         int length = 0;
         
@@ -91,8 +95,8 @@ public final class PictureUtil {
         Map < Character, Integer > charLen = new HashMap < Character, Integer >();
         charLen.put('A', 1);
         charLen.put('B', 1);
-        charLen.put('G', 1);
-        charLen.put('N', 1);
+        charLen.put('G', (calcStorageLength) ? 2 : 1);
+        charLen.put('N', (calcStorageLength) ? 2 : 1);
         charLen.put('X', 1);
         charLen.put('P', 0);
         charLen.put('Z', 1);
@@ -202,7 +206,6 @@ public final class PictureUtil {
     public static List < PictureSymbol > parsePicture(
             final String picture,
             final char currencyChar) {
-        int factor = 1;
         int factoredNumber = 0;
         boolean factorSequence = false;
         char lastChar = 0;
@@ -219,13 +222,11 @@ public final class PictureUtil {
                     factorSequence = false;
                 } else {
                     if  (Character.isDigit(c)) {
-                        factoredNumber = factoredNumber * factor + Character.getNumericValue(c);
-                        factor *= 10;
+                        factoredNumber = factoredNumber * 10 + Character.getNumericValue(c);
                     }
                 }
             } else {
                 if (c == '(') {
-                    factor = 1;
                     factoredNumber = 0;
                     factorSequence = true;
                 } else {

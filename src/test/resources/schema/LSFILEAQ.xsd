@@ -121,7 +121,7 @@
             <element name="LastTransAmount">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="LAST-TRANS-AMOUNT" levelNumber="15" picture="$9999.99" srceLine="55" type="NUMERIC_EDITED_ITEM"/>
+                        <cb:cobolElement cobolName="LAST-TRANS-AMOUNT" fractionDigits="2" levelNumber="15" picture="$9999.99" signed="false" srceLine="55" totalDigits="6" type="NUMERIC_EDITED_ITEM"/>
                     </appinfo>
                 </annotation>
                 <simpleType>

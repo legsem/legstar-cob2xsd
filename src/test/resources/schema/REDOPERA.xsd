@@ -30,7 +30,7 @@
                     </annotation>
                     <simpleType>
                         <restriction base="string">
-                            <maxLength value="2000"/>
+                            <maxLength value="200"/>
                         </restriction>
                     </simpleType>
                 </element>
@@ -73,7 +73,7 @@
                 </annotation>
                 <simpleType>
                     <restriction base="string">
-                        <maxLength value="1700"/>
+                        <maxLength value="170"/>
                     </restriction>
                 </simpleType>
             </element>
@@ -101,7 +101,7 @@
                 </annotation>
                 <simpleType>
                     <restriction base="string">
-                        <maxLength value="1902"/>
+                        <maxLength value="192"/>
                     </restriction>
                 </simpleType>
             </element>

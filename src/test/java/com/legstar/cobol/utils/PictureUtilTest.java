@@ -42,7 +42,21 @@ public class PictureUtilTest extends TestCase {
         assertEquals(19, getLengthFromPicture("ABEGNPSVXZ90/,.+-CRDB*", false));
         assertEquals(20, getLengthFromPicture("ABEGNPSVXZ90/,.+-CRDB*$", false));
         assertEquals(21, getLengthFromPicture("ABEGNPSVXZ90/,.+-CRDB*$", true));
+        assertEquals(9, getLengthFromPicture("X(9)", false));
+        assertEquals(14, getLengthFromPicture("X(14)", false));
+        assertEquals(149, getLengthFromPicture("X(149)", false));
+        assertEquals(1495, getLengthFromPicture("X(1495)", false));
         
+    }
+    
+    /**
+     * Test that z/OS storage length is correctly inferred from picture clause.
+     */
+    public void testCalcStorageLengthFromPicture() {
+        assertEquals(3, getStorageLengthFromPicture("X(3)", false));
+        assertEquals(5, getStorageLengthFromPicture("ABEG", false));
+        assertEquals(7, getStorageLengthFromPicture("ABEGN", false));
+        assertEquals(7, getStorageLengthFromPicture("ABEGNP", false));
     }
     
     /**
@@ -122,9 +136,20 @@ public class PictureUtilTest extends TestCase {
     private int getLengthFromPicture(final String picture, final boolean isSignSeparate) {
         Map < Character, Integer > charNum =
             PictureUtil.getPictureCharOccurences(picture, '$');
-        return PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, '$');
+        return PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, '$', false);
     }
 
+    /**
+     * Helper to calculate z/OS storage length from a picture clause.
+     * @param picture picture clause
+     * @param isSignSeparate true if sign is separate
+     * @return return the character length derived from picture
+     */
+    private int getStorageLengthFromPicture(final String picture, final boolean isSignSeparate) {
+        Map < Character, Integer > charNum =
+            PictureUtil.getPictureCharOccurences(picture, '$');
+        return PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, '$', true);
+    }
     /**
      * Helper to count a single character occurrences in a string.
      * @param character the character to look for

@@ -222,25 +222,36 @@
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId> 
-                <configuration>
-                    <descriptors>
-                        <descriptor>assembly-exe.xml</descriptor>
-                        <descriptor>assembly.xml</descriptor>
-                        <descriptor>assembly-full.xml</descriptor>
-                    </descriptors>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.legstar.cob2xsd.exe.CobolStructureToXsdMain</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
                 <executions>
+                    <execution>
+                        <id>make-full-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly-full.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>make-assembly</id>
                         <phase>package</phase>
                         <goals>
                             <goal>attached</goal>
                         </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly-exe.xml</descriptor>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.legstar.cob2xsd.exe.CobolStructureToXsdMain</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

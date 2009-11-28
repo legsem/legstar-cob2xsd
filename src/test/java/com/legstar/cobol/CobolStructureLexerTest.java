@@ -697,9 +697,35 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 + "[@7,71:71='.',<PERIOD>,1:71]");
 
         lexAndCheck(
-                "       10 CUSTOM-NAME               PIC (z)."
+                "       10 CUSTOM-NAME               PIC (q)."
                 ,
                 new RecognizerException(
-                        "line 1:43 Picture string contains invalid symbols"));
+                        "line 1:42 Picture string contains invalid symbols"));
     }
+
+    /**
+     * Test lower case picture symbols.
+     */
+    public void testLowerCasePictureSymbols() {
+        lexAndCheck(
+                "       10 custom-name               pic x(4).\n"
+                + "      10 max-replies                 pic s9(4) comp. "
+                ,
+                "[@0,7:8='10',<DATA_ITEM_LEVEL>,1:7]"
+                + "[@1,10:20='custom-name',<DATA_NAME>,1:10]"
+                + "[@2,36:38='pic',<PICTURE_KEYWORD>,1:36]"
+                + "[@3,40:41='x(',<PICTURE_PART>,1:40]"
+                + "[@4,42:42='4',<PICTURE_PART>,1:42]"
+                + "[@5,43:43=')',<PICTURE_PART>,1:43]"
+                + "[@6,44:44='.',<PERIOD>,1:44]"
+                + "[@7,53:54='10',<DATA_ITEM_LEVEL>,2:6]"
+                + "[@8,56:66='max-replies',<DATA_NAME>,2:9]"
+                + "[@9,84:86='pic',<PICTURE_KEYWORD>,2:37]"
+                + "[@10,88:90='s9(',<PICTURE_PART>,2:41]"
+                + "[@11,91:91='4',<PICTURE_PART>,2:44]"
+                + "[@12,92:92=')',<PICTURE_PART>,2:45]"
+                + "[@13,94:97='comp',<BINARY_KEYWORD>,2:47]"
+                + "[@14,98:98='.',<PERIOD>,2:51]");
+    }
+
 }
