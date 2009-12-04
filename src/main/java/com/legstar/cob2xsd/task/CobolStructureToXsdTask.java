@@ -56,8 +56,9 @@ public class CobolStructureToXsdTask extends Task {
     /** The list of filesets that were setup.*/
     private List < FileSet > _fileSets = new LinkedList < FileSet >();
 
-    /** The target directory where xsd files will be created. */
-    private File _targetDir;
+    /** The target can either be a folder where XML schema result is to be written
+     *  or a file in which case the XML schema is written there. */
+    private File _target;
 
     /** Set of translation options to use.    */
     private Cob2XsdContext _context = new Cob2XsdContext();
@@ -75,7 +76,7 @@ public class CobolStructureToXsdTask extends Task {
         checkParameters();
         _log.info("Taking COBOL from    : " + _fileSets);
         _log.info("COBOL files encoding : " + getCobolSourceFileEncoding());
-        _log.info("Output XML Schema to : " + getTargetDir());
+        _log.info("Output XML Schema to : " + getTarget());
         _log.info(getContext().toString());
 
         try {
@@ -91,7 +92,7 @@ public class CobolStructureToXsdTask extends Task {
                     File cobolFile = new File(fileset.getDir(getProject()), files[i]);
                     _log.info("Translation started for: " + cobolFile);
                     File xmlSchemaFile = cob2xsd.translate(
-                            cobolFile, getCobolSourceFileEncoding(), getTargetDir());
+                            cobolFile, getCobolSourceFileEncoding(), getTarget());
                     _log.info("Result XML Schema is   : " + xmlSchemaFile);
                 }
             }
@@ -107,28 +108,28 @@ public class CobolStructureToXsdTask extends Task {
 
     /**
      * Check that we have enough parameters to get started.
+     * Check that we have a valid target directory or file.
      */
     private void checkParameters() {
         if (_fileSets.isEmpty()) {
             throw new BuildException("No fileset specified");
         }
 
-        /* Check that we have a valid target directory.  */
-        if (getTargetDir() == null) {
+        if (getTarget() == null) {
             throw (new BuildException(
-            "You must provide a target directory"));
+            "You must provide a target directory or file"));
         }
-        if (!getTargetDir().exists()) {
+        if (!getTarget().exists()) {
             throw (new BuildException(
-                    "Directory " + getTargetDir() + " does not exist"));
+                    "Directory or file " + getTarget() + " does not exist"));
         }
-        if (!getTargetDir().isDirectory() || !getTargetDir().canWrite()) {
+        if (!getTarget().canWrite()) {
             throw (new BuildException(
-                    getTargetDir() + " is not a directory or is not writable"));
+                    getTarget() + " is not writable"));
         }
 
         if (_log.isDebugEnabled()) {
-            _log.debug("Target folder: " + getTargetDir());
+            _log.debug("Target folder or file: " + getTarget());
         }
     }
 
@@ -338,17 +339,17 @@ public class CobolStructureToXsdTask extends Task {
     }    
 
     /**
-     * @return the current target directory
+     * @return the current folder or file to receive the XML schema(s)
      */
-    public File getTargetDir() {
-        return _targetDir;
+    public File getTarget() {
+        return _target;
     }
 
     /**
-     * @param targetDir the target directory to set
+     * @param target the folder or file to receive the XML schema(s)
      */
-    public void setTargetDir(final File targetDir) {
-        _targetDir = targetDir;
+    public void setTarget(final File target) {
+        _target = target;
     }
 
     /**

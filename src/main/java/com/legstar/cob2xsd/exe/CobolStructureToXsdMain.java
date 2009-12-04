@@ -135,7 +135,7 @@ public class CobolStructureToXsdMain {
         options.addOption(cobolSourceFileEncoding);
 
         Option output = new Option("o", "output", true,
-        "folder receiving the translated XML schema");
+        "folder or file receiving the translated XML schema");
         options.addOption(output);
 
         /* -------------------------------------------------------------------
@@ -293,31 +293,34 @@ public class CobolStructureToXsdMain {
      * Place results in the output folder.
      * @param input the input COBOL file or folder
      * @param cobolSourceFileEncoding the input file character set
-     * @param targetDir the output folder where XML schema file must go
+     * @param target the output folder or file where XML schema file must go
      * @throws XsdGenerationException if XML schema cannot be generated
      * @throws RecognizerException if COBOL parsing fails
      */
     protected void execute(
             final File input,
             final String cobolSourceFileEncoding,
-            final File targetDir) throws RecognizerException, XsdGenerationException {
+            final File target) throws RecognizerException, XsdGenerationException {
 
         _log.info("Started translation from COBOL to XML Schema");
         _log.info("Taking COBOL from      : " + input);
         _log.info("COBOL files encoding   : " + cobolSourceFileEncoding);
-        _log.info("Output XML Schema to   : " + targetDir);
+        _log.info("Output XML Schema to   : " + target);
         _log.info("Options in effect      : " + getContext().toString());
         CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getContext());
-        if (_input != null && _output != null) {
+        if (input != null && target != null) {
             if (input.isFile()) {
                 _log.info("Translation started for: " + input);
-                File xmlSchemaFile = cob2xsd.translate(input, cobolSourceFileEncoding, targetDir);
+                File xmlSchemaFile = cob2xsd.translate(input, cobolSourceFileEncoding, target);
                 _log.info("Result XML Schema is   : " + xmlSchemaFile);
             } else {
+                if (!target.exists()) {
+                    target.mkdir();
+                }
                 for (File cobolFile : input.listFiles()) {
                     if (cobolFile.isFile()) {
                         _log.info("Translation started for: " + cobolFile);
-                        File xmlSchemaFile = cob2xsd.translate(cobolFile, cobolSourceFileEncoding, targetDir);
+                        File xmlSchemaFile = cob2xsd.translate(cobolFile, cobolSourceFileEncoding, target);
                         _log.info("Result XML Schema is   : " + xmlSchemaFile);
                     }
                 }
@@ -379,14 +382,17 @@ public class CobolStructureToXsdMain {
      */
     public void setOutput(final String output) {
         File file = new File(output);
+        if (file == null) {
+            throw (new IllegalArgumentException(
+            "You must provide a target directory or file"));
+        }
         if (!file.exists()) {
-            if (!file.mkdir()) {
-                throw new IllegalArgumentException("Output folder " + output + " cannot be created");
-            }
-        } else {
-            if (!file.isDirectory()) {
-                throw new IllegalArgumentException("File " + output + " is not a folder");
-            }
+            throw (new IllegalArgumentException(
+                    "Directory or file " + file + " does not exist"));
+        }
+        if (!file.canWrite()) {
+            throw (new IllegalArgumentException(
+                    file + " is not writable"));
         }
         _output = file;
     }

@@ -118,22 +118,24 @@ public class CobolStructureToXsd {
     /**
      * Execute the translation from COBOL to XML Schema.
      * @param cobolSourceFile the COBOL source code
-     * @param targetDir folder where XML schema result is to be written
+     * @param target can either be a folder where XML schema result is to be written
+     *  or a file in which case the XML schema is written there
      * @return the XML Schema
      * @throws RecognizerException if COBOL recognition fails 
      * @throws XsdGenerationException if XML schema generation process fails
      */
     public File translate(
             final File cobolSourceFile,
-            final File targetDir) throws RecognizerException, XsdGenerationException {
-        return translate(cobolSourceFile, null, targetDir);
+            final File target) throws RecognizerException, XsdGenerationException {
+        return translate(cobolSourceFile, null, target);
     }
 
     /**
      * Execute the translation from COBOL to XML Schema.
      * @param cobolSourceFile the COBOL source code (platform encoding by default)
      * @param cobolSourceFileEncoding the character set used to encode the COBOL source file
-     * @param targetDir folder where XML schema result is to be written
+     * @param target can either be a folder where XML schema result is to be written
+     *  or a file in which case the XML schema is written there
      * @return the XML Schema
      * @throws RecognizerException if COBOL recognition fails 
      * @throws XsdGenerationException if XML schema generation process fails
@@ -141,15 +143,20 @@ public class CobolStructureToXsd {
     public File translate(
             final File cobolSourceFile,
             final String cobolSourceFileEncoding,
-            final File targetDir) throws RecognizerException, XsdGenerationException {
+            final File target) throws RecognizerException, XsdGenerationException {
         try {
             if (_log.isDebugEnabled()) {
                 _log.debug("Translating COBOL file: " + cobolSourceFile);
             }
             String xsdString = translate(
                     FileUtils.readFileToString(cobolSourceFile, cobolSourceFileEncoding));
-            String xsdFileName = cobolSourceFile.getName() + ".xsd";
-            File xsdFile = new File(targetDir, xsdFileName);
+            File xsdFile = null;
+            if (target.isDirectory()) {
+                String xsdFileName = cobolSourceFile.getName() + ".xsd";
+                xsdFile = new File(target, xsdFileName);
+            } else {
+                xsdFile = target;
+            }
             FileUtils.writeStringToFile(xsdFile, xsdString, getContext().getXsdEncoding());
             if (_log.isDebugEnabled()) {
                 _log.debug("Created XML schema file: " + xsdFile);

@@ -58,10 +58,10 @@ public class CobolStructureToXsdMainTest extends TestCase {
         try {
             CobolStructureToXsdMain main = new CobolStructureToXsdMain();
             Options options = main.createOptions();
-            main.collectOptions(options, new String[] {"-o src/test/resources/log4j.properties"});
+            main.collectOptions(options, new String[] {"-o nope"});
             fail();
         } catch (Exception e) {
-            assertEquals("java.lang.IllegalArgumentException: File src/test/resources/log4j.properties is not a folder",
+            assertEquals("java.lang.IllegalArgumentException: Directory or file nope does not exist",
                     e.toString());
         }
     }

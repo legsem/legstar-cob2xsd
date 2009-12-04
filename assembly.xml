@@ -28,6 +28,7 @@ Assembly descriptor for the full distribution.
             <outputDirectory>cobol</outputDirectory>
             <includes>
                 <include>LSFILEAQ</include>
+                <include>LSFILEAE</include>
             </includes>
         </fileSet>
         <fileSet>
