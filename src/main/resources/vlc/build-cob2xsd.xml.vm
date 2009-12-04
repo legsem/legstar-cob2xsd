@@ -1,0 +1,54 @@
+## ==================================================================
+## Generates an ant script for Cobol to XML Schema translation
+##
+<!-- =================================================================================
+     This script translates a COBOL Structure to an XML Schema.
+ -->
+<project basedir="${antModel.productLocation}" default="signalSuccess" name="translate-cobol-structure-to-xsd">
+
+    <!-- ===========================================================  -->
+    <!-- Setup environment
+    -->
+    <target name="init">
+    
+        <!-- Location of input COBOL source code  -->
+        <property name="cobol.dir" value="cobol"/>
+
+        <!-- Location of output XML Schemas  -->
+        <mkdir dir="${antModel.targetDir}"/>
+
+        <!-- COBOL Structure to XSD translator ant task  -->
+        <taskdef name="cob2xsd"
+            classname="com.legstar.cob2xsd.task.CobolStructureToXsdTask">
+            <classpath>
+                <fileset dir="${basedir}" includes="lib/*.jar"/>
+                <pathelement location="${basedir}/conf"/>
+            </classpath>
+        </taskdef>
+    
+    </target>
+
+    <!-- ===========================================================  -->
+    <!-- Generate XML Schemas
+    -->
+    <target name="generateXSD" depends="init">
+        <cob2xsd target="${antModel.targetXsdFile}"
+            addLegStarAnnotations="${antModel.context.addLegStarAnnotations()"
+            targetNamespace="${antModel.context.targetNamespace}"
+            jaxbPackageName="${antModel.context.jaxbPackageName}"
+#if(${antModel.context.jaxbTypeClassesSuffix})
+            jaxbTypeClassesSuffix="${antModel.context.jaxbTypeClassesSuffix}"
+#end
+        >
+            <fileset file="${antModel.cobolSourceFilePath}"/>
+        </cob2xsd>
+    </target>
+  
+    <!-- ===========================================================  -->
+    <!-- Delete the probe file to signal success
+    -->
+    <target name="signalSuccess" depends="generateXSD">
+        <delete file="${antModel.probeFile}" quiet="true"/>
+    </target>
+    
+</project>
