@@ -27,6 +27,7 @@ import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -148,6 +149,9 @@ public class CobolStructureToXsd {
             if (_log.isDebugEnabled()) {
                 _log.debug("Translating COBOL file: " + cobolSourceFile);
             }
+            checkCobolSourceFile(cobolSourceFile);
+            checkTarget(target);
+            
             String xsdString = translate(
                     FileUtils.readFileToString(cobolSourceFile, cobolSourceFileEncoding));
             File xsdFile = null;
@@ -164,6 +168,41 @@ public class CobolStructureToXsd {
             return xsdFile;
         } catch (IOException e) {
             throw (new XsdGenerationException(e));
+        }
+    }
+    
+    /**
+     * make sure the COBOL file is valid.
+     * @param cobolSourceFile the COBOL source file
+     * @throws IOException if file cannot be located
+     */
+    protected void checkCobolSourceFile(
+            final File cobolSourceFile) throws IOException {
+        if (cobolSourceFile == null) {
+            throw new IOException("You must provide a COBOL source file");
+        }
+        if (!cobolSourceFile.exists()) {
+            throw new IOException("COBOL source  file " + cobolSourceFile + " not found");
+        }
+    }
+
+    /**
+     * make sure the target, folder or file, is valid.
+     * We consider that target files will have extensions. Its ok for a target
+     * file not to exist but target folders must exist.
+     * @param target the target folder or file
+     * @throws IOException if file cannot be located
+     */
+    protected void checkTarget(
+            final File target) throws IOException {
+        if (target == null) {
+            throw new IOException("You must provide a target directory or file");
+        }
+        if (!target.exists()) {
+            String extension = FilenameUtils.getExtension(target.getName());
+            if (extension.length() == 0) {
+                throw new IOException("Target folder " + target + " not found");
+            }
         }
     }
     

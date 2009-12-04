@@ -1,6 +1,7 @@
 ## ==================================================================
 ## Generates an ant script for Cobol to XML Schema translation
 ##
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- =================================================================================
      This script translates a COBOL Structure to an XML Schema.
  -->
@@ -11,13 +12,10 @@
     -->
     <target name="init">
     
-        <!-- Location of input COBOL source code  -->
-        <property name="cobol.dir" value="cobol"/>
-
         <!-- Location of output XML Schemas  -->
         <mkdir dir="${antModel.targetDir}"/>
 
-        <!-- COBOL Structure to XSD translator ant task  -->
+        <!-- COBOL Structure to XML Schema translator ant task  -->
         <taskdef name="cob2xsd"
             classname="com.legstar.cob2xsd.task.CobolStructureToXsdTask">
             <classpath>
@@ -33,12 +31,36 @@
     -->
     <target name="generateXSD" depends="init">
         <cob2xsd target="${antModel.targetXsdFile}"
-            addLegStarAnnotations="${antModel.context.addLegStarAnnotations()"
+## -------------------------------------------------------------------
+## XML Schema related options
+##
+#if(${antModel.context.xsdEncoding})
+            xsdEncoding="${antModel.context.xsdEncoding}"
+#end
             targetNamespace="${antModel.context.targetNamespace}"
+            mapConditionsToFacets="${antModel.context.mapConditionsToFacets()}"
+#if(${antModel.context.customXsltFileName})
+            customXsltFileName="${antModel.context.customXsltFileName}"
+#end
+            nameConflictPrependParentName="${antModel.context.nameConflictPrependParentName()}"
+            elementNamesStartWithUppercase="${antModel.context.elementNamesStartWithUppercase()}"
+
+## -------------------------------------------------------------------
+## LegStar annotations related options
+##
+            addLegStarAnnotations="${antModel.context.addLegStarAnnotations()}"
             jaxbPackageName="${antModel.context.jaxbPackageName}"
 #if(${antModel.context.jaxbTypeClassesSuffix})
             jaxbTypeClassesSuffix="${antModel.context.jaxbTypeClassesSuffix}"
 #end
+
+## -------------------------------------------------------------------
+## COBOL compiler related options
+##
+            currencySymbol="${antModel.context.currencySymbol}"
+            nSymbolDbcs="${antModel.context.nSymbolDbcs()}"
+            decimalPointIsComma="${antModel.context.decimalPointIsComma()}"
+            quoteIsQuote="${antModel.context.quoteIsQuote()}"
         >
             <fileset file="${antModel.cobolSourceFilePath}"/>
         </cob2xsd>

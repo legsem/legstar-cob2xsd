@@ -1,6 +1,5 @@
 package com.legstar.cob2xsd;
 
-import java.io.File;
 import java.io.Serializable;
 
 /**
@@ -147,12 +146,6 @@ public class Cob2XsdContext implements Serializable {
      * @param customXsltFileName an optional XSLT transform for XML schema customization
      */
     public void setCustomXsltFileName(final String customXsltFileName) {
-        if (customXsltFileName != null) {
-            File customXsltFile = new File(customXsltFileName);
-            if (!customXsltFile.exists() || !customXsltFile.isFile()) {
-                throw new IllegalArgumentException("Unable to locate " + customXsltFileName);
-            }
-        }
         _customXsltFileName = customXsltFileName;
     }
 

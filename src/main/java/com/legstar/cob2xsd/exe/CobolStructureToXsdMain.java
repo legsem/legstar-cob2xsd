@@ -358,6 +358,10 @@ public class CobolStructureToXsdMain {
      * @param input a file or folder name (relative or absolute)
      */
     public void setInput(final String input) {
+        if (input == null) {
+            throw (new IllegalArgumentException(
+            "You must provide a COBOL source folder or file"));
+        }
         File file = new File(input);
         if (file.exists()) {
             if (file.isDirectory() && file.list().length == 0) {
@@ -381,20 +385,11 @@ public class CobolStructureToXsdMain {
      * @param output a file or folder name (relative or absolute)
      */
     public void setOutput(final String output) {
-        File file = new File(output);
-        if (file == null) {
+        if (output == null) {
             throw (new IllegalArgumentException(
             "You must provide a target directory or file"));
         }
-        if (!file.exists()) {
-            throw (new IllegalArgumentException(
-                    "Directory or file " + file + " does not exist"));
-        }
-        if (!file.canWrite()) {
-            throw (new IllegalArgumentException(
-                    file + " is not writable"));
-        }
-        _output = file;
+        _output = new File(output);
     }
 
     /**

@@ -52,21 +52,6 @@ public class CobolStructureToXsdMainTest extends TestCase {
     }
 
     /**
-     * Test with bad output folder.
-     */
-    public void testWrongOutputArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            main.collectOptions(options, new String[] {"-o nope"});
-            fail();
-        } catch (Exception e) {
-            assertEquals("java.lang.IllegalArgumentException: Directory or file nope does not exist",
-                    e.toString());
-        }
-    }
-
-    /**
      * Test with unsupported argument.
      */
     public void testUnsupportedArgument() {

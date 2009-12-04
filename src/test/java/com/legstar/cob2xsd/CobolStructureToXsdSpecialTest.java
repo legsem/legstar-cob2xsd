@@ -24,7 +24,61 @@ public class CobolStructureToXsdSpecialTest extends TestCase {
     public static final String LS = System.getProperty("line.separator");
 
     /** Where generated schemas are stored (cleanable location).*/
-    private static final String XSD_GEN_DIR = "target/generated-sources/schema";
+    private static final File XSD_GEN_DIR = new File("target/generated-sources/schema");
+
+    /** {@inheritDoc}*/
+    public void setUp() {
+        XSD_GEN_DIR.mkdir();
+    }
+    /**
+     * Check input file validation.
+     */
+    public void testInputFileValidation() {
+        try {
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd();
+            cob2xsd.checkCobolSourceFile(null);
+            fail();
+        } catch (Exception e) {
+            assertEquals("java.io.IOException: You must provide a COBOL source file",
+                    e.toString());
+        }
+        try {
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd();
+            cob2xsd.checkCobolSourceFile(new File("toto"));
+            fail();
+        } catch (Exception e) {
+            assertEquals("java.io.IOException: COBOL source  file toto not found",
+                    e.toString());
+        }
+    }
+
+    /**
+     * Check output file/folder validation.
+     */
+    public void testOutputFileValidation() {
+        try {
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd();
+            cob2xsd.checkTarget(null);
+            fail();
+        } catch (Exception e) {
+            assertEquals("java.io.IOException: You must provide a target directory or file",
+                    e.toString());
+        }
+        try {
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd();
+            cob2xsd.checkTarget(new File("toto"));
+            fail();
+        } catch (Exception e) {
+            assertEquals("java.io.IOException: Target folder toto not found",
+                    e.toString());
+        }
+        try {
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd();
+            cob2xsd.checkTarget(new File("toto.xsd"));
+        } catch (Exception e) {
+            fail(e.toString());
+        }
+    }
 
     /**
      * Invoke COBOL structure to XML Schema snippet used in the documentation.
@@ -182,7 +236,7 @@ public class CobolStructureToXsdSpecialTest extends TestCase {
             out.flush();
             out.close();
             File xmlSchema = cob2xsd.translate(
-                    tempCobolFile, "UTF-8", new File(XSD_GEN_DIR));
+                    tempCobolFile, "UTF-8", XSD_GEN_DIR);
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(
                             new FileInputStream(xmlSchema), "UTF8"));

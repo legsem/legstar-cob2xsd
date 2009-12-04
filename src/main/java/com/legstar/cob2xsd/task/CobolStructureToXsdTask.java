@@ -116,18 +116,9 @@ public class CobolStructureToXsdTask extends Task {
         }
 
         if (getTarget() == null) {
-            throw (new BuildException(
+            throw (new IllegalArgumentException(
             "You must provide a target directory or file"));
         }
-        if (!getTarget().exists()) {
-            throw (new BuildException(
-                    "Directory or file " + getTarget() + " does not exist"));
-        }
-        if (!getTarget().canWrite()) {
-            throw (new BuildException(
-                    getTarget() + " is not writable"));
-        }
-
         if (_log.isDebugEnabled()) {
             _log.debug("Target folder or file: " + getTarget());
         }
@@ -191,7 +182,7 @@ public class CobolStructureToXsdTask extends Task {
     /**
      * @return an optional XSLT transform for XML schema customization
      */
-    public String getCustomXslt() {
+    public String getCustomXsltFileName() {
         return getContext().getCustomXsltFileName();
     }
 
@@ -303,7 +294,7 @@ public class CobolStructureToXsdTask extends Task {
     /**
      * @return the NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false
      */
-    public boolean isNSymbolDbcs() {
+    public boolean nSymbolDbcs() {
         return getContext().nSymbolDbcs();
     }
 
@@ -327,6 +318,21 @@ public class CobolStructureToXsdTask extends Task {
      */
     public void setDecimalPointIsComma(final boolean decimalPointIsComma) {
         getContext().setDecimalPointIsComma(decimalPointIsComma);
+    }
+
+    /**
+     * The COBOL QUOTE|APOST compiler option. False means APOST.
+     * @return the COBOL QUOTE|APOST compiler option. False means APOST
+     */
+    public boolean quoteIsQuote() {
+        return getContext().quoteIsQuote();
+    }
+
+    /**
+     * @param quoteIsQuote the COBOL QUOTE|APOST compiler option. False means APOST
+     */
+    public void setQuoteIsQuote(final boolean quoteIsQuote) {
+        getContext().setQuoteIsQuote(quoteIsQuote);
     }
 
     /**
