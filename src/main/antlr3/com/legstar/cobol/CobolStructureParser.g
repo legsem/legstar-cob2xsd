@@ -6,12 +6,6 @@ parser grammar CobolStructureParser;
  * before column 7 and after column 72.
  * This is not a validating recognizer. COBOL code is assumed to be
  * valid.
- * TODO:
- * ----
- * Handle Currency signs other than $
- * Handle Decimal point is comma
- * Renames should follow the structure they rename
- * Handle NSYMBOL(DBCS) versus NSYMBOL(NATIONAL)
  *------------------------------------------------------------------*/
 /*------------------------------------------------------------------
  * Produces an Abstract Syntax Tree

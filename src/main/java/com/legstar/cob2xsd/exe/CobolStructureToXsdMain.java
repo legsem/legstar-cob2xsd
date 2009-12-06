@@ -186,13 +186,17 @@ public class CobolStructureToXsdMain {
         /* -------------------------------------------------------------------
          * COBOL compiler related options
          * */
+        Option currencySign = new Option("y", "currencySign", true,
+        "the COBOL currency sign used (CURRENCY SIGN clause in the SPECIAL-NAMES)");
+        options.addOption(currencySign);
+
+        Option currencySymbol = new Option("w", "currencySymbol", true,
+        "the COBOL currency symbol used (CURRENCY PICTURE SYMBOL clause in the SPECIAL-NAMES)");
+        options.addOption(currencySymbol);
+
         Option decimalPointIsComma = new Option("d", "decimalPointIsComma", false,
         "whether COBOL comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)");
         options.addOption(decimalPointIsComma);
-
-        Option currencySymbol = new Option("w", "currencySymbol", true,
-        "the COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)");
-        options.addOption(currencySymbol);
 
         Option nSymbolDbcs = new Option("z", "nSymbolDbcs", false,
         "the COBOL NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if unspecified");
@@ -272,11 +276,14 @@ public class CobolStructureToXsdMain {
         /* -------------------------------------------------------------------
          * COBOL compiler related options
          * */
-        if (line.hasOption("decimalPointIsComma")) {
-            getContext().setDecimalPointIsComma(true);
+        if (line.hasOption("currencySign")) {
+            getContext().setCurrencySign(line.getOptionValue("currencySign").trim());
         }
         if (line.hasOption("currencySymbol")) {
             getContext().setCurrencySymbol(line.getOptionValue("currencySymbol").trim());
+        }
+        if (line.hasOption("decimalPointIsComma")) {
+            getContext().setDecimalPointIsComma(true);
         }
         if (line.hasOption("nSymbolDbcs")) {
             getContext().setNSymbolDbcs(true);

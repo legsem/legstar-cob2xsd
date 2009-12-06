@@ -17,7 +17,6 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.RecognizerSharedState;
 import org.antlr.runtime.TokenStream;
 
-import com.legstar.antlr.RecognizerErrorHandler;
 
 /**
  * Overrides some of the ANTLR generated parser methods so that the resulting

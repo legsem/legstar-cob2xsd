@@ -41,6 +41,7 @@ public class PictureUtilTest extends TestCase {
         assertEquals(18, getLengthFromPicture("ABEGNPSVXZ90/,.+-CRDB", false));
         assertEquals(19, getLengthFromPicture("ABEGNPSVXZ90/,.+-CRDB*", false));
         assertEquals(20, getLengthFromPicture("ABEGNPSVXZ90/,.+-CRDB*$", false));
+        assertEquals(23, getLengthFromPicture("$$ABEGNPSVXZ90/,.+-CRDB*", false));
         assertEquals(21, getLengthFromPicture("ABEGNPSVXZ90/,.+-CRDB*$", true));
         assertEquals(9, getLengthFromPicture("X(9)", false));
         assertEquals(14, getLengthFromPicture("X(14)", false));
@@ -136,7 +137,7 @@ public class PictureUtilTest extends TestCase {
     private int getLengthFromPicture(final String picture, final boolean isSignSeparate) {
         Map < Character, Integer > charNum =
             PictureUtil.getPictureCharOccurences(picture, '$');
-        return PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, '$', false);
+        return PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, "USD", '$', false);
     }
 
     /**
@@ -148,7 +149,7 @@ public class PictureUtilTest extends TestCase {
     private int getStorageLengthFromPicture(final String picture, final boolean isSignSeparate) {
         Map < Character, Integer > charNum =
             PictureUtil.getPictureCharOccurences(picture, '$');
-        return PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, '$', true);
+        return PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, "USD", '$', true);
     }
     /**
      * Helper to count a single character occurrences in a string.

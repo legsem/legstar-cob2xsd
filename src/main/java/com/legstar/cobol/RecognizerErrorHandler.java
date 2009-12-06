@@ -1,4 +1,4 @@
-package com.legstar.antlr;
+package com.legstar.cobol;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +99,9 @@ public class RecognizerErrorHandler {
             }
             if (msg.contains("PICTURE_PART failed predicate: {Syntax error in last picture clause}")) {
                 return "Syntax error in last picture clause";
+            }
+            if (msg.contains("DATA_NAME failed predicate: {Syntax error in last clause}")) {
+                return "Syntax error in last COBOL clause";
             }
         }
         return msg;

@@ -1,5 +1,6 @@
 package com.legstar.cobol;
 
+
 import com.legstar.antlr.RecognizerException;
 
 
@@ -724,15 +725,14 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 + "[@2,36:38='PIC',<PICTURE_KEYWORD>,1:36]"
                 + "[@3,40:53='ABEGNPSVXZ0123',<PICTURE_PART>,1:40]"
                 + "[@4,54:54='.',<DECIMAL_POINT>,1:54]"
-                + "[@5,55:60='456789',<PICTURE_PART>,1:55]"
-                + "[@6,61:70=',+CRD-*$()',<PICTURE_PART>,1:61]"
-                + "[@7,71:71='.',<PERIOD>,1:71]");
+                + "[@5,55:70='456789,+CRD-*$()',<PICTURE_PART>,1:55]"
+                + "[@6,71:71='.',<PERIOD>,1:71]");
 
         lexAndCheck(
-                "       10 CUSTOM-NAME               PIC (q)."
+                "       10 CUSTOM-NAME               ABEGNPSVXZ0123.456789,+CRD-*$()."
                 ,
                 new RecognizerException(
-                        "line 1:42 Picture string contains invalid symbols"));
+                        "line 1:67 Syntax error in last COBOL clause"));
     }
 
     /**
@@ -746,18 +746,14 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 "[@0,7:8='10',<DATA_ITEM_LEVEL>,1:7]"
                 + "[@1,10:20='custom-name',<DATA_NAME>,1:10]"
                 + "[@2,36:38='pic',<PICTURE_KEYWORD>,1:36]"
-                + "[@3,40:41='x(',<PICTURE_PART>,1:40]"
-                + "[@4,42:42='4',<PICTURE_PART>,1:42]"
-                + "[@5,43:43=')',<PICTURE_PART>,1:43]"
-                + "[@6,44:44='.',<PERIOD>,1:44]"
-                + "[@7,53:54='10',<DATA_ITEM_LEVEL>,2:6]"
-                + "[@8,56:66='max-replies',<DATA_NAME>,2:9]"
-                + "[@9,84:86='pic',<PICTURE_KEYWORD>,2:37]"
-                + "[@10,88:90='s9(',<PICTURE_PART>,2:41]"
-                + "[@11,91:91='4',<PICTURE_PART>,2:44]"
-                + "[@12,92:92=')',<PICTURE_PART>,2:45]"
-                + "[@13,94:97='comp',<BINARY_KEYWORD>,2:47]"
-                + "[@14,98:98='.',<PERIOD>,2:51]");
+                + "[@3,40:43='x(4)',<PICTURE_PART>,1:40]"
+                + "[@4,44:44='.',<PERIOD>,1:44]"
+                + "[@5,53:54='10',<DATA_ITEM_LEVEL>,2:6]"
+                + "[@6,56:66='max-replies',<DATA_NAME>,2:9]"
+                + "[@7,84:86='pic',<PICTURE_KEYWORD>,2:37]"
+                + "[@8,88:92='s9(4)',<PICTURE_PART>,2:41]"
+                + "[@9,94:97='comp',<BINARY_KEYWORD>,2:47]"
+                + "[@10,98:98='.',<PERIOD>,2:51]");
     }
-
+    
 }

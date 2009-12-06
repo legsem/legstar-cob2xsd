@@ -31,10 +31,6 @@ import java.util.regex.Pattern;
     private CobolStructureKeywordsLexerImpl keywordLexer
             = new CobolStructureKeywordsLexerImpl();
 
-    /** Pattern that recognizes picture strings. */
-    public static final Pattern PICTURE_PATTERN =
-        Pattern.compile("[ABEGNPSVXZ\\d/,\\+CRD\\-\\*$\\(\\)]+", Pattern.CASE_INSENSITIVE);
-
     /**
      * Asks secondary lexer to check if text is a keyword. If there is a match,
      * makes sure the entire text was matched (as opposed to a substring).
@@ -76,11 +72,21 @@ import java.util.regex.Pattern;
     }
     
     /**
+     * Check that a string is a valid data name.
+     * @param string a proposed data name
+     * @throws FailedPredicateException if this is not a valid data name
+     */
+    public void checkDataName(final String string) throws FailedPredicateException {
+        if (!string.matches("[a-zA-Z][a-zA-Z0-9\\-]*")) {
+            throw new FailedPredicateException(
+                    input, "DATA_NAME", "Syntax error in last clause");
+        }
+    }
+
+    /**
      * Check that a string is a valid part of a picture string.
      * <p/>
      * Check that we are in the context of collecting picture string parts.
-     * <p/>
-     * Check that the string contains only valid picture symbols.
      * <p/>
      * When string is a valid picture part, close picture string sequence
      * if the next character is space or new line.
@@ -92,11 +98,6 @@ import java.util.regex.Pattern;
         if (!pictureStarted) {
             throw new FailedPredicateException(
                     input, "PICTURE_PART", "Syntax error in last picture clause");
-        }
-        Matcher matcher = PICTURE_PATTERN.matcher(string);
-        if (!matcher.matches()) {
-            throw new FailedPredicateException(
-                    input, "PICTURE_PART", "Contains invalid picture symbols");
         }
         if (input.LA(1) == ' ' || input.LA(1) == '\r' || input.LA(1) == '\n' || input.LA(1) == -1) {
             pictureStarted = false;
@@ -195,7 +196,7 @@ DATE_PATTERN
                 checkPicture(getText());
                 $type = PICTURE_PART;
             } else {
-                $type = DATA_NAME;
+               $type = DATA_NAME;
             }
         }
     }
@@ -234,6 +235,7 @@ PICTURE_PART
     : PICTURE_CHAR+
     {
         if (lastKeyword != PICTURE_KEYWORD) {
+            checkDataName(getText());
             $type = DATA_NAME;
         } else {
             checkPicture(getText());
@@ -242,14 +244,16 @@ PICTURE_PART
     ;
     
 /*------------------------------------------------------------------
- * In addition to the characters listed here, a PICTURE can also
- * contain a DECIMAL point. We can't list it here though because
- * the lexer would get confused (period is also the sentence delimiter).
- * TODO $ should not be the only currency sign supported
+ * Although picture characters are normally taken from a limited set,
+ * the currency symbol can be pretty much any character.
+ * 
+ * In addition a PICTURE can also contain a DECIMAL point. We have to
+ * exclude it here though because the lexer would get confused
+ * because period is also the sentence delimiter.
  *------------------------------------------------------------------*/
 fragment
 PICTURE_CHAR
-    : ('A' | 'B' | 'E' | 'G' | 'N' | 'P' | 'S' | 'V' | 'X' | 'Z' | '9' | '0' | '/' | ',' | '+' | 'C' | 'R' | 'D' | '-' | '*' | '$' | '(' | ')' )
+    : ~( QUOTE | APOST | SPACE | '\r' | '\n' | '.')
     ;
 
 /*------------------------------------------------------------------

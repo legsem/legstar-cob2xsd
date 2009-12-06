@@ -35,7 +35,6 @@ import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaForm;
 
 import com.legstar.antlr.CleanerException;
-import com.legstar.antlr.RecognizerErrorHandler;
 import com.legstar.antlr.RecognizerException;
 import com.legstar.cobol.CobolSourceCleaner;
 import com.legstar.cobol.CobolStructureEmitter;
@@ -44,6 +43,7 @@ import com.legstar.cobol.CobolStructureLexer;
 import com.legstar.cobol.CobolStructureLexerImpl;
 import com.legstar.cobol.CobolStructureParser;
 import com.legstar.cobol.CobolStructureParserImpl;
+import com.legstar.cobol.RecognizerErrorHandler;
 import com.legstar.cobol.CobolStructureParser.cobdata_return;
 import com.legstar.cobol.model.CobolDataItem;
 

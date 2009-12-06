@@ -34,9 +34,7 @@ public class CobolStructureToXsdErrorHandlingTest extends TestCase {
             Cob2XsdContext context = new Cob2XsdContext();
             CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
             cob2xsd.translate("       1 ^ù@.");
-            assertEquals("line 1:9 unrecognized character '^'", cob2xsd.getErrorHistory().get(0));
-            assertEquals("line 1:10 unrecognized character 'ù'", cob2xsd.getErrorHistory().get(1));
-            assertEquals("line 1:11 unrecognized character '@'", cob2xsd.getErrorHistory().get(2));
+            assertEquals("line 1:12 Syntax error in last COBOL clause", cob2xsd.getErrorHistory().get(0));
         } catch (XsdGenerationException e) {
             fail();
         } catch (RecognizerException e) {

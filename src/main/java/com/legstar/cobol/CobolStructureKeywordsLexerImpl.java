@@ -16,7 +16,6 @@ import org.antlr.runtime.RecognizerSharedState;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.legstar.antlr.RecognizerErrorHandler;
 
 /**
  * Overrides some of the ANTLR generated lexer methods so that the resulting

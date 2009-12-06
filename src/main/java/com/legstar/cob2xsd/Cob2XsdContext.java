@@ -20,8 +20,11 @@ public class Cob2XsdContext implements Serializable {
     /** Default JAXB package name. */
     public static final String DEFAULT_JAXB_PACKAGE_NAME = "com.acme.test";
 
-    /** Default Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
-    public static final String DEFAULT_CURRENCY_SYMBOL = "$";
+    /** Default Currency sign used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
+    public static final String DEFAULT_CURRENCY_SIGN = "$";
+
+    /** Default Currency symbol used (CURRENCY PICTURE SYMBOL clause in the SPECIAL-NAMES). */
+    public static final String DEFAULT_CURRENCY_SYMBOL = DEFAULT_CURRENCY_SIGN;
 
 
     /* -------------------------------------------------------------------
@@ -68,7 +71,10 @@ public class Cob2XsdContext implements Serializable {
      * COBOL compiler related options
      * */
 
-    /** Currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
+    /** Currency sign used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
+    private String _currencySign = DEFAULT_CURRENCY_SIGN;
+
+    /** Currency symbol used (CURRENCY PICTURE SYMBOL clause in the SPECIAL-NAMES). */
     private String _currencySymbol = DEFAULT_CURRENCY_SYMBOL;
 
     /** Whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES). */
@@ -240,7 +246,25 @@ public class Cob2XsdContext implements Serializable {
      * */
 
     /**
-     * The COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES).
+     * The COBOL currency sign used (CURRENCY SIGN clause in the SPECIAL-NAMES).
+     * @return the COBOL currency sign used
+     */
+    public String getCurrencySign() {
+        return _currencySign;
+    }
+
+    /**
+     * @param currencySign the COBOL currency sign used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     */
+    public void setCurrencySign(final String currencySign) {
+        if (currencySign == null || currencySign.length() == 0) {
+            throw new IllegalArgumentException("Currency sign cannot be null or empty");
+        }
+        _currencySign = currencySign;
+    }
+
+    /**
+     * The COBOL currency symbol used (CURRENCY PICTURE SYMBOL clause in the SPECIAL-NAMES).
      * @return the COBOL currency symbol used
      */
     public String getCurrencySymbol() {
@@ -248,7 +272,7 @@ public class Cob2XsdContext implements Serializable {
     }
 
     /**
-     * @param currencySymbol the COBOL currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     * @param currencySymbol the COBOL currency symbol used (CURRENCY PICTURE SYMBOL clause in the SPECIAL-NAMES)
      */
     public void setCurrencySymbol(final String currencySymbol) {
         if (currencySymbol == null || currencySymbol.length() == 0) {
@@ -316,6 +340,7 @@ public class Cob2XsdContext implements Serializable {
         sb.append("addLegStarAnnotations: " + addLegStarAnnotations() + ", ");
         sb.append("jaxbPackageName: " + getJaxbPackageName() + ", ");
         sb.append("jaxbTypeClassesSuffix: " + getJaxbTypeClassesSuffix() + ", ");
+        sb.append("currencySign: " + getCurrencySign() + ", ");
         sb.append("currencySymbol: " + getCurrencySymbol() + ", ");
         sb.append("decimalPointIsComma: " + decimalPointIsComma() + ", ");
         sb.append("nSymbolDbcs: " + nSymbolDbcs() + ", ");

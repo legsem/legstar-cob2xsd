@@ -256,6 +256,46 @@ public class XsdDataItemTest extends TestCase {
     }
 
     /**
+     * Test setting numeric attributes from edited numerics picture.
+     */
+    public void testSetNumericAttributeEditedNumerics() {
+        
+        CobolDataItem dataItem = new CobolDataItem();
+
+        dataItem.setPicture("99.9");
+        dataItem.setUsage(Usage.DISPLAY);
+        XsdDataItem mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
+        assertEquals("NUMERIC_EDITED_ITEM", mapper.getCobolType().toString());
+        assertEquals("STRING", mapper.getXsdType().toString());
+        assertEquals(3, mapper.getTotalDigits());
+        assertEquals(1, mapper.getFractionDigits());
+        assertEquals("99.9", mapper.getPicture());
+
+        Cob2XsdContext context = new Cob2XsdContext();
+        context.setCurrencySign("USD");
+        dataItem.setPicture("$$$$.99");
+        mapper = new XsdDataItem(dataItem, context, null, new ArrayList < String >());
+        assertEquals(5, mapper.getTotalDigits());
+        assertEquals(2, mapper.getFractionDigits());
+        assertEquals(9, mapper.getLength());
+        assertEquals(9, mapper.getMaxStorageLength());
+
+        dataItem.setPicture("+,+++,999.99");
+        mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
+        assertEquals(8, mapper.getTotalDigits());
+        assertEquals(2, mapper.getFractionDigits());
+
+        dataItem.setPicture("$B*,***,***.**BBDB");
+        mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
+        assertEquals(9, mapper.getTotalDigits());
+        assertEquals(2, mapper.getFractionDigits());
+
+        dataItem.setPicture("$Z,ZZZ,ZZZ.ZZCR");
+        mapper = new XsdDataItem(dataItem, _context, null, new ArrayList < String >());
+        assertEquals(9, mapper.getTotalDigits());
+        assertEquals(2, mapper.getFractionDigits());
+    }
+    /**
      * Test what happens when the ODOObject is not found.
      */
     public void testUpdateDependencyNoMatch() {
@@ -353,7 +393,7 @@ public class XsdDataItemTest extends TestCase {
      * Test a CONDITION data entry.
      */
     public void testCondition() {
-        CobolDataItem dataItem = new CobolDataItem("COBOL-RENAME");
+        CobolDataItem dataItem = new CobolDataItem("COBOL-CONDITION");
         dataItem.setDataEntryType(DataEntryType.CONDITION);
 
         XsdDataItem xsdDataItem = new XsdDataItem(

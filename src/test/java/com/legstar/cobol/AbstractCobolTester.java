@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 import com.legstar.antlr.ANTLRNoCaseReaderStream;
 import com.legstar.antlr.AbstractAntlrTester;
 import com.legstar.antlr.CleanerException;
-import com.legstar.antlr.RecognizerErrorHandler;
 import com.legstar.antlr.RecognizerException;
 import com.legstar.cobol.CobolStructureParser.cobdata_return;
 import com.legstar.cobol.model.CobolDataItem;

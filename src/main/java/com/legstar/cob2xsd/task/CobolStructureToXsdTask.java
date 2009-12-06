@@ -278,14 +278,28 @@ public class CobolStructureToXsdTask extends Task {
      * */
 
     /**
-     * @return the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     * @return the currency sign used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     */
+    public String getCurrencySign() {
+        return getContext().getCurrencySign();
+    }
+
+    /**
+     * @param currencySign the currency sign used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     */
+    public void setCurrencySign(final String currencySign) {
+        getContext().setCurrencySign(currencySign);
+    }
+
+    /**
+     * @return the currency symbol used (CURRENCY PICTURE SYMBOL clause in the SPECIAL-NAMES)
      */
     public String getCurrencySymbol() {
         return getContext().getCurrencySymbol();
     }
 
     /**
-     * @param currencySymbol the currency symbol used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     * @param currencySymbol the currency symbol used (CURRENCY PICTURE SYMBOL clause in the SPECIAL-NAMES)
      */
     public void setCurrencySymbol(final String currencySymbol) {
         getContext().setCurrencySymbol(currencySymbol);

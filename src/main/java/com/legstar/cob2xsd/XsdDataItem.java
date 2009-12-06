@@ -68,7 +68,9 @@ public class XsdDataItem {
     /** For xsd numeric types, the fractional digits. */
     private int _fractionDigits = -1;
 
-    /** Determines if a numeric item is signed or unsigned.*/
+    /** Determines if a numeric item is signed or unsigned. This is different from
+     * the COBOL data item _isSign member which denotes the presence of the 
+     * special SIGN COBOL clause (position of the sign as leading or trailing). */
     private boolean _isSigned;
 
     /* Array boundaries have a different semantic in XSD. MinOccurs defaults
@@ -159,6 +161,7 @@ public class XsdDataItem {
                     cobolDataItem.getPicture(),
                     cobolDataItem.isSignSeparate(),
                     cobolDataItem.isBlankWhenZero(),
+                    context.getCurrencySign(),
                     context.getCurrencySymbol().charAt(0),
                     context.nSymbolDbcs(),
                     context.decimalPointIsComma());
@@ -357,7 +360,8 @@ public class XsdDataItem {
      * @param picture the picture clause
      * @param isSignSeparate if sign occupies a separated position (no overpunch)
      * @param isBlankWhenZero item contains only spaces when its value is zero
-     * @param currencyChar the currency sign
+     * @param currencySign the currency sign
+     * @param currencySymbol the currency symbol
      * @param nSymbolDbcs true if COBOL compiler option NSYMBOL(DBCS)
      * @param decimalPointIsComma if COBOL compiler option DECIMAL POINT IS COMMA
      */
@@ -365,7 +369,8 @@ public class XsdDataItem {
             final String picture,
             final boolean isSignSeparate,
             final boolean isBlankWhenZero,
-            final char currencyChar,
+            final String currencySign,
+            final char currencySymbol,
             final boolean nSymbolDbcs,
             final boolean decimalPointIsComma) {
 
@@ -373,11 +378,12 @@ public class XsdDataItem {
         char decimalPoint = (decimalPointIsComma) ? ',' : '.';
 
         Map < Character, Integer > charNum =
-            PictureUtil.getPictureCharOccurences(picture, currencyChar);
+            PictureUtil.getPictureCharOccurences(picture, currencySymbol);
 
-        _length = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, currencyChar, false);
+        _length = PictureUtil.calcLengthFromPicture(
+                charNum, isSignSeparate, currencySign, currencySymbol, false);
         /* storage is valid only for simple strings at this stage. will be refined later. */
-        _pattern = PictureUtil.getRegexFromPicture(picture, currencyChar);
+        _pattern = PictureUtil.getRegexFromPicture(picture, currencySymbol);
 
         if ((charNum.get('A') + charNum.get('X')) > 0) {
             if ((charNum.get('9') + charNum.get('B') + charNum.get('0') + charNum.get('/')) > 0) {
@@ -390,14 +396,16 @@ public class XsdDataItem {
                 }
             }
             _xsdType = XsdType.STRING;
-            _minStorageLength = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, currencyChar, true);
+            _minStorageLength = PictureUtil.calcLengthFromPicture(
+                    charNum, isSignSeparate, currencySign, currencySymbol, true);
             return;
         }
 
         if (charNum.get('G') > 0) {
             _cobolType = CobolType.DBCS_ITEM;
             _xsdType = XsdType.STRING;
-            _minStorageLength = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, currencyChar, true);
+            _minStorageLength = PictureUtil.calcLengthFromPicture(
+                    charNum, isSignSeparate, currencySign, currencySymbol, true);
             return;
         }
 
@@ -408,7 +416,8 @@ public class XsdDataItem {
                 _cobolType = CobolType.NATIONAL_ITEM;
             }
             _xsdType = XsdType.STRING;
-            _minStorageLength = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate, currencyChar, true);
+            _minStorageLength = PictureUtil.calcLengthFromPicture(
+                    charNum, isSignSeparate, currencySign, currencySymbol, true);
             return;
         }
 
@@ -434,13 +443,13 @@ public class XsdDataItem {
                 + charNum.get('-')
                 + charNum.get('C')  /* CR */
                 + charNum.get('D')  /* DB */
-                + charNum.get(currencyChar)) > 0)
+                + charNum.get(currencySymbol)) > 0)
                 || isBlankWhenZero) {
             _cobolType = CobolType.NUMERIC_EDITED_ITEM;
             _xsdType = XsdType.STRING;
             _minStorageLength = _length;
             /* Adding digits and sign for numeric edited is experimental. */
-            setDigitsAndSign(picture, currencyChar, decimalPointIsComma);
+            setDigitsAndSign(picture, currencySymbol, decimalPointIsComma);
             return;
         }
 
@@ -452,7 +461,7 @@ public class XsdDataItem {
             _cobolType = CobolType.ZONED_DECIMAL_ITEM;
             _minStorageLength = _length;
         }
-        setNumericAttributes(picture, currencyChar, decimalPointIsComma);
+        setNumericAttributes(picture, currencySymbol, decimalPointIsComma);
 
     }
 
@@ -474,7 +483,7 @@ public class XsdDataItem {
             final String picture,
             final char currencyChar,
             final boolean decimalPointIsComma) {
-        
+
         setDigitsAndSign(picture, currencyChar, decimalPointIsComma);
 
         if (_fractionDigits == 0) {
@@ -511,21 +520,20 @@ public class XsdDataItem {
         }
 
     }
-    
+
     /**
      * Extracts total number of digits, fraction digits and
      * sign from a picture clause.
      * <p/>
      * Works for zoned decimals, binary and packed decimal.
      * <p/>
-     * TODO This is incomplete for edited numerics.
      * @param picture a purely numeric picture clause
-     * @param currencyChar the currency sign
+     * @param currencySymbol the currency symbol
      * @param decimalPointIsComma true if decimal point is comma
      */
     protected void setDigitsAndSign(
             final String picture,
-            final char currencyChar,
+            final char currencySymbol,
             final boolean decimalPointIsComma) {
 
         char decimalPoint = (decimalPointIsComma) ? ',' : '.';
@@ -543,19 +551,44 @@ public class XsdDataItem {
         Map < Character, Integer > decCharNum;
         if (iV > 0) {
             intCharNum = PictureUtil.getPictureCharOccurences(
-                    picture.substring(0, iV), currencyChar);
+                    picture.substring(0, iV), currencySymbol);
             decCharNum = PictureUtil.getPictureCharOccurences(
-                    picture.substring(iV), currencyChar);
-            _fractionDigits = decCharNum.get('9');
-            _totalDigits = intCharNum.get('9') + _fractionDigits;
+                    picture.substring(iV), currencySymbol);
+            _fractionDigits = getMaxDigits(decCharNum, currencySymbol);
+            _totalDigits = getMaxDigits(intCharNum, currencySymbol) + _fractionDigits;
         } else {
-            intCharNum = PictureUtil.getPictureCharOccurences(picture, currencyChar);
+            intCharNum = PictureUtil.getPictureCharOccurences(picture, currencySymbol);
             _fractionDigits = 0;
-            _totalDigits = intCharNum.get('9');
+            _totalDigits = getMaxDigits(intCharNum, currencySymbol);
         }
 
         _isSigned = ((intCharNum.get('S') + intCharNum.get('+') + intCharNum.get('-')) > 0) ? true : false;
 
+    }
+
+    /**
+     * The maximum number of digits supported by a numeric is given by its picture clause.
+     * <p/>
+     * Currency symbol, + and - can be used for floating insertion editing in which case
+     * they are repeated more than once.
+     * @param intCharNum the picture symbols map
+     * @param currencySymbol the currency symbol in use
+     * @return the maximum number of digits supported
+     */
+    protected int getMaxDigits(
+            final Map < Character, Integer > intCharNum,
+            final char currencySymbol) {
+        int maxDigits = intCharNum.get('9') + intCharNum.get('Z') + intCharNum.get('*');
+        if (intCharNum.get('+') > 0) {
+            maxDigits += intCharNum.get('+') - 1;
+        }
+        if (intCharNum.get('-') > 0) {
+            maxDigits += intCharNum.get('-') - 1;
+        }
+        if (intCharNum.get(currencySymbol) > 0) {
+            maxDigits += intCharNum.get(currencySymbol) - 1;
+        }
+        return maxDigits;
     }
 
     /**
@@ -941,14 +974,77 @@ public class XsdDataItem {
     public int getMaxStorageLength() {
         return _maxStorageLength;
     }
-    
+
+    /**
+     * @return true if this is a numeric element
+     */
+    public boolean isNumeric() {
+        switch (getXsdType()) {
+        case SHORT:
+        case USHORT:
+        case INT:
+        case UINT:
+        case LONG:
+        case ULONG:
+        case INTEGER:
+        case DECIMAL:
+        case FLOAT:
+        case DOUBLE:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     /** {@inheritDoc}*/
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append('{');
         sb.append("typeName:" + getXsdTypeName());
         sb.append(',');
-        sb.append("type:" + getXsdType().toString());
+        sb.append("elementName:" + getXsdElementName());
+        if (getXsdType() != null) {
+            sb.append(',');
+            sb.append("type:" + getXsdType().toString());
+            if (getCobolType() != null) {
+                sb.append(',');
+                sb.append("cobolType:" + getCobolType().toString());
+            }
+            if (getXsdType() == XsdType.STRING || getXsdType() == XsdType.HEXBINARY) {
+                if (getLength() > -1) {
+                    sb.append(',');
+                    sb.append("length:" + getLength());
+                }
+                if (getPattern() != null) {
+                    sb.append(',');
+                    sb.append("pattern:" + getPattern());
+                }
+            }
+            if (isNumeric()) {
+                if (getTotalDigits() > -1) {
+                    sb.append(',');
+                    sb.append("totalDigits:" + getTotalDigits());
+                }
+                if (getFractionDigits() > -1) {
+                    sb.append(',');
+                    sb.append("fractionDigits:" + getFractionDigits());
+                }
+                sb.append(',');
+                sb.append("isSigned:" + isSigned());
+            }
+            sb.append(',');
+            sb.append("minOccurs:" + getMinOccurs());
+            sb.append(',');
+            sb.append("maxOccurs:" + getMaxOccurs());
+            sb.append(',');
+            sb.append("isODOObject:" + isODOObject());
+            sb.append(',');
+            sb.append("isRedefined:" + isRedefined());
+            sb.append(',');
+            sb.append("minStorageLength:" + getMinStorageLength());
+            sb.append(',');
+            sb.append("maxStorageLength:" + getMaxStorageLength());
+        }
         sb.append(',');
         sb.append(_cobolDataItem.toString());
         return sb.toString();
