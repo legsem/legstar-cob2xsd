@@ -1,9 +1,17 @@
 package com.legstar.cob2xsd.task;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
 
 import com.legstar.cob2xsd.Cob2XsdContext;
 import com.legstar.codegen.CodeGenMakeException;
+import com.legstar.codegen.CodeGenUtil;
 import com.legstar.codegen.models.SourceToXsdCobolModel;
 
 /**
@@ -30,6 +38,9 @@ public class CobolStructureToXsdModel extends SourceToXsdCobolModel {
     /** This velocity template. */
     public static final String C2S_VELOCITY_MACRO_NAME =
         "vlc/build-cob2xsd-xml.vm";
+    
+    /** Whether velocity is already initialized.*/
+    private boolean _velocityInitialized;
 
     /**
      * Creates an ant build script file ready for XSD generation.
@@ -38,8 +49,22 @@ public class CobolStructureToXsdModel extends SourceToXsdCobolModel {
      */
     public final void generateBuild(
             final File targetFile) throws CodeGenMakeException {
-        super.generateBuild(
-                C2S_GENERATOR_NAME, C2S_VELOCITY_MACRO_NAME, targetFile);
+        try {
+            if (!_velocityInitialized) {
+                CodeGenUtil.initVelocity();
+                _velocityInitialized = true;
+            }
+            VelocityContext context = CodeGenUtil.getContext(C2S_GENERATOR_NAME);
+            context.put("antModel", this);
+            Writer w = new OutputStreamWriter(
+                    new FileOutputStream(targetFile), "UTF-8");
+            Velocity.mergeTemplate(C2S_VELOCITY_MACRO_NAME, "UTF-8", context, w);
+            w.close();
+        } catch (IOException e) {
+            throw new CodeGenMakeException(e);
+        } catch (Exception e) {
+            throw new CodeGenMakeException(e);
+        }
     }
 
     /**

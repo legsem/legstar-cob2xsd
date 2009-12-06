@@ -854,8 +854,8 @@ public class XsdDataItem {
     /**
      * @return the Cobol value clause
      */
-    public List < String > getValues() {
-        return _cobolDataItem.getValues();
+    public String getValue() {
+        return _cobolDataItem.getValue();
     }
 
     /**

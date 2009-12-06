@@ -193,9 +193,12 @@ public class XsdAnnotationEmitter {
             elc.setAttribute(CobolMarkup.UNMARSHAL_CHOICE_STRATEGY, "");
         }
 
-        if (xsdDataItem.getValues().size() > 0) {
+        if (xsdDataItem.getValue() != null && xsdDataItem.getValue().length() > 0) {
             elc.setAttribute(CobolMarkup.VALUE,
-                    ValueUtil.cleanValue(xsdDataItem, getContext().quoteIsQuote()));
+                    ValueUtil.resolveFigurative(
+                            xsdDataItem.getValue(),
+                            xsdDataItem.getMaxStorageLength(),
+                            getContext().quoteIsQuote()));
         }
 
         if (xsdDataItem.getSrceLine() > 0) {

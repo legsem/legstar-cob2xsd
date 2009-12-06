@@ -64,6 +64,17 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
     }
     
     /**
+     * Check that long separators are trimmed.
+     */
+    public void testCleanLongSeparators() {
+
+        assertEquals(
+                "       01 A  PIC  X(5)  VALUE  5.",
+                CobolSourceCleaner.removeLineSequenceNumbering(
+                        "123456 01 A, PIC; X(5), VALUE, 5."));
+    }
+
+    /**
      * Test that DATA DIVISION is properly delineated.
      */
     public void testDataDivision() {
@@ -112,7 +123,7 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
         removeExtraneousCharactersAndCheck("       01  FILEA.   COPY DFH0CFIL.", "       01  FILEA. ", context);
         assertTrue(context.isLookingForLevel());
     }
-
+    
     /**
      * Test cleaning of multi statement line.
      */

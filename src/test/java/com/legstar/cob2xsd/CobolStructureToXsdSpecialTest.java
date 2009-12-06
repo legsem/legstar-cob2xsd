@@ -259,4 +259,60 @@ public class CobolStructureToXsdSpecialTest extends TestCase {
         }
        
     }
+
+    /**
+     * Test combinations of conditions and figurative constants.
+     */
+    public void testConditionsWithFigurativeConstants() {
+        try {
+            Cob2XsdContext context = new Cob2XsdContext();
+            context.setTargetNamespace("http://www.mycompany.com/test");
+            context.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            String xmlSchema = cob2xsd.translate(
+                    "       01 DFHCOMMAREA.\n"
+                    + "          05 E-FIELD-1        PIC X(5).\n"
+                    + "             88 ISEMPTY VALUE ALL SPACES.\n"
+                    + "          05 E-FIELD-2        PIC X(5).\n"
+                    + "             88 INRANGE VALUE ALL \"A\" THROUGH ALL \"C\".\n"
+                    );
+            assertEquals(
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" + LS
+                    + "<schema xmlns=\"http://www.w3.org/2001/XMLSchema\""
+                    + " xmlns:tns=\"http://www.mycompany.com/test\""
+                    + " elementFormDefault=\"qualified\""
+                    + " targetNamespace=\"http://www.mycompany.com/test\">" + LS
+                    + "    <complexType name=\"Dfhcommarea\">" + LS
+                    + "        <sequence>" + LS
+                    + "            <element name=\"eField1\">" + LS
+                    + "                <simpleType>" + LS
+                    + "                    <restriction base=\"string\">" + LS
+                    + "                        <maxLength value=\"5\"/>" + LS
+                    + "                        <enumeration value=\"     \"/>" + LS
+                    + "                    </restriction>" + LS
+                    + "                </simpleType>" + LS
+                    + "            </element>" + LS
+                    + "            <element name=\"eField2\">" + LS
+                    + "                <simpleType>" + LS
+                    + "                    <restriction base=\"string\">" + LS
+                    + "                        <maxLength value=\"5\"/>" + LS
+                    + "                        <minInclusive value=\"AAAAA\"/>" + LS
+                    + "                        <maxInclusive value=\"CCCCC\"/>" + LS
+                    + "                    </restriction>" + LS
+                    + "                </simpleType>" + LS
+                    + "            </element>" + LS
+                    + "        </sequence>" + LS
+                    + "    </complexType>" + LS
+                    + "</schema>" + LS
+                    ,
+                    xmlSchema);
+        } catch (XsdGenerationException e) {
+            e.printStackTrace();
+            fail();
+        } catch (RecognizerException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
 }

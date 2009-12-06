@@ -363,8 +363,8 @@ usage_clause
     ;
 
 value_clause
-    :   VALUE_KEYWORD literal+
-    ->^(VALUE literal+)
+    :   VALUE_KEYWORD literal
+    ->^(VALUE literal)
     ;
     
 literal
@@ -383,7 +383,7 @@ literal
     |   HIGH_VALUE_CONSTANT
     |   LOW_VALUE_CONSTANT
     |   QUOTE_CONSTANT
-    |   ALL_CONSTANT
+    |   ALL_CONSTANT (ALPHANUM_LITERAL_STRING | ZERO_CONSTANT | SPACE_CONSTANT | HIGH_VALUE_CONSTANT | LOW_VALUE_CONSTANT | QUOTE_CONSTANT | NULL_CONSTANT)
     |   NULL_CONSTANT
     ;
 

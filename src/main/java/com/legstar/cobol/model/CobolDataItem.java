@@ -76,8 +76,8 @@ public class CobolDataItem {
     /** Cobol usage. */
     private Usage _usage = null;
 
-    /** Cobol value clause. Conditions might have multiple values. */
-    private List < String > _values = new LinkedList < String >();
+    /** Cobol value clause. */
+    private String _value;
 
     /** Cobol date format clause.*/
     private String _dateFormat;
@@ -462,22 +462,15 @@ public class CobolDataItem {
     /**
      * @return the Cobol value clause
      */
-    public List < String > getValues() {
-        return _values;
+    public String getValue() {
+        return _value;
     }
 
     /**
-     * @param values the Cobol values to set
+     * @param value the Cobol values to set
      */
-    public void setValues(final List < String > values) {
-        _values = values;
-    }
-
-    /**
-     * @param value a cobol value to add
-     */
-    public void addValue(final String value) {
-        _values.add(value);
+    public void setValue(final String value) {
+        _value = value;
     }
 
     /**
@@ -743,8 +736,9 @@ public class CobolDataItem {
                 sb.append("picture:" + '\"' + getPicture() + '\"');
             }
         }
-        if (getValues().size() > 0) {
-            toStringList(sb, getValues(), "values");
+        if (getValue() != null && getValue().length() > 0) {
+            sb.append(',');
+            sb.append("value:" + getValue());
         }
         if (getDateFormat() != null) {
             sb.append(',');

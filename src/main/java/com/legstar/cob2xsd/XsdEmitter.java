@@ -22,6 +22,7 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 import com.legstar.cob2xsd.XsdDataItem.XsdType;
 import com.legstar.cobol.model.CobolDataItem.DataEntryType;
 import com.legstar.cobol.model.CobolDataItem.Range;
+import com.legstar.cobol.utils.ValueUtil;
 import com.legstar.coxb.CobolType;
 
 /**
@@ -281,13 +282,28 @@ public class XsdEmitter {
                 if (child.getDataEntryType() == DataEntryType.CONDITION) {
                     for (String conditionValue : child.getConditionLiterals()) {
                         restriction.getFacets().add(
-                                createEnumerationFacet(conditionValue));
+                                createEnumerationFacet(
+                                        ValueUtil.resolveFigurative(
+                                                conditionValue,
+                                                xsdDataItem.getMaxStorageLength(),
+                                                getContext().quoteIsQuote())
+                                ));
                     }
                     for (Range conditionRange : child.getConditionRanges()) {
                         restriction.getFacets().add(
-                                createMinInclusiveFacet(conditionRange.getFrom()));
+                                createMinInclusiveFacet(
+                                        ValueUtil.resolveFigurative(
+                                                conditionRange.getFrom(),
+                                                xsdDataItem.getMaxStorageLength(),
+                                                getContext().quoteIsQuote())
+                                ));
                         restriction.getFacets().add(
-                                createMaxInclusiveFacet(conditionRange.getTo()));
+                                createMaxInclusiveFacet(
+                                        ValueUtil.resolveFigurative(
+                                                conditionRange.getTo(),
+                                                xsdDataItem.getMaxStorageLength(),
+                                                getContext().quoteIsQuote())
+                                ));
                     }
                 }
             }

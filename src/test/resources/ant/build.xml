@@ -39,7 +39,7 @@
             jaxbPackageName="test.jaxbPackageName"
             jaxbTypeClassesSuffix="TestJaxbTypeClassesSuffix"
 
-            currencySymbol="€"
+            currencySymbol="â‚¬"
             nSymbolDbcs="true"
             decimalPointIsComma="true"
             quoteIsQuote="false"

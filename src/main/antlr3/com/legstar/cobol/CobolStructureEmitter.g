@@ -217,12 +217,12 @@ usage_clause
     ;
 
 value_clause
-    :   ^(VALUE value_clause_literal+)
+    :   ^(VALUE value_clause_literal)
     ;
     
 value_clause_literal
     :   literal
-        {$data_entry::dataEntry.addValue($literal.value);}
+        {$data_entry::dataEntry.setValue($literal.value);}
     ;
     
 literal returns [String value]
@@ -256,8 +256,8 @@ literal returns [String value]
         {$value = $LOW_VALUE_CONSTANT.text;}
     |   QUOTE_CONSTANT
         {$value = $QUOTE_CONSTANT.text;}
-    |   ALL_CONSTANT
-        {$value = $ALL_CONSTANT.text;}
+    |   ALL_CONSTANT (v=ALPHANUM_LITERAL_STRING | v=ZERO_CONSTANT | v=SPACE_CONSTANT | v=HIGH_VALUE_CONSTANT | v=LOW_VALUE_CONSTANT | v=QUOTE_CONSTANT | v=NULL_CONSTANT)
+        {$value = $ALL_CONSTANT.text + ' ' + $v.text;}
     |   NULL_CONSTANT
         {$value = $NULL_CONSTANT.text;}
     ;

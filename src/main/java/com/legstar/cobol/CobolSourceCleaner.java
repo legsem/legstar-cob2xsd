@@ -85,6 +85,9 @@ public class CobolSourceCleaner {
     /**
      * Replaces any characters in column 1 to 6 by spaces and removes
      * any characters past column 72.
+     * Also replace token separators such as ", " and "; " which complicate
+     * matters uselessly. Replacement should not change column numbers though
+     * so we simply replace the extra separators with a whitespace.
      * @param line with potential sequence number
      * @return a line without a sequence number
      */
@@ -96,6 +99,7 @@ public class CobolSourceCleaner {
         } else {
             cleanedLine.append("      ");
             String areaA = line.substring(6, (length > 72) ? 72 : length);
+            areaA = areaA.replace(", ", "  ").replace("; ", "  ");
             /* Right trim, no need to over burden the lexer with spaces*/
             cleanedLine.append(("a" + areaA).trim().substring(1));
         }

@@ -172,92 +172,92 @@ public class CobolStructureEmitterTest extends AbstractCobolTester {
         emitAndCheck(
                 "      01 A VALUE +0.99E-02."
                 , 
-                "[{level:1,cobolName:A,values:[+0.99E-02],srceLine:1}]");
+                "[{level:1,cobolName:A,value:+0.99E-02,srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE -95.25."
                 , 
-                "[{level:1,cobolName:A,values:[-95.25],srceLine:1}]");
+                "[{level:1,cobolName:A,value:-95.25,srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE 19."
                 , 
-                "[{level:1,cobolName:A,values:[19],srceLine:1}]");
+                "[{level:1,cobolName:A,value:19,srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE -25."
                 , 
-                "[{level:1,cobolName:A,values:[-25],srceLine:1}]");
+                "[{level:1,cobolName:A,value:-25,srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE \"pazuzu\"."
                 , 
-                "[{level:1,cobolName:A,values:[\"pazuzu\"],srceLine:1}]");
+                "[{level:1,cobolName:A,value:\"pazuzu\",srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE 'pazuzu'."
                 , 
-                "[{level:1,cobolName:A,values:['pazuzu'],srceLine:1}]");
+                "[{level:1,cobolName:A,value:'pazuzu',srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE X'FF95'."
                 , 
-                "[{level:1,cobolName:A,values:[X'FF95'],srceLine:1}]");
+                "[{level:1,cobolName:A,value:X'FF95',srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE Z'ab'."
                 , 
-                "[{level:1,cobolName:A,values:[Z'ab'],srceLine:1}]");
+                "[{level:1,cobolName:A,value:Z'ab',srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE G'ab'."
                 , 
-                "[{level:1,cobolName:A,values:[G'ab'],srceLine:1}]");
+                "[{level:1,cobolName:A,value:G'ab',srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE N'ab'."
                 , 
-                "[{level:1,cobolName:A,values:[N'ab'],srceLine:1}]");
+                "[{level:1,cobolName:A,value:N'ab',srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE NX'FF95'."
                 , 
-                "[{level:1,cobolName:A,values:[NX'FF95'],srceLine:1}]");
+                "[{level:1,cobolName:A,value:NX'FF95',srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE ZERO."
                 , 
-                "[{level:1,cobolName:A,values:[ZERO],srceLine:1}]");
+                "[{level:1,cobolName:A,value:ZERO,srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE SPACES."
                 , 
-                "[{level:1,cobolName:A,values:[SPACES],srceLine:1}]");
+                "[{level:1,cobolName:A,value:SPACES,srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE HIGH-VALUE."
                 , 
-                "[{level:1,cobolName:A,values:[HIGH-VALUE],srceLine:1}]");
+                "[{level:1,cobolName:A,value:HIGH-VALUE,srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE low-value."
                 , 
-                "[{level:1,cobolName:A,values:[low-value],srceLine:1}]");
+                "[{level:1,cobolName:A,value:low-value,srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE QUOTE."
                 , 
-                "[{level:1,cobolName:A,values:[QUOTE],srceLine:1}]");
+                "[{level:1,cobolName:A,value:QUOTE,srceLine:1}]");
         
         emitAndCheck(
                 "      01 A VALUE ALL 'A'."
                 , 
-                "[{level:1,cobolName:A,values:[ALL,'A'],srceLine:1}]");
+                "[{level:1,cobolName:A,value:ALL 'A',srceLine:1}]");
 
         emitAndCheck(
                 "      01 A VALUE NULL."
                 , 
-                "[{level:1,cobolName:A,values:[NULL],srceLine:1}]");
+                "[{level:1,cobolName:A,value:NULL,srceLine:1}]");
     }
 
     /**
@@ -268,7 +268,7 @@ public class CobolStructureEmitterTest extends AbstractCobolTester {
                 "      01 DATE-FIELD DATE FORMAT YYXXXX PICTURE 9(6)" + LS
                 + "                VALUE IS 450101."
                 , 
-                "[{level:1,cobolName:DATE-FIELD,picture:\"9(6)\",values:[450101],dateFormat:YYXXXX,srceLine:1}]");
+                "[{level:1,cobolName:DATE-FIELD,picture:\"9(6)\",value:450101,dateFormat:YYXXXX,srceLine:1}]");
     }
 
     /**
@@ -338,5 +338,45 @@ public class CobolStructureEmitterTest extends AbstractCobolTester {
                 "      88 A VALUE 3 THRU 12, 16 THRU 18."
                 , 
                 "[{level:88,cobolName:A,conditionRanges:[{from:3,to:12},{from:16,to:18}],srceLine:1}]");
+
+        emitAndCheck(
+                "      88 A VALUE ALL SPACES THRU ALL 'B'."
+                , 
+                "[{level:88,cobolName:A,conditionRanges:[{from:ALL SPACES,to:ALL 'B'}],srceLine:1}]");
+    }
+
+    /**
+     * Test combinations of conditions and figurative constants.
+     */
+    public void testConditionsWithFigurativeConstants() {
+        emitAndCheck(
+                "       01 DFHCOMMAREA.\n"
+                + "          05 E-FIELD-1        PIC X(5).\n"
+                + "             88 ISEMPTY VALUE ALL SPACES.\n"
+                + "          05 E-FIELD-2        PIC X(5).\n"
+                + "             88 INRANGE VALUE ALL \"A\" THROUGH ALL \"C\".\n"
+                , 
+                "[{level:1,cobolName:DFHCOMMAREA,children:["
+                + "{level:5,cobolName:E-FIELD-1,children:["
+                + "{level:88,cobolName:ISEMPTY,conditionLiterals:[ALL SPACES],srceLine:3}],"
+                + "srceLine:2},"
+                + "{level:5,cobolName:E-FIELD-2,children:["
+                + "{level:88,cobolName:INRANGE,conditionRanges:[{from:ALL \"A\",to:ALL \"C\"}],"
+                + "srceLine:5}],"
+                + "srceLine:4}],"
+                + "srceLine:1}]");
+    }
+
+    /**
+     * Test multiple instructions on same line.
+     */
+    public void testMultiStatementsSameLine() {
+        emitAndCheck(
+                "       01 DFHCOMMAREA. 05 E-FIELD-1 PIC X(5). 05 E-FIELD-2 PIC X(5)."
+                , 
+                "[{level:1,cobolName:DFHCOMMAREA,children:["
+                + "{level:5,cobolName:E-FIELD-1,picture:\"X(5)\",srceLine:1},"
+                + "{level:5,cobolName:E-FIELD-2,picture:\"X(5)\",srceLine:1}],"
+                + "srceLine:1}]");
     }
 }

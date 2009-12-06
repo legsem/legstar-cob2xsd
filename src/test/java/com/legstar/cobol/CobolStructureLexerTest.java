@@ -599,8 +599,40 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 + "[@2,19:23='VALUE',<VALUE_KEYWORD>,1:19]"
                 + "[@3,25:26='99',<INT>,1:25]"
                 + "[@4,27:27='.',<PERIOD>,1:27]");
+        lexAndCheck(
+                "      88 CONDITION VALUE 'A'."
+                , "[@0,6:7='88',<CONDITION_LEVEL>,1:6]"
+                + "[@1,9:17='CONDITION',<DATA_NAME>,1:9]"
+                + "[@2,19:23='VALUE',<VALUE_KEYWORD>,1:19]"
+                + "[@3,25:27=''A'',<ALPHANUM_LITERAL_STRING>,1:25]"
+                + "[@4,28:28='.',<PERIOD>,1:28]");
     }
  
+    /**
+     * A condition.
+     */
+    public void testConditionWithFigurativeConstant() {
+        lexAndCheck(
+                "      88 ISEMPTY VALUE ALL SPACES."
+                , "[@0,6:7='88',<CONDITION_LEVEL>,1:6]"
+                + "[@1,9:15='ISEMPTY',<DATA_NAME>,1:9]"
+                + "[@2,17:21='VALUE',<VALUE_KEYWORD>,1:17]"
+                + "[@3,23:25='ALL',<ALL_CONSTANT>,1:23]"
+                + "[@4,27:32='SPACES',<SPACE_CONSTANT>,1:27]"
+                + "[@5,33:33='.',<PERIOD>,1:33]");
+        lexAndCheck(
+                "      88 INRANGLE VALUE ALL \"A\" THROUGH ALL \"C\"."
+                , "[@0,6:7='88',<CONDITION_LEVEL>,1:6]"
+                + "[@1,9:16='INRANGLE',<DATA_NAME>,1:9]"
+                + "[@2,18:22='VALUE',<VALUE_KEYWORD>,1:18]"
+                + "[@3,24:26='ALL',<ALL_CONSTANT>,1:24]"
+                + "[@4,28:30='\"A\"',<ALPHANUM_LITERAL_STRING>,1:28]"
+                + "[@5,32:38='THROUGH',<THROUGH_KEYWORD>,1:32]"
+                + "[@6,40:42='ALL',<ALL_CONSTANT>,1:40]"
+                + "[@7,44:46='\"C\"',<ALPHANUM_LITERAL_STRING>,1:44]"
+                + "[@8,47:47='.',<PERIOD>,1:47]");
+    }
+
     /**
      * A value clause followed by a keyword.
      */
@@ -653,7 +685,7 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 "[@0,7:8='01',<DATA_ITEM_LEVEL>,1:7]"
                 + "[@1,10:16='hisName',<DATA_NAME>,1:10]"
                 + "[@2,18:24='INDEXED',<INDEXED_KEYWORD>,1:18]"
-                + "[@3,29:30='A',<DATA_NAME>,1:29]"
+                + "[@3,29:29='A',<DATA_NAME>,1:29]"
                 + "[@4,32:32='B',<DATA_NAME>,1:32]"
                 + "[@5,33:33='.',<PERIOD>,1:33]");
 

@@ -49,14 +49,13 @@ import java.util.regex.Pattern;
             final int originalType) throws RecognitionException {
         try {
             int type = originalType;
-            String str = trimSeparator(text);
             keywordLexer.setCharStream( new ANTLRNoCaseReaderStream(
-                new StringReader(str)));
+                new StringReader(text)));
             CommonTokenStream kTokens = new CommonTokenStream(keywordLexer);
             List < ? > kTokenl = kTokens.getTokens();
             if (kTokenl.size() > 0) {
                 CommonToken kToken = (CommonToken) kTokenl.get(0);
-                if (kToken.getText().length() == str.length()) {
+                if (kToken.getText().length() == text.length()) {
                     if (kToken.getType() == Token.SKIP_TOKEN.getType()) {
                         skip();
                     } else {
@@ -76,22 +75,6 @@ import java.util.regex.Pattern;
         }
     }
     
-    /**
-     * COBOL accepts ', ' and '; ' as clause separators. This method
-     * removes this separators when they get concatenated to a token text.  
-     * @param text the token text
-     * @return the text without the trailing separator
-     */
-    public String trimSeparator(final String text) {
-        if (text.length() > 0) {
-            char c = text.charAt(text.length() - 1);
-            if (c == ',' || c == ';') {
-                return text.substring(0, text.length() - 1);
-            }
-        }
-        return text;
-    }
-
     /**
      * Check that a string is a valid part of a picture string.
      * <p/>
@@ -150,7 +133,7 @@ PERIOD
  * We may have to retype these tokens which have a broad pattern,
  * depending on context.
  *------------------------------------------------------------------*/
-INT :   '0'..'9'+
+INT :   '0'..'9'+ 
     {
         if (lastKeyword == PICTURE_KEYWORD) {
             checkPicture(getText());
@@ -170,7 +153,7 @@ INT :   '0'..'9'+
     ;
 
 SIGNED_INT
-    : ('+' | '-') '0'..'9'+
+    : ('+' | '-') '0'..'9'+ 
     {
         if (lastKeyword == PICTURE_KEYWORD) {
             checkPicture(getText());
@@ -187,7 +170,7 @@ SIGNED_INT
  * exponent, is recognized here.
  *------------------------------------------------------------------*/
 FLOAT_PART2
-    : '0'..'9'+ 'E' ('+' | '-')? '0'..'9'+
+    : '0'..'9'+ 'E' ('+' | '-')? '0'..'9'+ 
     {
         if (lastKeyword == PICTURE_KEYWORD) {
             checkPicture(getText());
@@ -205,7 +188,7 @@ FLOAT_PART2
  * The post action retypes the token according to context.
  *------------------------------------------------------------------*/
 DATE_PATTERN
-    : ('X'|'Y')+
+    : ('X'|'Y')+ 
     {
         if (lastKeyword != DATE_FORMAT_KEYWORD) {
             if (lastKeyword == PICTURE_KEYWORD) {
@@ -225,22 +208,15 @@ DATE_PATTERN
  * All COBOL keywords fall into this category. Since COBOL keywords
  * are reserved and cannot be used as DATA_NAME, we check with an
  * auxiliary parser for a match and change the token type accordingly.
- * When the ', ' or '; ' separator is used, it gets concatenated
- * to the data name so we remove that.
  *------------------------------------------------------------------*/
 DATA_NAME
-    : LETTER (LETTER|'0'..'9'|'-')* (',' | ';')?
+    : LETTER (LETTER|'0'..'9'|'-')*
     {
         $type = matchKeywords(getText(), $type);
         if ($type == DATA_NAME) {
             if (lastKeyword == PICTURE_KEYWORD) {
                 checkPicture(getText());
                 $type = PICTURE_PART;
-            } else {
-                setText(trimSeparator(getText()));
-                if (getText().length() == 0) {
-                    skip();
-                }
             }
         }
     }
@@ -253,16 +229,10 @@ DATA_NAME
  * 3 tokens : PICTURE_STRING DECIMAL_POINT PICTURE_STRING.
  * The complete picture string is reconstructed by the 
  * picture_string parser rule.
- * When the ', ' or '; ' separator is used, it gets concatenated
- * to the picture part so we remove that.
  *------------------------------------------------------------------*/
 PICTURE_PART
     : PICTURE_CHAR+
     {
-        setText(trimSeparator(getText()));
-        if (getText().length() == 0) {
-            skip();
-        }
         if (lastKeyword != PICTURE_KEYWORD) {
             $type = DATA_NAME;
         } else {

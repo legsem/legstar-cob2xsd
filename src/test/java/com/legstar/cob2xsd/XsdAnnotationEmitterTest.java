@@ -256,7 +256,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
      */
     public void testValueZERO() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
-        dataItem.addValue("ZEROS");
+        dataItem.setValue("ZEROS");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
@@ -270,11 +270,11 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
      */
     public void testValueSPACE() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
-        dataItem.addValue("SPACE");
+        dataItem.setValue("SPACE");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
-                + " value=\"\""
+                + " value=\" \""
                 + " type=\"GROUP_ITEM\""
                 + "/>");
     }
@@ -285,7 +285,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     public void testValueHIGHVALUE() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setPicture("X(3)");
-        dataItem.addValue("HIGH-VALUES");
+        dataItem.setValue("HIGH-VALUES");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
@@ -301,7 +301,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     public void testValueLOWVALUE() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setPicture("X(3)");
-        dataItem.addValue("LOW-VALUES");
+        dataItem.setValue("LOW-VALUES");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
@@ -317,7 +317,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     public void testValueNULLS() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setPicture("X(3)");
-        dataItem.addValue("NULLS");
+        dataItem.setValue("NULLS");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
@@ -333,7 +333,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     public void testValueQUOTES() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setPicture("X(3)");
-        dataItem.addValue("QUOTES");
+        dataItem.setValue("QUOTES");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
@@ -348,7 +348,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     public void testValueAPOST() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setPicture("X(3)");
-        dataItem.addValue("apost");
+        dataItem.setValue("apost");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
@@ -363,8 +363,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     public void testValueALL() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setPicture("X(3)");
-        dataItem.addValue("ALL");
-        dataItem.addValue("A");
+        dataItem.setValue("ALL A");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
@@ -380,8 +379,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     public void testValueALLFigurative() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setPicture("X(3)");
-        dataItem.addValue("ALL");
-        dataItem.addValue("QUOTE");
+        dataItem.setValue("ALL QUOTE");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
@@ -396,7 +394,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     public void testValueNumeric() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setUsage(Usage.PACKEDDECIMAL);
-        dataItem.addValue("-125.63");
+        dataItem.setValue("-125.63");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
@@ -412,7 +410,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     public void testValueEscaped() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setPicture("X(3)");
-        dataItem.addValue("<A>");
+        dataItem.setValue("<A>");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""
@@ -428,7 +426,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     public void testValueDelimitedLiteral() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setPicture("X(3)");
-        dataItem.addValue("\"ABD\"");
+        dataItem.setValue("\"ABD\"");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
                 + " levelNumber=\"1\""

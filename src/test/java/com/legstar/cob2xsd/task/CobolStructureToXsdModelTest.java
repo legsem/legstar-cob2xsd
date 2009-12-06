@@ -15,7 +15,6 @@ import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.app.Velocity;
 
 import junit.framework.TestCase;
 
@@ -42,7 +41,6 @@ public class CobolStructureToXsdModelTest extends TestCase {
     /** @{inheritDoc}*/
     public void setUp() {
         try {
-            Velocity.addProperty("output.encoding", "UTF-8");
             CodeGenUtil.initVelocity();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -81,8 +79,11 @@ public class CobolStructureToXsdModelTest extends TestCase {
         model.getContext().setQuoteIsQuote(false);
 
         String antScriptName = "build.xml";
-        model.generateBuild(CodeGenUtil.getFile(GEN_ANT_DIR, antScriptName));
-        String result = FileUtils.readFileToString(new File(GEN_ANT_DIR, antScriptName));
+        
+        File resultFile = CodeGenUtil.getFile(GEN_ANT_DIR, antScriptName);
+        model.generateBuild(resultFile);
+        
+        String result = FileUtils.readFileToString(resultFile, "UTF-8");
         
         if (_log.isDebugEnabled()) {
             _log.debug(result);
@@ -91,7 +92,7 @@ public class CobolStructureToXsdModelTest extends TestCase {
         result = result.replace(CodeGenUtil.CRLF, "\n");
         result = result.replace('\\', '/');
         
-        String expected = FileUtils.readFileToString(new File(TEST_ANT_DIR, antScriptName));
+        String expected = FileUtils.readFileToString(new File(TEST_ANT_DIR, antScriptName), "UTF-8");
         assertEquals(expected, result);
     }
 }
