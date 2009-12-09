@@ -172,7 +172,7 @@ public final class PictureUtil {
         charRegex.put('E', "E"); // Exponent
         charRegex.put('S', "[\\+\\-]"); // A numeric sign
         charRegex.put('V', ""); // A virtual decimal point
-        charRegex.put(currencySymbol, "((" + currencySign.replace(" ", "\\s") + ")|\\d)");
+        charRegex.put(currencySymbol, "(" + currencySign.replace(" ", "\\s") + "|\\d|\\s)");
         
         List < PictureSymbol > pictureSymbols = parsePicture(picture, currencySymbol);
 

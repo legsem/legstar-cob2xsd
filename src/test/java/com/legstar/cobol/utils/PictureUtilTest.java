@@ -121,6 +121,7 @@ public class PictureUtilTest extends TestCase {
         assertTrue(checkRegexFromPicture("$9(5).9(2)DB", "$100.9  ", "$", '$'));
         assertTrue(checkRegexFromPicture("+,+++,999.99", "-123,456.78", "$", '$'));
         assertTrue(checkRegexFromPicture("$$$9.99", "USD0.12", "USD", '$'));
+        assertTrue(checkRegexFromPicture("$$99999", " $00450", "$", '$'));
         assertFalse(checkRegexFromPicture("$$$9.99", "$0.12A", "$", '$'));
         assertTrue(checkRegexFromPicture("Z(3)", "123", "$", '$'));
         assertTrue(checkRegexFromPicture("Z,ZZZ.ZZ+", "123.45+", "$", '$'));
