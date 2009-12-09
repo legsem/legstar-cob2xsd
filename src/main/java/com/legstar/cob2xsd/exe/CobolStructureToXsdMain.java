@@ -314,21 +314,16 @@ public class CobolStructureToXsdMain {
         _log.info("COBOL files encoding   : " + cobolSourceFileEncoding);
         _log.info("Output XML Schema to   : " + target);
         _log.info("Options in effect      : " + getContext().toString());
-        CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getContext());
         if (input != null && target != null) {
             if (input.isFile()) {
-                _log.info("Translation started for: " + input);
-                File xmlSchemaFile = cob2xsd.translate(input, cobolSourceFileEncoding, target);
-                _log.info("Result XML Schema is   : " + xmlSchemaFile);
+                translate(input, cobolSourceFileEncoding, target);
             } else {
                 if (!target.exists()) {
                     target.mkdir();
                 }
                 for (File cobolFile : input.listFiles()) {
                     if (cobolFile.isFile()) {
-                        _log.info("Translation started for: " + cobolFile);
-                        File xmlSchemaFile = cob2xsd.translate(cobolFile, cobolSourceFileEncoding, target);
-                        _log.info("Result XML Schema is   : " + xmlSchemaFile);
+                        translate(cobolFile, cobolSourceFileEncoding, target);
                     }
                 }
             }
@@ -337,6 +332,27 @@ public class CobolStructureToXsdMain {
         }
         _log.info("Finished translation");
 
+    }
+    
+    /**
+     * Translates a single COBOL source file.
+     * @param cobolFile COBOL source file
+     * @param cobolSourceFileEncoding COBOL source file character encoding
+     * @param target target file or folder
+     * @throws RecognizerException if parser fails
+     * @throws XsdGenerationException if COBOL model interpretation fails
+     */
+    protected void translate(
+            final File cobolFile,
+            final String cobolSourceFileEncoding,
+            final File target) throws RecognizerException, XsdGenerationException {
+        CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getContext());
+        _log.info("Translation started for: " + cobolFile);
+        File xmlSchemaFile = cob2xsd.translate(cobolFile, cobolSourceFileEncoding, target);
+        for (String errorMessage : cob2xsd.getErrorHistory()) {
+            _log.warn(errorMessage);
+        }
+        _log.info("Result XML Schema is   : " + xmlSchemaFile);
     }
 
     /**

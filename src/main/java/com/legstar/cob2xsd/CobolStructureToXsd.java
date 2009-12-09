@@ -108,12 +108,7 @@ public class CobolStructureToXsd {
         if (_log.isDebugEnabled()) {
             debug("Translating with options:", getContext().toString());
         }
-        String xmlSchemaString = xsdToString(emitXsd(toModel(cobolSource)));
-        
-        for (String errorMessage : getErrorHistory()) {
-            _log.warn(errorMessage);
-        }
-        return xmlSchemaString;
+        return xsdToString(emitXsd(toModel(cobolSource)));
     }
 
     /**
