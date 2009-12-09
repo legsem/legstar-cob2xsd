@@ -150,7 +150,7 @@
                 <simpleType>
                     <restriction base="string">
                         <maxLength value="16"/>
-                        <pattern value="[$\d]{0,3}\d{0,4}/?,?\d{0,2}\.?\d{0,3}[\+\-\d]?"/>
+                        <pattern value="(($)|\d){0,3}\d{0,4}/?,?\d{0,2}\.?\d{0,3}[\+\-\d]?"/>
                     </restriction>
                 </simpleType>
             </element>

@@ -21,7 +21,7 @@ public class CobolStructureToXsdErrorHandlingTest extends TestCase {
         } catch (XsdGenerationException e) {
             fail();
         } catch (RecognizerException e) {
-            assertEquals("No data descriptions between columns 6 and 72. Are you sure this is COBOL source?",
+            assertEquals("No data descriptions between columns 7 and 72. Are you sure this is COBOL source?",
                     e.getMessage());
         }
     }

@@ -383,7 +383,7 @@ public class XsdDataItem {
         _length = PictureUtil.calcLengthFromPicture(
                 charNum, isSignSeparate, currencySign, currencySymbol, false);
         /* storage is valid only for simple strings at this stage. will be refined later. */
-        _pattern = PictureUtil.getRegexFromPicture(picture, currencySymbol);
+        _pattern = PictureUtil.getRegexFromPicture(picture, currencySign, currencySymbol);
 
         if ((charNum.get('A') + charNum.get('X')) > 0) {
             if ((charNum.get('9') + charNum.get('B') + charNum.get('0') + charNum.get('/')) > 0) {
@@ -847,6 +847,13 @@ public class XsdDataItem {
      */
     public boolean isJustifiedRight() {
         return _cobolDataItem.isJustifiedRight();
+    }
+
+    /**
+     * @return true if COBOL data item has a SIGN clause
+     */
+    public boolean isSign() {
+        return _cobolDataItem.isSign();
     }
 
     /**

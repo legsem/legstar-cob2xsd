@@ -31,7 +31,7 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
             clean("");
             fail();
         } catch (RecognizerException e) {
-            assertEquals("No data descriptions between columns 6 and 72."
+            assertEquals("No data descriptions between columns 7 and 72."
                     + " Are you sure this is COBOL source?", e.getMessage());
         }
     }
@@ -45,22 +45,27 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
         assertEquals(
                 "",
                 CobolSourceCleaner.removeLineSequenceNumbering(
-                ""));
+                "", 7, 72));
 
         assertEquals(
                 "",
                 CobolSourceCleaner.removeLineSequenceNumbering(
-                "123456"));
+                "123456", 7, 72));
+
+        assertEquals(
+                "01 A.",
+                CobolSourceCleaner.removeLineSequenceNumbering(
+                "01 A.", 1, 66));
 
         assertEquals(
                 "      *",
                 CobolSourceCleaner.removeLineSequenceNumbering(
-                "123456*"));
+                "123456*", 7, 72));
 
         assertEquals(
                 "      *                                                              ABC",
                 CobolSourceCleaner.removeLineSequenceNumbering(
-                "123456*                                                              ABC123456"));
+                "123456*                                                              ABC123456", 7, 72));
     }
     
     /**
@@ -71,7 +76,7 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
         assertEquals(
                 "       01 A  PIC  X(5)  VALUE  5.",
                 CobolSourceCleaner.removeLineSequenceNumbering(
-                        "123456 01 A, PIC; X(5), VALUE, 5."));
+                        "123456 01 A, PIC; X(5), VALUE, 5.", 7, 72));
     }
 
     /**
@@ -79,10 +84,15 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
      */
     public void testDataDivision() {
         
+        CobolSourceCleaner cleaner = new CobolSourceCleaner(getErrorHandler());
         CobolSourceCleaner.CleaningContext context = new CobolSourceCleaner.CleaningContext();
-        assertTrue(CobolSourceCleaner.isDataDivision("", context));
-        assertFalse(CobolSourceCleaner.isDataDivision(" PROCEDURE DIVISION", context));
-        assertFalse(CobolSourceCleaner.isDataDivision("whatever", context));
+        assertTrue(cleaner.isDataDivision("", 7, context));
+        assertFalse(cleaner.isDataDivision(" PROCEDURE DIVISION", 7, context));
+        assertFalse(cleaner.isDataDivision("whatever", 7, context));
+        context = new CobolSourceCleaner.CleaningContext();
+        assertFalse(cleaner.isDataDivision("PROCEDURE DIVISION", 1, context));
+        assertEquals("Procedure division found. The rest of the source code will be ignored.",
+                getErrorHandler().getErrorMessages().get(0));
     }
     
     /**
@@ -119,8 +129,10 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
         removeExtraneousCharactersAndCheck(" 01   A  .", " 01   A  .", context);
         assertTrue(context.isLookingForLevel());
         removeExtraneousCharactersAndCheck("blabla", "", context);
+        assertEquals("Extraneous characters ignored: blabla", getErrorHandler().getErrorMessages().get(0));
         assertTrue(context.isLookingForLevel());
         removeExtraneousCharactersAndCheck("       01  FILEA.   COPY DFH0CFIL.", "       01  FILEA. ", context);
+        assertEquals("Extraneous characters ignored:   COPY DFH0CFIL.", getErrorHandler().getErrorMessages().get(1));
         assertTrue(context.isLookingForLevel());
     }
     
@@ -135,6 +147,7 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
         removeExtraneousCharactersAndCheck(" 01 A. 02 B.03 C.", " 01 A. 02 B.03 C.", context);
         /* Extraneous characters past closed statement should be wiped out*/
         removeExtraneousCharactersAndCheck(" 01 A. 02 B. blabla 03 C.", " 01 A. 02 B.        03 C.", context);
+        removeExtraneousCharactersAndCheck(" 01. 02 B.", " 01. 02 B.", context);
 
     }
 
@@ -166,7 +179,8 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
             final String line,
             final String expected,
             final CobolSourceCleaner.CleaningContext context) {
-        assertEquals(expected, CobolSourceCleaner.removeExtraneousCharacters(line, context));
+        CobolSourceCleaner cleaner = new CobolSourceCleaner(getErrorHandler());
+        assertEquals(expected, cleaner.removeExtraneousCharacters(line, context));
     }
 
     /**
@@ -219,5 +233,19 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
                 + "" + LS
                 + "" + LS
         );
+    }
+    
+    /**
+     * Test effect of cleaning on source code starting at column1.
+     */
+    public void testCodeStartingColumnOne() {
+        cleanAndCheck(
+                "01   PO-RECORD1." + LS
+                + "     05 RECORD-TYPE  PIC 9 VALUE 1."
+                ,
+                "" + LS
+                + "      5 RECORD-TYPE  PIC 9 VALUE 1." + LS
+                );
+        
     }
 }

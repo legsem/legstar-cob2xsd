@@ -38,7 +38,7 @@ public abstract class AbstractCobolTester extends AbstractAntlrTester {
      * @throws CleanerException 
      */
     public String clean(final String source) throws CleanerException {
-        CobolSourceCleaner cleaner = new CobolSourceCleaner();
+        CobolSourceCleaner cleaner = new CobolSourceCleaner(getErrorHandler());
         return cleaner.execute(source);
     }
 

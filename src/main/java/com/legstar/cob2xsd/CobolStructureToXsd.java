@@ -217,6 +217,21 @@ public class CobolStructureToXsd {
     }
 
     /**
+     * Parses a COBOL source into an in-memory model.
+     * @param cobolSource the COBOL source
+     * @return a list of root COBOL data items
+     * @param startColumn column where code starts (inclusive, based 1)
+     * @param endColumn column where code ends (inclusive, based 1)
+     * @throws RecognizerException if COBOL recognition fails 
+     */
+    public List < CobolDataItem > toModel(
+            final String cobolSource,
+            final int startColumn,
+            final int endColumn) throws RecognizerException {
+        return emitModel(parse(lex(clean(cobolSource, startColumn, endColumn))));
+    }
+
+    /**
      * Remove any non COBOL Structure characters from the source.
      * @param cobolSource the raw source
      * @return a cleaned up source
@@ -224,11 +239,29 @@ public class CobolStructureToXsd {
 
      */
     public String clean(final String cobolSource) throws CleanerException {
+        return clean(cobolSource,
+                CobolSourceCleaner.DEFAULT_START_COLUMN,
+                CobolSourceCleaner.DEFAULT_END_COLUMN);
+    }
+
+    /**
+     * Remove any non COBOL Structure characters from the source.
+     * @param cobolSource the raw source
+     * @param startColumn column where code starts (inclusive, based 1)
+     * @param endColumn column where code ends (inclusive, based 1)
+     * @return a cleaned up source
+     * @throws CleanerException if source cannot be read
+
+     */
+    public String clean(
+            final String cobolSource,
+            final int startColumn,
+            final int endColumn) throws CleanerException {
         if (_log.isDebugEnabled()) {
             debug("1. Cleaning COBOL source code:", cobolSource);
         }
-        CobolSourceCleaner cleaner = new CobolSourceCleaner();
-        return cleaner.execute(cobolSource);
+        CobolSourceCleaner cleaner = new CobolSourceCleaner(getErrorHandler());
+        return cleaner.execute(cobolSource, startColumn, endColumn);
     }
 
     /**

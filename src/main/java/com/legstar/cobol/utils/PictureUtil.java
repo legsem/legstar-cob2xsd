@@ -140,11 +140,13 @@ public final class PictureUtil {
      * <p/>
      * Regular expressions in XML Schema are more like PERL than Java regex.
      * @param picture the picture clause
+     * @param currencySign the currency sign
      * @param currencySymbol the currency symbol
      * @return a regular expression
      */
     public static String getRegexFromPicture(
             final String picture,
+            final String currencySign,
             final char currencySymbol) {
         StringBuilder result = new StringBuilder();
         
@@ -170,7 +172,7 @@ public final class PictureUtil {
         charRegex.put('E', "E"); // Exponent
         charRegex.put('S', "[\\+\\-]"); // A numeric sign
         charRegex.put('V', ""); // A virtual decimal point
-        charRegex.put(currencySymbol, "[" + currencySymbol + "\\d]");
+        charRegex.put(currencySymbol, "((" + currencySign.replace(" ", "\\s") + ")|\\d)");
         
         List < PictureSymbol > pictureSymbols = parsePicture(picture, currencySymbol);
 

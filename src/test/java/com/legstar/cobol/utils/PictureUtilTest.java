@@ -110,22 +110,22 @@ public class PictureUtilTest extends TestCase {
      * Test the regex generation from a picture clause.
      */
     public void testRegexFromPicture() {
-        assertTrue(checkRegexFromPicture("A", "a"));
-        assertFalse(checkRegexFromPicture("A", "9"));
-        assertFalse(checkRegexFromPicture("A", "ab"));
-        assertTrue(checkRegexFromPicture("A(2)", "a "));
-        assertFalse(checkRegexFromPicture("A(2)", "a b"));
-        assertTrue(checkRegexFromPicture("X(5)", null));
-        assertTrue(checkRegexFromPicture("S999PPP", "-1000"));
-        assertTrue(checkRegexFromPicture("$9(5).9(2)CR", "$1000.99CR"));
-        assertTrue(checkRegexFromPicture("$9(5).9(2)DB", "$100.9  "));
-        assertTrue(checkRegexFromPicture("+,+++,999.99", "-123,456.78"));
-        assertTrue(checkRegexFromPicture("$$$9.99", "$0.12"));
-        assertFalse(checkRegexFromPicture("$$$9.99", "$0.12A"));
-        assertTrue(checkRegexFromPicture("Z(3)", "123"));
-        assertTrue(checkRegexFromPicture("Z,ZZZ.ZZ+", "123.45+"));
-        assertTrue(checkRegexFromPicture("****.99", "****.00"));
-        assertTrue(checkRegexFromPicture("90/9.99", "50/6.12"));
+        assertTrue(checkRegexFromPicture("A", "a", "$", '$'));
+        assertFalse(checkRegexFromPicture("A", "9", "$", '$'));
+        assertFalse(checkRegexFromPicture("A", "ab", "$", '$'));
+        assertTrue(checkRegexFromPicture("A(2)", "a ", "$", '$'));
+        assertFalse(checkRegexFromPicture("A(2)", "a b", "$", '$'));
+        assertTrue(checkRegexFromPicture("X(5)", null, "$", '$'));
+        assertTrue(checkRegexFromPicture("S999PPP", "-1000", "$", '$'));
+        assertTrue(checkRegexFromPicture("$9(5).9(2)CR", "USD 1000.99CR", "USD ", '$'));
+        assertTrue(checkRegexFromPicture("$9(5).9(2)DB", "$100.9  ", "$", '$'));
+        assertTrue(checkRegexFromPicture("+,+++,999.99", "-123,456.78", "$", '$'));
+        assertTrue(checkRegexFromPicture("$$$9.99", "USD0.12", "USD", '$'));
+        assertFalse(checkRegexFromPicture("$$$9.99", "$0.12A", "$", '$'));
+        assertTrue(checkRegexFromPicture("Z(3)", "123", "$", '$'));
+        assertTrue(checkRegexFromPicture("Z,ZZZ.ZZ+", "123.45+", "$", '$'));
+        assertTrue(checkRegexFromPicture("****.99", "****.00", "$", '$'));
+        assertTrue(checkRegexFromPicture("90/9.99", "50/6.12", "$", '$'));
     }
     
     /**
@@ -182,10 +182,16 @@ public class PictureUtilTest extends TestCase {
      * are some conversions needed before we can actually test.
      * @param picture the COBOL picture clause
      * @param testValue the test value
+     * @param currencySign the currency sign
+     * @param currencySymbol the currency symbol
      * @return true if there is a match
      */
-    private boolean checkRegexFromPicture(final String picture, final String testValue) {
-        String xmlsRegex = PictureUtil.getRegexFromPicture(picture, '$');
+    private boolean checkRegexFromPicture(
+            final String picture,
+            final String testValue,
+            final String currencySign,
+            final char currencySymbol) {
+        String xmlsRegex = PictureUtil.getRegexFromPicture(picture, currencySign, currencySymbol);
         if (xmlsRegex != null) {
             String javaRegex = '^'
                 + xmlsRegex.replace("$", "\\$").replace("\\p{L}", "a-zA-Z")

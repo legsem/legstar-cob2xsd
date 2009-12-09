@@ -379,4 +379,5 @@ public class CobolStructureEmitterTest extends AbstractCobolTester {
                 + "{level:5,cobolName:E-FIELD-2,picture:\"X(5)\",srceLine:1}],"
                 + "srceLine:1}]");
     }
+
 }
