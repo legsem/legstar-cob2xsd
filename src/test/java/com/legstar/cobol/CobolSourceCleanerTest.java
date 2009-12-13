@@ -44,28 +44,28 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
         /*       123456789012345678901234567890123456789012345678901234567890123456789012*/
         assertEquals(
                 "",
-                CobolSourceCleaner.removeLineSequenceNumbering(
+                CobolSourceCleaner.cleanLine(
                 "", 7, 72));
 
         assertEquals(
                 "",
-                CobolSourceCleaner.removeLineSequenceNumbering(
+                CobolSourceCleaner.cleanLine(
                 "123456", 7, 72));
 
         assertEquals(
                 "01 A.",
-                CobolSourceCleaner.removeLineSequenceNumbering(
+                CobolSourceCleaner.cleanLine(
                 "01 A.", 1, 66));
 
         assertEquals(
-                "      *",
-                CobolSourceCleaner.removeLineSequenceNumbering(
-                "123456*", 7, 72));
+                "      -",
+                CobolSourceCleaner.cleanLine(
+                "123456-", 7, 72));
 
         assertEquals(
-                "      *                                                              ABC",
-                CobolSourceCleaner.removeLineSequenceNumbering(
-                "123456*                                                              ABC123456", 7, 72));
+                "      -                                                              ABC",
+                CobolSourceCleaner.cleanLine(
+                "123456-                                                              ABC123456", 7, 72));
     }
     
     /**
@@ -75,7 +75,7 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
 
         assertEquals(
                 "       01 A  PIC  X(5)  VALUE  5.",
-                CobolSourceCleaner.removeLineSequenceNumbering(
+                CobolSourceCleaner.cleanLine(
                         "123456 01 A, PIC; X(5), VALUE, 5.", 7, 72));
     }
 
@@ -245,6 +245,22 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
                 ,
                 "" + LS
                 + "      5 RECORD-TYPE  PIC 9 VALUE 1." + LS
+                );
+        
+    }
+    /**
+     * Test removal of comments even containing valid data descriptions.
+     */
+    public void testCommentWithValidDataDescription() {
+        cleanAndCheck(
+                ""
+                + "        01   PO-RECORD1." + LS
+                + "      * 01   PO-RECORD2." + LS
+                + "      / 01   PO-RECORD3."
+                ,
+                "        01   PO-RECORD1." + LS
+                + "" + LS
+                + "" + LS
                 );
         
     }

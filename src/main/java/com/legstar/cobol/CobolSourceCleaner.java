@@ -105,7 +105,7 @@ public class CobolSourceCleaner {
                             startColumn,
                             context)) {
                         cleanedSource.append(removeExtraneousCharacters(
-                                removeLineSequenceNumbering(line, startColumn, endColumn),
+                                cleanLine(line, startColumn, endColumn),
                                 context));
                     }
                     cleanedSource.append(LS);
@@ -125,17 +125,23 @@ public class CobolSourceCleaner {
     }
 
     /**
+     * Remove characters that should not be passed to the lexer.
+     * <p/>
      * Replaces any characters in column 1 to 6 by spaces and removes
-     * any characters past column 72.
-     * Also replace token separators such as ", " and "; " which complicate
+     * any characters past column 72. This should remove sequence numbering.
+     * <p/>
+     * Replace token separators such as ", " and "; " which complicate
      * matters uselessly. Replacement should not change column numbers though
      * so we simply replace the extra separators with a whitespace.
+     * <p/>
+     * Clear comment lines. We don't remove the line so that line numbers
+     * are preserved.
      * @param line with potential sequence number
      * @param startColumn column where code starts (inclusive, based 1)
      * @param endColumn column where code ends (inclusive, based 1)
      * @return a line without a sequence number
      */
-    public static String removeLineSequenceNumbering(
+    public static String cleanLine(
             final String line,
             final int startColumn,
             final int endColumn) {
@@ -143,16 +149,26 @@ public class CobolSourceCleaner {
         int length = line.length();
         if (length < startColumn) {
             return "";
-        } else {
-            for (int i = 0; i < startColumn - 1; i++) {
-                cleanedLine.append(" ");
-            }
-            String areaA = line.substring(
-                    startColumn - 1, (length > endColumn) ? endColumn : length);
-            areaA = areaA.replace(", ", "  ").replace("; ", "  ");
-            /* Right trim, no need to over burden the lexer with spaces*/
-            cleanedLine.append(("a" + areaA).trim().substring(1));
         }
+
+        /* Remove comments */
+        char indicatorArea = line.charAt(startColumn - 1);
+        if (indicatorArea == '*' || indicatorArea == '/') {
+            return "";
+        }
+        
+        /* Clear sequence numbering */
+        for (int i = 0; i < startColumn - 1; i++) {
+            cleanedLine.append(" ");
+        }
+        String areaA = line.substring(
+                startColumn - 1, (length > endColumn) ? endColumn : length);
+
+        /* Replace long separator forms */
+        areaA = areaA.replace(", ", "  ").replace("; ", "  ");
+
+        /* Right trim, no need to over burden the lexer with spaces*/
+        cleanedLine.append(("a" + areaA).trim().substring(1));
         return cleanedLine.toString();
     }
 
