@@ -81,6 +81,8 @@ import java.util.Map;
         put("PACKED-DECIMAL", PACKED_DECIMAL_KEYWORD);
         put("COMPUTATIONAL", BINARY_KEYWORD);
         put("COMP", BINARY_KEYWORD);
+        put("COMPUTATIONAL-4", BINARY_KEYWORD);
+        put("COMP-4", BINARY_KEYWORD);
         put("BINARY", BINARY_KEYWORD);
         put("DISPLAY-1", DISPLAY_1_KEYWORD);
         put("DISPLAY", DISPLAY_KEYWORD);
