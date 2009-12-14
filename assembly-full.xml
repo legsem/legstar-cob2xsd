@@ -13,12 +13,20 @@ use by third party products.
         <dependencySet>
             <unpack>true</unpack>
             <scope>runtime</scope>
-            <!-- Only need to distribute the antlr runtime -->
+            <!--
+                 Only need to distribute the antlr runtime.
+                 Also removes velocity and dependencies which
+                 are only used by the Eclipse UI and not needed
+                 at the API level.
+             -->
             <excludes>
                 <exclude>org.antlr:antlr</exclude>
                 <exclude>antlr:antlr</exclude>
                 <exclude>org.antlr:stringtemplate</exclude>
                 <exclude>log4j:log4j</exclude>
+                <exclude>org.apache.velocity:velocity</exclude>
+                <exclude>commons-collections:commons-collections</exclude>
+                <exclude>commons-lang:commons-lang</exclude>
             </excludes>
         </dependencySet>
      </dependencySets>
