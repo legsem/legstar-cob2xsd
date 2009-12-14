@@ -678,7 +678,7 @@ public class XsdDataItem {
             final CobolDataItem cobolDataItem,
             final Cob2XsdContext context) {
 
-        String cobolName = getXmlCompatibleCobolName(cobolDataItem);
+        String cobolName = getXmlCompatibleCobolName(cobolDataItem.getCobolName());
         if (cobolName.equalsIgnoreCase("FILLER")) {
             return "filler" + cobolDataItem.getSrceLine();
         }
@@ -709,11 +709,10 @@ public class XsdDataItem {
     /**
      * Transform the COBOL name to a valid XML Name.
      * Does not do any beautification other than strictly complying with XML specifications.
-     * @param cobolDataItem the original COBOL data item
+     * @param cobolName the original COBOL data item name
      * @return a valid XML Name
      */
-    public static String getXmlCompatibleCobolName(final CobolDataItem cobolDataItem) {
-        String cobolName = cobolDataItem.getCobolName();
+    public static String getXmlCompatibleCobolName(final String cobolName) {
         if (cobolName != null && cobolName.length() > 0
                 && Character.isDigit(cobolName.charAt(0))) {
             return SAFE_NAME_PREFIX + cobolName;
