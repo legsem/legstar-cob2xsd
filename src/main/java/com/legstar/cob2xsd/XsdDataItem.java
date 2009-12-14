@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2009 LegSem.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     LegSem - initial API and implementation
+ ******************************************************************************/
 package com.legstar.cob2xsd;
 
 import java.util.LinkedList;
@@ -94,6 +104,9 @@ public class XsdDataItem {
 
     /** Maximum number of storage bytes occupied by this item in z/OS memory.*/
     private int _maxStorageLength;
+
+    /** A prefix to use when a COBOL name starts with an illegal XML character. */
+    public static final String SAFE_NAME_PREFIX = "C";
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
@@ -637,11 +650,7 @@ public class XsdDataItem {
     /**
      * Turn a COBOL name to an XSD element name.
      * <p/>
-     * This is not strictly necessary if there is no name conflict as the only requirement
-     * for an XML schema element name is to be an NCName (non columnized name) which is
-     * a superset of valid COBOL names.
-     * <p/>
-     * COBOL names look ugly in XML schema though. They are often uppercased and use
+     * COBOL names look ugly in XML schema. They are often uppercased and use
      * hyphens extensively. XML schema names they will have to be transformed later
      * to java identifiers so we try to get as close as possible to a naming convention
      * that suits XML Schema as well as Java.
@@ -654,6 +663,13 @@ public class XsdDataItem {
      * COBOL FILLERs are a particular case because there might be more than one in the
      * same parent group. So what we do is systematically append the COBOL source line
      * number so that these become unique names.
+     * <p/>
+     * COBOL names can start with a digit which is illegal for XML element names. In this
+     * case we prepend a "C" character.
+     * <p/>
+     * Since Enterprise COBOL V4R1, underscores can be used (apart from first character).
+     * We treat them as hyphens here, they are not propagated to the XSD name but are
+     * used as word breakers.
      * @param cobolDataItem the original COBOL data item
      * @param context the translator options
      * @return an XML schema element name
@@ -662,7 +678,7 @@ public class XsdDataItem {
             final CobolDataItem cobolDataItem,
             final Cob2XsdContext context) {
 
-        String cobolName = cobolDataItem.getCobolName();
+        String cobolName = getXmlCompatibleCobolName(cobolDataItem);
         if (cobolName.equalsIgnoreCase("FILLER")) {
             return "filler" + cobolDataItem.getSrceLine();
         }
@@ -671,7 +687,7 @@ public class XsdDataItem {
         boolean wordBreaker = (context.elementNamesStartWithUppercase()) ? true : false;
         for (int i = 0; i < cobolName.length(); i++) {
             char c = cobolName.charAt(i);
-            if (c != '-') {
+            if (c != '-' && c != '_') {
                 if (Character.isDigit(c)) {
                     sb.append(c);
                     wordBreaker = true;
@@ -688,6 +704,22 @@ public class XsdDataItem {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Transform the COBOL name to a valid XML Name.
+     * Does not do any beautification other than strictly complying with XML specifications.
+     * @param cobolDataItem the original COBOL data item
+     * @return a valid XML Name
+     */
+    public static String getXmlCompatibleCobolName(final CobolDataItem cobolDataItem) {
+        String cobolName = cobolDataItem.getCobolName();
+        if (cobolName != null && cobolName.length() > 0
+                && Character.isDigit(cobolName.charAt(0))) {
+            return SAFE_NAME_PREFIX + cobolName;
+        } else {
+            return cobolName;
+        }
     }
 
     /**

@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2009 LegSem.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     LegSem - initial API and implementation
+ ******************************************************************************/
 package com.legstar.cob2xsd;
 
 import java.io.BufferedReader;
@@ -315,4 +325,53 @@ public class CobolStructureToXsdSpecialTest extends TestCase {
         }
     }
 
+    /**
+     * Test identifiers starting with digit.
+     */
+    public void testIdentifierStartsWithDigit() {
+        try {
+            Cob2XsdContext context = new Cob2XsdContext();
+            context.setTargetNamespace("http://www.mycompany.com/test");
+            context.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            String xmlSchema = cob2xsd.translate(
+                    "        01  5500-REC-01.\n"
+                    + "          05 5500-REC-TYPE      PIC X(01).\n"
+                    + "          05 5500-PLAN-NUM      PIC X(06)."
+                    );
+            assertEquals(
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" + LS
+                    + "<schema xmlns=\"http://www.w3.org/2001/XMLSchema\""
+                    + " xmlns:tns=\"http://www.mycompany.com/test\""
+                    + " elementFormDefault=\"qualified\""
+                    + " targetNamespace=\"http://www.mycompany.com/test\">" + LS
+                    + "    <complexType name=\"C5500Rec01\">" + LS
+                    + "        <sequence>" + LS
+                    + "            <element name=\"c5500RecType\">" + LS
+                    + "                <simpleType>" + LS
+                    + "                    <restriction base=\"string\">" + LS
+                    + "                        <maxLength value=\"1\"/>" + LS
+                    + "                    </restriction>" + LS
+                    + "                </simpleType>" + LS
+                    + "            </element>" + LS
+                    + "            <element name=\"c5500PlanNum\">" + LS
+                    + "                <simpleType>" + LS
+                    + "                    <restriction base=\"string\">" + LS
+                    + "                        <maxLength value=\"6\"/>" + LS
+                    + "                    </restriction>" + LS
+                    + "                </simpleType>" + LS
+                    + "            </element>" + LS
+                    + "        </sequence>" + LS
+                    + "    </complexType>" + LS
+                    + "</schema>" + LS
+                    ,
+                    xmlSchema);
+        } catch (XsdGenerationException e) {
+            e.printStackTrace();
+            fail();
+        } catch (RecognizerException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 }
