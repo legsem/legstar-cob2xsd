@@ -15,6 +15,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
@@ -24,7 +25,6 @@ import org.antlr.runtime.tree.TreeNodeStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.legstar.antlr.ANTLRNoCaseReaderStream;
 import com.legstar.antlr.AbstractAntlrTester;
 import com.legstar.antlr.CleanerException;
 import com.legstar.antlr.RecognizerException;
@@ -58,7 +58,7 @@ public abstract class AbstractCobolTester extends AbstractAntlrTester {
     public CommonTokenStream lex(final String source) throws RecognizerException {
         try {
             CobolStructureLexerImpl lex = new CobolStructureLexerImpl(
-                    new ANTLRNoCaseReaderStream(
+                    new ANTLRReaderStream(
                             new StringReader(
                                     clean(source))),
                                     getErrorHandler());
