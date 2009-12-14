@@ -61,6 +61,31 @@ public abstract class AbstractCobolTester extends AbstractAntlrTester {
     }
     
     /**
+     * Apply a lexer to a source and check that the token stream produced
+     * is as expected.
+     * @param source the source code
+     * @param expected the expected token stream
+     */
+    public void lexAndCheck(final String source, final String expected) {
+        try {
+            CommonTokenStream ts = lex(source);
+            StringBuilder sb = new StringBuilder();
+            for (Object token : ts.getTokens()) {
+                sb.append(toString((Token) token));
+            }
+            CobolStructureLexerImpl lexer = (CobolStructureLexerImpl) ts.getTokenSource();
+            if (lexer.getErrorHandler().getErrorMessages().size() > 0) {
+                throw new RecognizerException(
+                        lexer.getErrorHandler().getErrorMessages().get(0));
+            }
+            assertEquals(expected, sb.toString());
+        } catch (RecognizerException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+
+    /**
      * A generic test helper that takes a source fragment and checks the result
      * when it should be an exception.
      * @param source the source fragment

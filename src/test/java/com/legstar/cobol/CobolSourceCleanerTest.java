@@ -248,6 +248,7 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
                 );
         
     }
+
     /**
      * Test removal of comments even containing valid data descriptions.
      */
@@ -261,6 +262,23 @@ public class CobolSourceCleanerTest extends AbstractCobolTester {
                 "        01   PO-RECORD1." + LS
                 + "" + LS
                 + "" + LS
+                );
+        
+    }
+
+    /**
+     * Test that identifiers starting with digits are correctly identified.
+     */
+    public void testIdentifierStartsWithDigit() {
+        cleanAndCheck(
+                ""
+                + "        01  5500-REC-01." + LS
+                + "          05 5500-REC-TYPE      PIC X(01)." + LS
+                + "          05 5500-PLAN-NUM      PIC X(06)."
+                ,
+                "        01  5500-REC-01." + LS
+                + "          05 5500-REC-TYPE      PIC X(01)." + LS
+                + "          05 5500-PLAN-NUM      PIC X(06)." + LS
                 );
         
     }

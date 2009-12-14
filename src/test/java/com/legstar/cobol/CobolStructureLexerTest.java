@@ -756,4 +756,27 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 + "[@10,98:98='.',<PERIOD>,2:51]");
     }
     
+    /**
+     * Test identifiers starting with digit.
+     */
+    public void testIdentifierStartsWithDigit() {
+        lexAndCheck(
+                "        01  5500-REC-01.\n"
+                + "          05 5500-REC-TYPE      PIC X(01).\n"
+                + "          05 5500-PLAN-NUM      PIC X(06)."
+                ,
+                "[@0,8:9='01',<DATA_ITEM_LEVEL>,1:8]"
+                + "[@1,12:22='5500-REC-01',<DATA_NAME>,1:12]"
+                + "[@2,23:23='.',<PERIOD>,1:23]"
+                + "[@3,36:37='05',<DATA_ITEM_LEVEL>,2:10]"
+                + "[@4,39:51='5500-REC-TYPE',<DATA_NAME>,2:13]"
+                + "[@5,58:60='PIC',<PICTURE_KEYWORD>,2:32]"
+                + "[@6,62:66='X(01)',<PICTURE_PART>,2:36]"
+                + "[@7,67:67='.',<PERIOD>,2:41]"
+                + "[@8,80:81='05',<DATA_ITEM_LEVEL>,3:10]"
+                + "[@9,83:95='5500-PLAN-NUM',<DATA_NAME>,3:13]"
+                + "[@10,102:104='PIC',<PICTURE_KEYWORD>,3:32]"
+                + "[@11,106:110='X(06)',<PICTURE_PART>,3:36]"
+                + "[@12,111:111='.',<PERIOD>,3:41]");
+    }
 }

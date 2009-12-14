@@ -2,21 +2,15 @@ lexer grammar CobolStructureLexer;
 /*------------------------------------------------------------------
  * Lexer grammar for COBOL structures.
  * Built from IBM Entreprise COBOL V3R4
- * COBOL keywords recognition is delegated to a secondary lexer.
  *------------------------------------------------------------------*/
-options {
-	tokenVocab=CobolStructureKeywordsLexer;
-}
+
 /*------------------------------------------------------------------
  * Java overrides
  *------------------------------------------------------------------*/
 @header {
 package com.legstar.cobol;
-import java.io.IOException;
-import java.io.StringReader;
-import com.legstar.antlr.ANTLRNoCaseReaderStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashMap;
+import java.util.Map;
 }
 
 @members {
@@ -27,57 +21,118 @@ import java.util.regex.Pattern;
     /** True when a picture string is being built (potentially from multiple parts). */
     private boolean pictureStarted;
 
-    /** Secondary lexer specializing in keyword recognition.*/
-    private CobolStructureKeywordsLexerImpl keywordLexer
-            = new CobolStructureKeywordsLexerImpl();
-
+    /** Map to help with COBOL keyword recognition.*/
+    private static Map <String, Integer> KEYWORDS_MAP = new HashMap <String, Integer>()
+    {{
+        put("RENAMES", RENAMES_KEYWORD);
+        put("THROUGH", THROUGH_KEYWORD);
+        put("THRU", THROUGH_KEYWORD);
+        put("REDEFINES", REDEFINES_KEYWORD);
+        put("BLANK", BLANK_KEYWORD);
+        put("WHEN", Token.SKIP_TOKEN.getType());
+        put("EXTERNAL", EXTERNAL_KEYWORD);
+        put("GLOBAL", GLOBAL_KEYWORD);
+        put("GROUP-USAGE", GROUP_USAGE_KEYWORD);
+        put("IS", Token.SKIP_TOKEN.getType());
+        put("ARE", Token.SKIP_TOKEN.getType());
+        put("NATIONAL", NATIONAL_KEYWORD);
+        put("JUSTIFIED", JUSTIFIED_KEYWORD);
+        put("JUST", JUSTIFIED_KEYWORD);
+        put("RIGHT", RIGHT_KEYWORD);
+        put("OCCURS", OCCURS_KEYWORD);
+        put("TIMES", Token.SKIP_TOKEN.getType());
+        put("TO", TO_KEYWORD);
+        put("ASCENDING", ASCENDING_KEYWORD);
+        put("DESCENDING", DESCENDING_KEYWORD);
+        put("KEY", KEY_KEYWORD);
+        put("INDEXED", INDEXED_KEYWORD);
+        put("BY", Token.SKIP_TOKEN.getType());
+        put("PICTURE", PICTURE_KEYWORD);
+        put("PIC", PICTURE_KEYWORD);
+        put("DEPENDING", DEPENDING_KEYWORD);
+        put("ON", Token.SKIP_TOKEN.getType());
+        put("SIGN", Token.SKIP_TOKEN.getType());
+        put("LEADING", SIGN_LEADING_KEYWORD);
+        put("TRAILING", SIGN_TRAILING_KEYWORD);
+        put("SEPARATE", SEPARATE_KEYWORD);
+        put("CHARACTER", Token.SKIP_TOKEN.getType());
+        put("SYNCHRONIZED", SYNCHRONIZED_KEYWORD);
+        put("SYNC", SYNCHRONIZED_KEYWORD);
+        put("LEFT", LEFT_KEYWORD);
+        put("USAGE", USAGE_KEYWORD);
+        put("COMPUTATIONAL-1", SINGLE_FLOAT_KEYWORD);
+        put("COMP-1", SINGLE_FLOAT_KEYWORD);
+        put("COMPUTATIONAL-2", DOUBLE_FLOAT_KEYWORD);
+        put("COMP-2", DOUBLE_FLOAT_KEYWORD);
+        put("COMPUTATIONAL-5", NATIVE_BINARY_KEYWORD);
+        put("COMP-5", NATIVE_BINARY_KEYWORD);
+        put("COMPUTATIONAL-3", PACKED_DECIMAL_KEYWORD);
+        put("COMP-3", PACKED_DECIMAL_KEYWORD);
+        put("PACKED-DECIMAL", PACKED_DECIMAL_KEYWORD);
+        put("COMPUTATIONAL", BINARY_KEYWORD);
+        put("COMP", BINARY_KEYWORD);
+        put("BINARY", BINARY_KEYWORD);
+        put("DISPLAY-1", DISPLAY_1_KEYWORD);
+        put("DISPLAY", DISPLAY_KEYWORD);
+        put("INDEX", INDEX_KEYWORD);
+        put("POINTER", POINTER_KEYWORD);
+        put("PROCEDURE-POINTER", PROCEDURE_POINTER_KEYWORD);
+        put("FUNCTION-POINTER", FUNCTION_POINTER_KEYWORD);
+        put("VALUES", VALUE_KEYWORD);
+        put("VALUE", VALUE_KEYWORD);
+        put("DATE", Token.SKIP_TOKEN.getType());
+        put("FORMAT", DATE_FORMAT_KEYWORD);
+        put("ZEROES", ZERO_CONSTANT);
+        put("ZEROS", ZERO_CONSTANT);
+        put("ZERO", ZERO_CONSTANT);
+        put("SPACES", SPACE_CONSTANT);
+        put("SPACE", SPACE_CONSTANT);
+        put("HIGH-VALUES", HIGH_VALUE_CONSTANT);
+        put("HIGH-VALUE", HIGH_VALUE_CONSTANT);
+        put("LOW-VALUES", LOW_VALUE_CONSTANT);
+        put("LOW-VALUE", LOW_VALUE_CONSTANT);
+        put("QUOTES", QUOTE_CONSTANT);
+        put("QUOTE", QUOTE_CONSTANT);
+        put("ALL", ALL_CONSTANT);
+        put("NULLS", NULL_CONSTANT);
+        put("NULL", NULL_CONSTANT);
+    }};
+    
     /**
-     * Asks secondary lexer to check if text is a keyword. If there is a match,
-     * makes sure the entire text was matched (as opposed to a substring).
-     * If the text matches a keyword that needs to be skipped, skip.
+     * Adding all the COBOL keywords directly generates too much code. It
+     * is more efficient, with the current release of ANTLR, to recognize
+     * keywords manually.
      * @param text the text to match with keywords
      * @param originalType the initial token type
      * @return the keyword type if a match is found otherwise the original type
-     * @throws RecognitionException if failed to call secondary lexer
      */
     public int matchKeywords(
             final String text,
-            final int originalType) throws RecognitionException {
-        try {
-            int type = originalType;
-            keywordLexer.setCharStream( new ANTLRNoCaseReaderStream(
-                new StringReader(text)));
-            CommonTokenStream kTokens = new CommonTokenStream(keywordLexer);
-            List < ? > kTokenl = kTokens.getTokens();
-            if (kTokenl.size() > 0) {
-                CommonToken kToken = (CommonToken) kTokenl.get(0);
-                if (kToken.getText().length() == text.length()) {
-                    if (kToken.getType() == Token.SKIP_TOKEN.getType()) {
-                        skip();
-                    } else {
-                        type = kToken.getType();
-                        lastKeyword = type;
-                    }
+            final int originalType) {
+        Integer type = KEYWORDS_MAP.get(text.toUpperCase());
+        if (type == null) {
+            return originalType;
+        } else {
+            if (type == Token.SKIP_TOKEN.getType()) {
+                skip();
+            } else {
+                /* Just found a PICTURE keyword, start collecting picture string parts */
+                if (type == PICTURE_KEYWORD) {
+                    pictureStarted = true;
                 }
-            }
-            /* Just found a PICTURE keyword, start collecting picture string parts */
-            if (type == PICTURE_KEYWORD) {
-                pictureStarted = true;
+                lastKeyword = type;
             }
             return type;
-
-        } catch (IOException e) {
-            throw new RecognitionException(input);
         }
     }
-    
+        
     /**
      * Check that a string is a valid data name.
      * @param string a proposed data name
      * @throws FailedPredicateException if this is not a valid data name
      */
     public void checkDataName(final String string) throws FailedPredicateException {
-        if (!string.matches("[a-zA-Z][a-zA-Z0-9\\-]*")) {
+        if (!string.matches("[a-zA-Z0-9][a-zA-Z0-9_\\-]*")) {
             throw new FailedPredicateException(
                     input, "DATA_NAME", "Syntax error in last clause");
         }
@@ -211,7 +266,7 @@ DATE_PATTERN
  * auxiliary parser for a match and change the token type accordingly.
  *------------------------------------------------------------------*/
 DATA_NAME
-    : LETTER (LETTER|'0'..'9'|'-')*
+    : (LETTER|'0'..'9') (LETTER|'0'..'9'|'-'|'_')*
     {
         $type = matchKeywords(getText(), $type);
         if ($type == DATA_NAME) {
@@ -346,27 +401,74 @@ fragment LETTER     : 'A'..'Z'| 'a'..'z';
 fragment SPACE      : ' ' | '\t';
 fragment QUOTE      : '"';
 fragment APOST      : '\'';
+
 /*------------------------------------------------------------------
- * DECIMAL_POINT is reported as a fragment so that the lexer code
- * generator does not complain when it is referenced from other
- * rules. In reality it is an imaginary token set in some cases
- * when a PERIOD is recognized (see PERIOD rule).
+ * The following are fake fragments used by other rules to recast
+ * the token type depending on context.
  *------------------------------------------------------------------*/
-fragment
-DECIMAL_POINT 
-    :  '.'
-    ;
-
-fragment
-DATA_ITEM_LEVEL
-    : ('0'..'9')('0'..'9')?
-    ;
-
-fragment
-RENAMES_LEVEL
-    : '66'
-    ;
-fragment
-CONDITION_LEVEL
-    : '88'
-    ;
+fragment DECIMAL_POINT             :;
+fragment DATA_ITEM_LEVEL           :;
+fragment RENAMES_LEVEL             :;
+fragment CONDITION_LEVEL           :;
+    
+/*------------------------------------------------------------------
+ * COBOL Structures keywords
+ *------------------------------------------------------------------*/
+fragment RENAMES_KEYWORD           :; 
+fragment THROUGH_KEYWORD           :; 
+fragment REDEFINES_KEYWORD         :; 
+fragment BLANK_KEYWORD             :; 
+fragment WHEN_KEYWORD              :; 
+fragment EXTERNAL_KEYWORD          :; 
+fragment GLOBAL_KEYWORD            :; 
+fragment GROUP_USAGE_KEYWORD       :; 
+fragment IS_KEYWORD                :; 
+fragment ARE_KEYWORD               :; 
+fragment NATIONAL_KEYWORD          :; 
+fragment JUSTIFIED_KEYWORD         :; 
+fragment RIGHT_KEYWORD             :; 
+fragment OCCURS_KEYWORD            :; 
+fragment TIMES_KEYWORD             :; 
+fragment TO_KEYWORD                :; 
+fragment ASCENDING_KEYWORD         :; 
+fragment DESCENDING_KEYWORD        :; 
+fragment KEY_KEYWORD               :; 
+fragment INDEXED_KEYWORD           :; 
+fragment BY_KEYWORD                :; 
+fragment PICTURE_KEYWORD           :; 
+fragment DEPENDING_KEYWORD         :; 
+fragment ON_KEYWORD                :; 
+fragment SIGN_KEYWORD              :; 
+fragment SIGN_LEADING_KEYWORD      :; 
+fragment SIGN_TRAILING_KEYWORD     :; 
+fragment SEPARATE_KEYWORD          :; 
+fragment CHARACTER_KEYWORD         :; 
+fragment SYNCHRONIZED_KEYWORD      :; 
+fragment LEFT_KEYWORD              :; 
+fragment USAGE_KEYWORD             :; 
+fragment SINGLE_FLOAT_KEYWORD      :; 
+fragment DOUBLE_FLOAT_KEYWORD      :; 
+fragment NATIVE_BINARY_KEYWORD     :; 
+fragment PACKED_DECIMAL_KEYWORD    :; 
+fragment BINARY_KEYWORD            :; 
+fragment DISPLAY_1_KEYWORD         :; 
+fragment DISPLAY_KEYWORD           :; 
+fragment INDEX_KEYWORD             :; 
+fragment POINTER_KEYWORD           :; 
+fragment PROCEDURE_POINTER_KEYWORD :; 
+fragment FUNCTION_POINTER_KEYWORD  :; 
+fragment VALUE_KEYWORD             :; 
+fragment DATE_KEYWORD              :; 
+fragment DATE_FORMAT_KEYWORD       :; 
+ 
+/*------------------------------------------------------------------
+ * Figurative constants
+ * ZERO_CONSTANT is also a keyword in BLANK WHEN ZERO
+ *------------------------------------------------------------------*/
+fragment ZERO_CONSTANT             :; 
+fragment SPACE_CONSTANT            :; 
+fragment HIGH_VALUE_CONSTANT       :; 
+fragment LOW_VALUE_CONSTANT        :; 
+fragment QUOTE_CONSTANT            :; 
+fragment ALL_CONSTANT              :; 
+fragment NULL_CONSTANT             :; 
