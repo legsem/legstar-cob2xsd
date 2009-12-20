@@ -53,7 +53,7 @@
                     </annotation>
                 </element>
             </choice>
-            <element name="filler65" type="tns:Filler65">
+            <element name="Filler65" type="tns:Filler65">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="5" srceLine="65" type="GROUP_ITEM"/>
@@ -88,7 +88,7 @@
                     </restriction>
                 </simpleType>
             </element>
-            <element name="filler60">
+            <element name="Filler60">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="10" picture="X(123)" srceLine="60" type="ALPHANUMERIC_ITEM"/>

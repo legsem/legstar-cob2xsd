@@ -12,7 +12,7 @@
             <element name="WsFileStart">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-FILE-START" levelNumber="5" picture="X(8)" srceLine="54" type="ALPHANUMERIC_ITEM" value=""/>
+                        <cb:cobolElement cobolName="WS-FILE-START" levelNumber="5" picture="X(8)" srceLine="54" type="ALPHANUMERIC_ITEM" value=" "/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -24,7 +24,7 @@
             <element name="WsFileName">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-FILE-NAME" levelNumber="5" picture="X(8)" srceLine="55" type="ALPHANUMERIC_ITEM" value=""/>
+                        <cb:cobolElement cobolName="WS-FILE-NAME" levelNumber="5" picture="X(8)" srceLine="55" type="ALPHANUMERIC_ITEM" value=" "/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -36,7 +36,7 @@
             <element name="WsFileDsname">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-FILE-DSNAME" levelNumber="5" picture="X(44)" srceLine="56" type="ALPHANUMERIC_ITEM" value=""/>
+                        <cb:cobolElement cobolName="WS-FILE-DSNAME" levelNumber="5" picture="X(44)" srceLine="56" type="ALPHANUMERIC_ITEM" value=" "/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -64,7 +64,7 @@
             <element name="WsProgramStart">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PROGRAM-START" levelNumber="5" picture="X(8)" srceLine="60" type="ALPHANUMERIC_ITEM" value=""/>
+                        <cb:cobolElement cobolName="WS-PROGRAM-START" levelNumber="5" picture="X(8)" srceLine="60" type="ALPHANUMERIC_ITEM" value=" "/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -76,7 +76,7 @@
             <element name="WsProgramName">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-PROGRAM-NAME" levelNumber="5" picture="X(8)" srceLine="61" type="ALPHANUMERIC_ITEM" value=""/>
+                        <cb:cobolElement cobolName="WS-PROGRAM-NAME" levelNumber="5" picture="X(8)" srceLine="61" type="ALPHANUMERIC_ITEM" value=" "/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -140,7 +140,7 @@
             <element name="WsTransactionStart">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-TRANSACTION-START" levelNumber="5" picture="X(8)" srceLine="68" type="ALPHANUMERIC_ITEM" value=""/>
+                        <cb:cobolElement cobolName="WS-TRANSACTION-START" levelNumber="5" picture="X(8)" srceLine="68" type="ALPHANUMERIC_ITEM" value=" "/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -152,7 +152,7 @@
             <element name="WsTransactionName">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-TRANSACTION-NAME" levelNumber="5" picture="X(8)" srceLine="69" type="ALPHANUMERIC_ITEM" value=""/>
+                        <cb:cobolElement cobolName="WS-TRANSACTION-NAME" levelNumber="5" picture="X(8)" srceLine="69" type="ALPHANUMERIC_ITEM" value=" "/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -164,7 +164,7 @@
             <element name="WsTransactionProgram">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-TRANSACTION-PROGRAM" levelNumber="5" picture="X(8)" srceLine="70" type="ALPHANUMERIC_ITEM" value=""/>
+                        <cb:cobolElement cobolName="WS-TRANSACTION-PROGRAM" levelNumber="5" picture="X(8)" srceLine="70" type="ALPHANUMERIC_ITEM" value=" "/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -455,7 +455,7 @@
                     </restriction>
                 </simpleType>
             </element>
-            <element name="filler113">
+            <element name="Filler113">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="25" picture="X(24)" srceLine="113" type="ALPHANUMERIC_ITEM"/>
@@ -507,7 +507,7 @@
                     </restriction>
                 </simpleType>
             </element>
-            <element name="filler119">
+            <element name="Filler119">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="25" picture="X(36)" srceLine="119" type="ALPHANUMERIC_ITEM"/>

@@ -9,7 +9,7 @@
     </annotation>
     <complexType name="WsTs">
         <sequence>
-            <element name="filler21">
+            <element name="Filler21">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="5" picture="X(2)" srceLine="21" type="ALPHANUMERIC_ITEM" value="TS"/>
@@ -37,7 +37,7 @@
     </complexType>
     <complexType name="WsTc">
         <sequence>
-            <element name="filler24">
+            <element name="Filler24">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="5" picture="X(4)" srceLine="24" type="ALPHANUMERIC_ITEM" value="TCEC"/>
@@ -65,7 +65,7 @@
     </complexType>
     <complexType name="WsTc2">
         <sequence>
-            <element name="filler27">
+            <element name="Filler27">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="5" picture="X(6)" srceLine="27" type="ALPHANUMERIC_ITEM" value="TC2EC2"/>

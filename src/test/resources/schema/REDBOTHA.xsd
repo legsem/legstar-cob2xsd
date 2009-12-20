@@ -22,7 +22,7 @@
                         </restriction>
                     </simpleType>
                 </element>
-                <element name="filler22" type="tns:Filler22">
+                <element name="Filler22" type="tns:Filler22">
                     <annotation>
                         <appinfo>
                             <cb:cobolElement cobolName="FILLER" levelNumber="5" redefines="C-NUMERIC" srceLine="22" type="GROUP_ITEM"/>

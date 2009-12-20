@@ -9,7 +9,7 @@
     </annotation>
     <complexType name="WsOdo">
         <sequence>
-            <element name="filler21">
+            <element name="Filler21">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="5" picture="X(3)" srceLine="21" type="ALPHANUMERIC_ITEM" value="ODO"/>

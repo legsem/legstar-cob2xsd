@@ -110,7 +110,7 @@
                         </restriction>
                     </simpleType>
                 </element>
-                <element name="filler49" type="tns:Filler49">
+                <element name="Filler49" type="tns:Filler49">
                     <annotation>
                         <appinfo>
                             <cb:cobolElement cobolName="FILLER" levelNumber="15" redefines="LAST-TRANS-DATE" srceLine="49" type="GROUP_ITEM"/>
@@ -199,7 +199,7 @@
                     </restriction>
                 </simpleType>
             </element>
-            <element name="filler51">
+            <element name="Filler51">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="20" picture="X" srceLine="51" type="ALPHANUMERIC_ITEM"/>
@@ -223,7 +223,7 @@
                     </restriction>
                 </simpleType>
             </element>
-            <element name="filler53">
+            <element name="Filler53">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="20" picture="X" srceLine="53" type="ALPHANUMERIC_ITEM"/>

@@ -680,7 +680,8 @@ public class XsdDataItem {
 
         String cobolName = getXmlCompatibleCobolName(cobolDataItem.getCobolName());
         if (cobolName.equalsIgnoreCase("FILLER")) {
-            return "filler" + cobolDataItem.getSrceLine();
+            String filler = (context.elementNamesStartWithUppercase()) ? "Filler" : "filler";
+            return filler + cobolDataItem.getSrceLine();
         }
 
         StringBuilder sb = new StringBuilder();

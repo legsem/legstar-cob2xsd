@@ -81,7 +81,7 @@
                     </restriction>
                 </simpleType>
             </element>
-            <element name="filler27">
+            <element name="Filler27">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="10" picture="X(17)" srceLine="27" type="ALPHANUMERIC_ITEM"/>

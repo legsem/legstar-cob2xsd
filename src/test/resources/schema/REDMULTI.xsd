@@ -86,14 +86,14 @@
                         </restriction>
                     </simpleType>
                 </element>
-                <element name="filler35" type="tns:Filler35">
+                <element name="Filler35" type="tns:Filler35">
                     <annotation>
                         <appinfo>
                             <cb:cobolElement cobolName="FILLER" levelNumber="3" redefines="C-DATA" srceLine="35" type="GROUP_ITEM"/>
                         </appinfo>
                     </annotation>
                 </element>
-                <element name="filler38" type="tns:Filler38">
+                <element name="Filler38" type="tns:Filler38">
                     <annotation>
                         <appinfo>
                             <cb:cobolElement cobolName="FILLER" levelNumber="3" redefines="C-DATA" srceLine="38" type="GROUP_ITEM"/>
@@ -117,7 +117,7 @@
                     </restriction>
                 </simpleType>
             </element>
-            <element name="filler37">
+            <element name="Filler37">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="5" picture="X(170)" srceLine="37" type="ALPHANUMERIC_ITEM"/>

@@ -202,7 +202,7 @@
     </complexType>
     <complexType name="WsPs9X18MinB">
         <sequence>
-            <element name="filler43">
+            <element name="Filler43">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="20" picture="S9(9)" signed="true" srceLine="43" totalDigits="9" type="NATIVE_BINARY_ITEM" usage="COMP-5" value="-2147483648"/>
@@ -212,7 +212,7 @@
                     <restriction base="int"/>
                 </simpleType>
             </element>
-            <element name="filler44">
+            <element name="Filler44">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="20" picture="9(9)" signed="false" srceLine="44" totalDigits="9" type="NATIVE_BINARY_ITEM" usage="COMP-5" value="0"/>
@@ -226,7 +226,7 @@
     </complexType>
     <complexType name="WsPs9X18HighB">
         <sequence>
-            <element name="filler49">
+            <element name="Filler49">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="20" picture="9(9)" signed="false" srceLine="49" totalDigits="9" type="NATIVE_BINARY_ITEM" usage="COMP-5" value="3"/>
@@ -236,7 +236,7 @@
                     <restriction base="unsignedInt"/>
                 </simpleType>
             </element>
-            <element name="filler50">
+            <element name="Filler50">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="20" picture="9(9)" signed="false" srceLine="50" totalDigits="9" type="NATIVE_BINARY_ITEM" usage="COMP-5" value="4294967295"/>
@@ -250,7 +250,7 @@
     </complexType>
     <complexType name="WsPs9X18MaxB">
         <sequence>
-            <element name="filler54">
+            <element name="Filler54">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="20" picture="9(9)" signed="false" srceLine="54" totalDigits="9" type="NATIVE_BINARY_ITEM" usage="COMP-5" value="2147483647"/>
@@ -260,7 +260,7 @@
                     <restriction base="unsignedInt"/>
                 </simpleType>
             </element>
-            <element name="filler55">
+            <element name="Filler55">
                 <annotation>
                     <appinfo>
                         <cb:cobolElement cobolName="FILLER" levelNumber="20" picture="9(9)" signed="false" srceLine="55" totalDigits="9" type="NATIVE_BINARY_ITEM" usage="COMP-5" value="4294967295"/>
