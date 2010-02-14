@@ -9,6 +9,77 @@
  *     LegSem - initial API and implementation
  ******************************************************************************/
 lexer grammar CobolStructureLexer;
+
+/*------------------------------------------------------------------
+ * Imaginary nodes
+ *------------------------------------------------------------------*/
+tokens {
+    DECIMAL_POINT ;
+    DATA_ITEM_LEVEL;
+    RENAMES_LEVEL;
+    CONDITION_LEVEL;
+/*------------------------------------------------------------------
+ * COBOL Structures keywords
+ *------------------------------------------------------------------*/
+    RENAMES_KEYWORD; 
+    THROUGH_KEYWORD; 
+    REDEFINES_KEYWORD; 
+    BLANK_KEYWORD; 
+    WHEN_KEYWORD; 
+    EXTERNAL_KEYWORD; 
+    GLOBAL_KEYWORD; 
+    GROUP_USAGE_KEYWORD; 
+    IS_KEYWORD; 
+    ARE_KEYWORD; 
+    NATIONAL_KEYWORD; 
+    JUSTIFIED_KEYWORD; 
+    RIGHT_KEYWORD; 
+    OCCURS_KEYWORD; 
+    TIMES_KEYWORD; 
+    TO_KEYWORD; 
+    ASCENDING_KEYWORD; 
+    DESCENDING_KEYWORD; 
+    KEY_KEYWORD; 
+    INDEXED_KEYWORD; 
+    BY_KEYWORD; 
+    PICTURE_KEYWORD; 
+    DEPENDING_KEYWORD; 
+    ON_KEYWORD; 
+    SIGN_KEYWORD; 
+    SIGN_LEADING_KEYWORD; 
+    SIGN_TRAILING_KEYWORD; 
+    SEPARATE_KEYWORD; 
+    CHARACTER_KEYWORD; 
+    SYNCHRONIZED_KEYWORD; 
+    LEFT_KEYWORD; 
+    USAGE_KEYWORD; 
+    SINGLE_FLOAT_KEYWORD; 
+    DOUBLE_FLOAT_KEYWORD; 
+    NATIVE_BINARY_KEYWORD; 
+    PACKED_DECIMAL_KEYWORD; 
+    BINARY_KEYWORD; 
+    DISPLAY_1_KEYWORD; 
+    DISPLAY_KEYWORD; 
+    INDEX_KEYWORD; 
+    POINTER_KEYWORD; 
+    PROCEDURE_POINTER_KEYWORD; 
+    FUNCTION_POINTER_KEYWORD; 
+    VALUE_KEYWORD; 
+    DATE_KEYWORD; 
+    DATE_FORMAT_KEYWORD; 
+ 
+/*------------------------------------------------------------------
+ * Figurative constants
+ * ZERO_CONSTANT is also a keyword in BLANK WHEN ZERO
+ *------------------------------------------------------------------*/
+    ZERO_CONSTANT; 
+    SPACE_CONSTANT; 
+    HIGH_VALUE_CONSTANT; 
+    LOW_VALUE_CONSTANT; 
+    QUOTE_CONSTANT; 
+    ALL_CONSTANT; 
+    NULL_CONSTANT; 
+}
 /*------------------------------------------------------------------
  * Lexer grammar for COBOL structures.
  * Built from a subset of IBM Entreprise COBOL V3R4
@@ -413,74 +484,3 @@ fragment LETTER     : 'A'..'Z'| 'a'..'z';
 fragment SPACE      : ' ' | '\t';
 fragment QUOTE      : '"';
 fragment APOST      : '\'';
-
-/*------------------------------------------------------------------
- * The following are fake fragments used by other rules to recast
- * the token type depending on context.
- *------------------------------------------------------------------*/
-fragment DECIMAL_POINT             :;
-fragment DATA_ITEM_LEVEL           :;
-fragment RENAMES_LEVEL             :;
-fragment CONDITION_LEVEL           :;
-    
-/*------------------------------------------------------------------
- * COBOL Structures keywords
- *------------------------------------------------------------------*/
-fragment RENAMES_KEYWORD           :; 
-fragment THROUGH_KEYWORD           :; 
-fragment REDEFINES_KEYWORD         :; 
-fragment BLANK_KEYWORD             :; 
-fragment WHEN_KEYWORD              :; 
-fragment EXTERNAL_KEYWORD          :; 
-fragment GLOBAL_KEYWORD            :; 
-fragment GROUP_USAGE_KEYWORD       :; 
-fragment IS_KEYWORD                :; 
-fragment ARE_KEYWORD               :; 
-fragment NATIONAL_KEYWORD          :; 
-fragment JUSTIFIED_KEYWORD         :; 
-fragment RIGHT_KEYWORD             :; 
-fragment OCCURS_KEYWORD            :; 
-fragment TIMES_KEYWORD             :; 
-fragment TO_KEYWORD                :; 
-fragment ASCENDING_KEYWORD         :; 
-fragment DESCENDING_KEYWORD        :; 
-fragment KEY_KEYWORD               :; 
-fragment INDEXED_KEYWORD           :; 
-fragment BY_KEYWORD                :; 
-fragment PICTURE_KEYWORD           :; 
-fragment DEPENDING_KEYWORD         :; 
-fragment ON_KEYWORD                :; 
-fragment SIGN_KEYWORD              :; 
-fragment SIGN_LEADING_KEYWORD      :; 
-fragment SIGN_TRAILING_KEYWORD     :; 
-fragment SEPARATE_KEYWORD          :; 
-fragment CHARACTER_KEYWORD         :; 
-fragment SYNCHRONIZED_KEYWORD      :; 
-fragment LEFT_KEYWORD              :; 
-fragment USAGE_KEYWORD             :; 
-fragment SINGLE_FLOAT_KEYWORD      :; 
-fragment DOUBLE_FLOAT_KEYWORD      :; 
-fragment NATIVE_BINARY_KEYWORD     :; 
-fragment PACKED_DECIMAL_KEYWORD    :; 
-fragment BINARY_KEYWORD            :; 
-fragment DISPLAY_1_KEYWORD         :; 
-fragment DISPLAY_KEYWORD           :; 
-fragment INDEX_KEYWORD             :; 
-fragment POINTER_KEYWORD           :; 
-fragment PROCEDURE_POINTER_KEYWORD :; 
-fragment FUNCTION_POINTER_KEYWORD  :; 
-fragment VALUE_KEYWORD             :; 
-fragment DATE_KEYWORD              :; 
-fragment DATE_FORMAT_KEYWORD       :; 
- 
-/*------------------------------------------------------------------
- * Figurative constants
- * ZERO_CONSTANT is also a keyword in BLANK WHEN ZERO
- *------------------------------------------------------------------*/
-fragment ZERO_CONSTANT             :; 
-fragment SPACE_CONSTANT            :; 
-fragment HIGH_VALUE_CONSTANT       :; 
-fragment LOW_VALUE_CONSTANT        :; 
-fragment QUOTE_CONSTANT            :; 
-fragment ALL_CONSTANT              :; 
-fragment NULL_CONSTANT             :; 
