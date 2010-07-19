@@ -12,7 +12,7 @@ package com.legstar.cob2xsd.exe;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
@@ -371,12 +371,11 @@ public class CobolStructureToXsdMain {
      * @throws IOException if version cannot be identified
      */
     protected String getVersion() throws IOException {
-        InputStreamReader stream = null;
+        InputStream stream = null;
         try {
             Properties version = new Properties();
-            stream = new InputStreamReader(
-                    CobolStructureToXsdMain.class.getResourceAsStream(
-                            VERSION_FILE_NAME));
+            stream = CobolStructureToXsdMain.class.getResourceAsStream(
+                            VERSION_FILE_NAME);
             version.load(stream);
             return  version.getProperty("version");
         } finally {
