@@ -500,4 +500,50 @@ public class CobolStructureToXsdSpecialTest extends TestCase {
             fail();
         }
     }
+
+    /**
+     * Test case where a group item has a PICTURE attribute. This gives a COBOL
+     * compilation issue but is often used by users to check the product reactions
+     * so we'd better warn about it.
+     */
+    public void testGroupItemWithPictureClause() {
+        try {
+            Cob2XsdContext context = new Cob2XsdContext();
+            context.setTargetNamespace("http://www.mycompany.com/test");
+            context.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            String xmlSchema = cob2xsd.translate(
+                    "        01  REC-01.\n"
+                    + "            05 REC-TYPE      PIC X(01).\n"
+                    + "                10 FIELD1      PIC X(01).\n"
+                    );
+            assertEquals(
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" + LS
+                    + "<schema xmlns=\"http://www.w3.org/2001/XMLSchema\""
+                    + " xmlns:tns=\"http://www.mycompany.com/test\""
+                    + " elementFormDefault=\"qualified\""
+                    + " targetNamespace=\"http://www.mycompany.com/test\">" + LS
+                    + "    <complexType name=\"Rec01\">" + LS
+                    + "        <sequence>" + LS
+                    + "            <element name=\"recType\">" + LS
+                    + "                <simpleType>" + LS
+                    + "                    <restriction base=\"string\">" + LS
+                    + "                        <maxLength value=\"1\"/>" + LS
+                    + "                    </restriction>" + LS
+                    + "                </simpleType>" + LS
+                    + "            </element>" + LS
+                    + "        </sequence>" + LS
+                    + "    </complexType>" + LS
+                    + "</schema>" + LS
+
+                    ,
+                    xmlSchema);
+        } catch (RecognizerException e) {
+            e.printStackTrace();
+            fail();
+        } catch (XsdGenerationException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 }

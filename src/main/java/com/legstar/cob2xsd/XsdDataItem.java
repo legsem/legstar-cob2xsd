@@ -186,6 +186,13 @@ public class XsdDataItem {
             _xsdType = XsdType.COMPLEX;
             _cobolType = CobolType.GROUP_ITEM;
         }
+        
+        /* A common COBOL mistake that we should warn about.*/
+        if (_xsdType != XsdType.COMPLEX
+                && cobolDataItem.getChildren().size() > 0) {
+            _log.warn("Group item with PICTURE clause will be treated as elementary (children are ignored) "
+                    + cobolDataItem.toString());
+        }
 
         /* Inform object upstream that someone depends on him.*/
         if (getDependingOn() != null && getParent() != null) {
