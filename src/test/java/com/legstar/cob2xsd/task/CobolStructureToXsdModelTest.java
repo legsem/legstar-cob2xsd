@@ -73,6 +73,8 @@ public class CobolStructureToXsdModelTest extends TestCase {
         model.getContext().setJaxbPackageName("test.jaxbPackageName");
         model.getContext().setJaxbTypeClassesSuffix("TestJaxbTypeClassesSuffix");
         
+        model.getContext().setCurrencySign("£");
+        model.getContext().setCurrencySymbol("€");
         model.getContext().setCurrencySymbol("€");
         model.getContext().setNSymbolDbcs(true);
         model.getContext().setDecimalPointIsComma(true);

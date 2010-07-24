@@ -57,6 +57,7 @@
 ## -------------------------------------------------------------------
 ## COBOL compiler related options
 ##
+            currencySign="${antModel.context.currencySign}"
             currencySymbol="${antModel.context.currencySymbol}"
             nSymbolDbcs="${antModel.context.nSymbolDbcs()}"
             decimalPointIsComma="${antModel.context.decimalPointIsComma()}"
