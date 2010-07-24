@@ -184,7 +184,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId> 
                     <artifactId>maven-assembly-plugin</artifactId> 
-                    <version>2.2-beta-3</version> 
+                    <version>2.2-beta-5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId> 
@@ -256,7 +256,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>make-assembly</id>
+                        <id>make-exe</id>
                         <phase>package</phase>
                         <goals>
                             <goal>attached</goal>
@@ -264,13 +264,27 @@
                         <configuration>
                             <descriptors>
                                 <descriptor>assembly-exe.xml</descriptor>
-                                <descriptor>assembly.xml</descriptor>
                             </descriptors>
                             <archive>
                                 <manifest>
                                     <mainClass>com.legstar.cob2xsd.exe.CobolStructureToXsdMain</mainClass>
                                 </manifest>
                             </archive>
+                            <archiverConfig>
+                                <duplicateBehavior>skip</duplicateBehavior>
+                            </archiverConfig>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
                             <archiverConfig>
                                 <duplicateBehavior>skip</duplicateBehavior>
                             </archiverConfig>

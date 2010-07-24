@@ -22,9 +22,6 @@ Assembly descriptor for the executable jar.
      </dependencySets>
     <fileSets>
         <fileSet>
-            <directory>${project.build.outputDirectory}</directory>
-        </fileSet>
-        <fileSet>
             <directory>src/test/resources</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
