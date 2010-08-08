@@ -28,6 +28,7 @@ import com.legstar.antlr.RecognizerException;
 import com.legstar.cob2xsd.Cob2XsdContext;
 import com.legstar.cob2xsd.CobolStructureToXsd;
 import com.legstar.cob2xsd.XsdGenerationException;
+import com.legstar.cob2xsd.Cob2XsdContext.CodeFormat;
 
 /**
  * COBOL structure to XML schema standalone executable.
@@ -149,6 +150,22 @@ public class CobolStructureToXsdMain {
         options.addOption(output);
 
         /* -------------------------------------------------------------------
+         * COBOL source format related options
+         * */
+
+        Option codeFormat = new Option("f", "codeFormat", true,
+        "COBOL code format. Either fixed or free");
+        options.addOption(codeFormat);
+
+        Option startColumn = new Option("l", "startColumn", true,
+        "fixed COBOL code indicator area position (default 7)");
+        options.addOption(startColumn);
+
+        Option endColumn = new Option("r", "endColumn", true,
+        "fixed COBOL code right margin position (default 72)");
+        options.addOption(endColumn);
+
+        /* -------------------------------------------------------------------
          * XML Schema related options
          * */
 
@@ -184,14 +201,6 @@ public class CobolStructureToXsdMain {
         Option addLegStarAnnotations = new Option("a", "addLegStarAnnotations", false,
         "whether we should generate LegStar COBOL/JAXB annotations");
         options.addOption(addLegStarAnnotations);
-
-        Option jaxbPackageName = new Option("p", "jaxbPackageName", true,
-        "the package name for JAXB generated Java classes");
-        options.addOption(jaxbPackageName);
-
-        Option jaxbTypeClassesSuffix = new Option("s", "jaxbTypeClassesSuffix", true,
-        "the JAXB type name prefix (generated JAXB class names will have this suffix)");
-        options.addOption(jaxbTypeClassesSuffix);
 
         /* -------------------------------------------------------------------
          * COBOL compiler related options
@@ -248,6 +257,28 @@ public class CobolStructureToXsdMain {
         }
 
         /* -------------------------------------------------------------------
+         * COBOL source format related options
+         * */
+        if (line.hasOption("codeFormat")) {
+            String codeFormat = line.getOptionValue("codeFormat").trim();
+            if (codeFormat.compareToIgnoreCase("fixed") == 0) {
+                getContext().setCodeFormat(CodeFormat.FIXED_FORMAT);
+            } else if (codeFormat.compareToIgnoreCase("free") == 0) {
+                getContext().setCodeFormat(CodeFormat.FREE_FORMAT);
+            } else {
+                throw new IllegalArgumentException("Unknown code format " + codeFormat);
+            }
+        }
+        if (line.hasOption("startColumn")) {
+            getContext().setStartColumn(
+                    Integer.parseInt(line.getOptionValue("startColumn").trim()));
+        }
+        if (line.hasOption("endColumn")) {
+            getContext().setEndColumn(
+                    Integer.parseInt(line.getOptionValue("endColumn").trim()));
+        }
+
+        /* -------------------------------------------------------------------
          * XML Schema related options
          * */
         if (line.hasOption("xsdEncoding")) {
@@ -276,13 +307,6 @@ public class CobolStructureToXsdMain {
         if (line.hasOption("nameConflictPrependParentName")) {
             getContext().setNameConflictPrependParentName(true);
         }
-        if (line.hasOption("jaxbPackageName")) {
-            getContext().setJaxbPackageName(line.getOptionValue("jaxbPackageName").trim());
-        }
-        if (line.hasOption("jaxbTypeClassesSuffix")) {
-            getContext().setJaxbTypeClassesSuffix(line.getOptionValue("jaxbTypeClassesSuffix").trim());
-        }
-
         /* -------------------------------------------------------------------
          * COBOL compiler related options
          * */

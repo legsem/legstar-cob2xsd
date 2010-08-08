@@ -21,14 +21,17 @@ public class Cob2XsdContext implements Serializable {
     /** serial ID. */
     private static final long serialVersionUID = 3689777932172778788L;
 
+    /** Default column where fixed format COBOL code starts (inclusive, based 1).*/
+    public static final int DEFAULT_START_COLUMN = 7;
+    
+    /** Default column where fixed format COBOL code ends (inclusive, based 1).*/
+    public static final int DEFAULT_END_COLUMN = 72;
+    
     /** The default character set used to encode the XML Schema.*/
     public static final String DEFAULT_XSD_ENCODING = "UTF-8";
 
     /** Default target namespace. */
     public static final String DEFAULT_TARGET_NAMESPACE = "http://www.acme.com/test";
-
-    /** Default JAXB package name. */
-    public static final String DEFAULT_JAXB_PACKAGE_NAME = "com.acme.test";
 
     /** Default Currency sign used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
     public static final String DEFAULT_CURRENCY_SIGN = "$";
@@ -36,6 +39,22 @@ public class Cob2XsdContext implements Serializable {
     /** Default Currency symbol used (CURRENCY PICTURE SYMBOL clause in the SPECIAL-NAMES). */
     public static final String DEFAULT_CURRENCY_SYMBOL = DEFAULT_CURRENCY_SIGN;
 
+
+    /* -------------------------------------------------------------------
+     * COBOL source format related options
+     * */
+    
+    /** Source can be in fixed format (sequence numbers, indicator area, area A, area B) or free format. */
+    public enum CodeFormat {FIXED_FORMAT, FREE_FORMAT};
+    
+    /** Fixed or Free format COBOL source. */
+    public CodeFormat _codeFormat = CodeFormat.FIXED_FORMAT;
+    
+    /** For fixed format COBOL, position of the indicator area.*/
+    public int _startColumn = DEFAULT_START_COLUMN;
+    
+    /** For fixed format COBOL position of the right margin.*/
+    public int _endColumn = DEFAULT_END_COLUMN;
 
     /* -------------------------------------------------------------------
      * XML Schema related options
@@ -70,12 +89,6 @@ public class Cob2XsdContext implements Serializable {
     /** Whether we should generate COBOL/JAXB annotations. */
     private boolean _addLegStarAnnotations = false;
 
-    /** The JAXB package name (appears in schema annotations).*/
-    private String _jaxbPackageName = DEFAULT_JAXB_PACKAGE_NAME;
-
-    /** JAXB appends this suffix to all generated types.*/
-    private String _jaxbTypeClassesSuffix;
-
 
     /* -------------------------------------------------------------------
      * COBOL compiler related options
@@ -96,6 +109,51 @@ public class Cob2XsdContext implements Serializable {
     /** COBOL QUOTE|APOST compiler option. False means APOST.*/
     private boolean _quoteIsQuote = true;
 
+
+    /* -------------------------------------------------------------------
+     * COBOL source format related options
+     * */
+    /**
+     * @return the Fixed or Free format COBOL source
+     */
+    public CodeFormat getCodeFormat() {
+        return _codeFormat;
+    }
+
+    /**
+     * @param cobolFormat the Fixed or Free format COBOL source to set
+     */
+    public void setCodeFormat(CodeFormat cobolFormat) {
+        _codeFormat = cobolFormat;
+    }
+
+    /**
+     * @return the position of the indicator area for fixed format COBOL
+     */
+    public int getStartColumn() {
+        return _startColumn;
+    }
+
+    /**
+     * @param startColumn the position of the indicator area for fixed format COBOL
+     */
+    public void setStartColumn(int startColumn) {
+        _startColumn = startColumn;
+    }
+
+    /**
+     * @return the position of the right margin for fixed format COBOL
+     */
+    public int getEndColumn() {
+        return _endColumn;
+    }
+
+    /**
+     * @param endColumn the position of the right margin for fixed format COBOL
+     */
+    public void setEndColumn(int endColumn) {
+        _endColumn = endColumn;
+    }
 
     /* -------------------------------------------------------------------
      * XML Schema related options
@@ -221,36 +279,6 @@ public class Cob2XsdContext implements Serializable {
         _addLegStarAnnotations = addLegStarAnnotations;
     }
 
-    /**
-     * The package name for JAXB generated Java classes.
-     * @return the package name for JAXB generated Java classes
-     */
-    public String getJaxbPackageName() {
-        return _jaxbPackageName;
-    }
-
-    /**
-     * @param jaxbPackageName the JAXB package name for generated Java classes
-     */
-    public void setJaxbPackageName(final String jaxbPackageName) {
-        _jaxbPackageName = jaxbPackageName;
-    }
-
-    /**
-     * The JAXB type name prefix (generated JAXB class names will have this suffix).
-     * @return the JAXB type name prefix (generated JAXB class names will have this suffix)
-     */
-    public String getJaxbTypeClassesSuffix() {
-        return _jaxbTypeClassesSuffix;
-    }
-
-    /**
-     * @param jaxbTypeClassesSuffix the JAXB type name prefix (generated JAXB class names will have this suffix)
-     */
-    public void setJaxbTypeClassesSuffix(final String jaxbTypeClassesSuffix) {
-        _jaxbTypeClassesSuffix = jaxbTypeClassesSuffix;
-    }
-
     /* -------------------------------------------------------------------
      * COBOL compiler related options
      * */
@@ -341,6 +369,9 @@ public class Cob2XsdContext implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
+        sb.append("sourceFormat: " + getCodeFormat() + ", ");
+        sb.append("startColumn: " + getStartColumn() + ", ");
+        sb.append("endColumn: " + getEndColumn() + ", ");
         sb.append("xsdEncoding: " + getXsdEncoding() + ", ");
         sb.append("targetNamespace: " + getTargetNamespace() + ", ");
         sb.append("mapConditionsToFacets: " + mapConditionsToFacets() + ", ");
@@ -348,8 +379,6 @@ public class Cob2XsdContext implements Serializable {
         sb.append("elementNamesStartWithUppercase: " + elementNamesStartWithUppercase() + ", ");
         sb.append("customXslt: " + getCustomXsltFileName() + ", ");
         sb.append("addLegStarAnnotations: " + addLegStarAnnotations() + ", ");
-        sb.append("jaxbPackageName: " + getJaxbPackageName() + ", ");
-        sb.append("jaxbTypeClassesSuffix: " + getJaxbTypeClassesSuffix() + ", ");
         sb.append("currencySign: " + getCurrencySign() + ", ");
         sb.append("currencySymbol: " + getCurrencySymbol() + ", ");
         sb.append("decimalPointIsComma: " + decimalPointIsComma() + ", ");

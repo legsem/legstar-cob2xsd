@@ -36,8 +36,6 @@
             elementNamesStartWithUppercase="true"
 
             addLegStarAnnotations="true"
-            jaxbPackageName="test.jaxbPackageName"
-            jaxbTypeClassesSuffix="TestJaxbTypeClassesSuffix"
 
             currencySign="£"
             currencySymbol="€"

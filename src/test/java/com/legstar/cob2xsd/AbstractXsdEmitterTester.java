@@ -86,7 +86,6 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
         Cob2XsdContext context = new Cob2XsdContext();
         if (withLegStarAnnotations) {
             context.setAddLegStarAnnotations(true);
-            context.setJaxbPackageName("com.legstar.test");
         }
         context.setMapConditionsToFacets(mapConditionsToFacets);
         XmlSchema xsd = getXmlSchema();

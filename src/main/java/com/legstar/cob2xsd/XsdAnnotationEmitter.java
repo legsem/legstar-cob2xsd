@@ -33,7 +33,6 @@ import org.apache.ws.commons.schema.utils.NamespacePrefixList;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import com.legstar.cobol.utils.ValueUtil;
 import com.legstar.coxb.CobolMarkup;
@@ -123,7 +122,6 @@ public class XsdAnnotationEmitter {
     protected void addSchemaData() {
         addNamespaceContext();
         addMetaInfo();
-        addSchemaAnnotations();
     }
 
     /**
@@ -270,51 +268,6 @@ public class XsdAnnotationEmitter {
     }
 
     /**
-     * The generated schema holds JAXB annotations needed when, later on, the
-     * schema is used to generate JAXB classes. The markup looks like this:
-     * <pre>
-     * &lt;xsd:appinfo>
-     *    &lt;jaxb:schemaBindings>
-     *       &lt;jaxb:package name="com.legstar.test.coxb.schema"/>
-     *       &lt;jaxb:nameXmlTransform>
-     *          &lt;jaxb:typeName suffix="Type" />
-     *        &lt;/jaxb:nameXmlTransform>
-     *    &lt;/jaxb:schemaBindings>
-     * &lt;/xsd:appinfo>
-     * </pre>
-     */
-    protected void addSchemaAnnotations() {
-
-        Document doc = _docBuilder.newDocument();
-        Element el = doc.createElementNS(getJAXBNamespace(), getJAXBElementsElement());
-        Element elsb = doc.createElementNS(getJAXBNamespace(), getJAXBSchemaBindingsElement());
-        
-        if (getContext().getJaxbPackageName() != null
-                && getContext().getJaxbPackageName().length() > 0) {
-            Element elpk = doc.createElementNS(getJAXBNamespace(), getJAXBPackageElement());
-            elpk.setAttribute(getJAXBPackageNameAttribute(), getContext().getJaxbPackageName());
-            elsb.appendChild(elpk);
-        }
-
-        if (getContext().getJaxbTypeClassesSuffix() != null
-                && getContext().getJaxbTypeClassesSuffix().length() > 0) {
-            Element eltr = doc.createElementNS(getJAXBNamespace(), getJAXBNameXmlTransformElement());
-            Element eltn = doc.createElementNS(getJAXBNamespace(), getJAXBTypeNameElement());
-            eltn.setAttribute(getJAXBTypeNameSuffixAttribute(), getContext().getJaxbTypeClassesSuffix());
-            eltr.appendChild(eltn);
-            elsb.appendChild(eltr);
-        }
-
-        el.appendChild(elsb);
-        XmlSchemaAnnotation annotation = new XmlSchemaAnnotation();
-        XmlSchemaAppInfo appInfo = new XmlSchemaAppInfo();
-        NodeList markup = el.getChildNodes();
-        appInfo.setMarkup(markup);
-        annotation.getItems().add(appInfo);
-        getXsd().setAnnotation(annotation);
-    }
-
-    /**
      * @return the JAXB namespace
      */
     public String getJAXBNamespace() {
@@ -355,46 +308,6 @@ public class XsdAnnotationEmitter {
     public String getJAXBElementsElement() {
         return getJAXBNamespacePrefix() + ':'
         + _annotations.getProperty("jaxb-elements");
-    }
-    /**
-     * @return the qualified JAXB schema bindings element
-     */
-    public String getJAXBSchemaBindingsElement() {
-        return getJAXBNamespacePrefix() + ':'
-        + _annotations.getProperty("jaxb-schema-bindings");
-    }
-    /**
-     * @return the qualified JAXB package element
-     */
-    public String getJAXBPackageElement() {
-        return getJAXBNamespacePrefix() + ':'
-        + _annotations.getProperty("jaxb-package");
-    }
-    /**
-     * @return the JAXB package name attribute
-     */
-    public String getJAXBPackageNameAttribute() {
-        return _annotations.getProperty("jaxb-package-name-attr");
-    }
-    /**
-     * @return the qualified JAXB name XML transform element
-     */
-    public String getJAXBNameXmlTransformElement() {
-        return getJAXBNamespacePrefix() + ':'
-        + _annotations.getProperty("jaxb-name-xml-transform");
-    }
-    /**
-     * @return the qualified JAXB type name element
-     */
-    public String getJAXBTypeNameElement() {
-        return getJAXBNamespacePrefix() + ':'
-        + _annotations.getProperty("jaxb-type-name");
-    }
-    /**
-     * @return the JAXB type name suffix attribute
-     */
-    public String getJAXBTypeNameSuffixAttribute() {
-        return _annotations.getProperty("jaxb-type-name-suffix-attr");
     }
     /**
      * @return the COXB namespace

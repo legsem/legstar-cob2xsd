@@ -25,68 +25,6 @@ import com.legstar.cobol.model.CobolDataItem.Usage;
 public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
 
     /**
-     * Schema level annotations happen at instantiation time.
-     * Check that we load the annotations properly.
-     */
-    public void testInstantiation() {
-        Cob2XsdContext context = new Cob2XsdContext();
-        context.setJaxbPackageName("jaxb.package.name");
-        XmlSchema xsd = getXmlSchema();
-        new XsdAnnotationEmitter(xsd, context);
-        check(
-                "<annotation>"
-                + "<appinfo>"
-                + "<jaxb:schemaBindings>"
-                + "<jaxb:package name=\"jaxb.package.name\"/>"
-                + "</jaxb:schemaBindings>"
-                + "</appinfo>"
-                + "</annotation>"
-                , xsd, true);
-    }
-
-    /**
-     * Test with a JAXB type suffix parameter.
-     */
-    public void testInstantiationWithTypeSuffix() {
-        Cob2XsdContext context = new Cob2XsdContext();
-        context.setJaxbPackageName("jaxb.package.name");
-        context.setJaxbTypeClassesSuffix("Type");
-        XmlSchema xsd = getXmlSchema();
-        new XsdAnnotationEmitter(xsd, context);
-        check(
-                "<annotation>"
-                + "<appinfo>"
-                + "<jaxb:schemaBindings>"
-                + "<jaxb:package name=\"jaxb.package.name\"/>"
-                + "<jaxb:nameXmlTransform>"
-                + "<jaxb:typeName suffix=\"Type\"/>"
-                + "</jaxb:nameXmlTransform>"
-                + "</jaxb:schemaBindings>"
-                + "</appinfo>"
-                + "</annotation>"
-                , xsd, true);
-    }
-
-    /**
-     * Test with an empty JAXB type suffix parameter.
-     */
-    public void testInstantiationWithEmptyTypeSuffix() {
-        Cob2XsdContext context = new Cob2XsdContext();
-        context.setJaxbPackageName("jaxb.package.name");
-        context.setJaxbTypeClassesSuffix("");
-        XmlSchema xsd = getXmlSchema();
-        new XsdAnnotationEmitter(xsd, context);
-        check(
-                "<annotation>"
-                + "<appinfo>"
-                + "<jaxb:schemaBindings>"
-                + "<jaxb:package name=\"jaxb.package.name\"/>"
-                + "</jaxb:schemaBindings>"
-                + "</appinfo>"
-                + "</annotation>"
-                , xsd, true);
-    }
-    /**
      * Test a group item.
      */
     public void testGroupItem() {
@@ -455,7 +393,6 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
     private void emitAnnotationAndCheck(final CobolDataItem dataItem, final String expected) {
         Cob2XsdContext context = new Cob2XsdContext();
         context.setAddLegStarAnnotations(true);
-        context.setJaxbPackageName("jaxb.package.name");
         XmlSchema xsd = getXmlSchema();
         XsdAnnotationEmitter emitter = new XsdAnnotationEmitter(xsd, context);
         XsdDataItem xsdDataItem = new XsdDataItem(

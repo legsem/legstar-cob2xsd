@@ -83,7 +83,6 @@ public class CobolStructureToXsdTest extends XMLTestCase {
                     context.setCustomXsltFileName(null);
                 }
                 context.setAddLegStarAnnotations(true);
-                context.setJaxbPackageName("com.legstar.test.coxb." + name);
                 context.setTargetNamespace("http://legstar.com/test/coxb/" + name);
                 
                 /* Backward compatibility */

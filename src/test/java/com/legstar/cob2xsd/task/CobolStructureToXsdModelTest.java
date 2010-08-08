@@ -70,8 +70,6 @@ public class CobolStructureToXsdModelTest extends TestCase {
         model.getContext().setElementNamesStartWithUppercase(true);
         
         model.getContext().setAddLegStarAnnotations(true);
-        model.getContext().setJaxbPackageName("test.jaxbPackageName");
-        model.getContext().setJaxbTypeClassesSuffix("TestJaxbTypeClassesSuffix");
         
         model.getContext().setCurrencySign("£");
         model.getContext().setCurrencySymbol("€");

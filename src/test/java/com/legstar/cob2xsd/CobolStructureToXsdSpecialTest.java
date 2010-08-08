@@ -189,13 +189,6 @@ public class CobolStructureToXsdSpecialTest extends TestCase {
                     + " jaxb:extensionBindingPrefixes=\"cb\""
                     + " jaxb:version=\"2.0\""
                     + " targetNamespace=\"http://www.mycompany.com/test\">" + LS
-                    + "    <annotation>" + LS
-                    + "        <appinfo>" + LS
-                    + "            <jaxb:schemaBindings>" + LS
-                    + "                <jaxb:package name=\"com.acme.test\"/>" + LS
-                    + "            </jaxb:schemaBindings>" + LS
-                    + "        </appinfo>" + LS
-                    + "    </annotation>" + LS
                     + "    <complexType name=\"A\">" + LS
                     + "        <sequence>" + LS
                     + "            <element name=\"sBinary\">" + LS

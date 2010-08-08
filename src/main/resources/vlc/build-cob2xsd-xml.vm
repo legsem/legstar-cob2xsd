@@ -49,10 +49,6 @@
 ## LegStar annotations related options
 ##
             addLegStarAnnotations="${antModel.context.addLegStarAnnotations()}"
-            jaxbPackageName="${antModel.context.jaxbPackageName}"
-#if(${antModel.context.jaxbTypeClassesSuffix})
-            jaxbTypeClassesSuffix="${antModel.context.jaxbTypeClassesSuffix}"
-#end
 
 ## -------------------------------------------------------------------
 ## COBOL compiler related options

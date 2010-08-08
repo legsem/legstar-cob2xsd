@@ -3,13 +3,14 @@
     <groupId>com.legsem.legstar</groupId>
     <artifactId>legstar-cob2xsd</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
     <name>LegStar COBOL to XML schema translator</name>
     <description>legstar-cob2xsd is a COBOL structure to XML Schema translator</description>
     <url>http://code.google.com/p/legstar-cob2xsd</url>
     <properties>
         <legstarVersion>1.2.6</legstarVersion>
         <antlrVersion>3.2</antlrVersion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <issueManagement>
@@ -166,19 +167,6 @@
     </dependencies>
 
     <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ftp</artifactId>
-                <version>1.0-beta-2</version>
-            </extension>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-webdav</artifactId>
-                <version>1.0-beta-2</version>
-            </extension>
-        </extensions>
-
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -194,36 +182,26 @@
             </plugins>
         </pluginManagement>
 
+         <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ftp</artifactId>
+                <version>1.0-beta-2</version>
+            </extension>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav</artifactId>
+                <version>1.0-beta-2</version>
+            </extension>
+        </extensions>
+ 
         <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId> 
-                <artifactId>maven-release-plugin</artifactId> 
-                <version>2.0-beta-9</version> 
-                <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <inherited>true</inherited>
-                <executions>
-                    <execution>
-                        <id>project-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
@@ -248,57 +226,14 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId> 
+                <artifactId>maven-source-plugin</artifactId>
+                <inherited>true</inherited>
                 <executions>
                     <execution>
-                        <id>make-full-assembly</id>
-                        <phase>package</phase>
+                        <id>project-sources</id>
                         <goals>
-                            <goal>attached</goal>
+                            <goal>jar</goal>
                         </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>assembly-full.xml</descriptor>
-                            </descriptors>
-                            <archiverConfig>
-                                <duplicateBehavior>skip</duplicateBehavior>
-                            </archiverConfig>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>make-exe</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>assembly-exe.xml</descriptor>
-                            </descriptors>
-                            <archive>
-                                <manifest>
-                                    <mainClass>com.legstar.cob2xsd.exe.CobolStructureToXsdMain</mainClass>
-                                </manifest>
-                            </archive>
-                            <archiverConfig>
-                                <duplicateBehavior>skip</duplicateBehavior>
-                            </archiverConfig>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>assembly.xml</descriptor>
-                            </descriptors>
-                            <archiverConfig>
-                                <duplicateBehavior>skip</duplicateBehavior>
-                            </archiverConfig>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -364,6 +299,15 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId> 
+                <artifactId>maven-release-plugin</artifactId> 
+                <version>2.0-beta-9</version> 
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
@@ -384,8 +328,64 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
-    </build>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId> 
+                <executions>
+                    <execution>
+                        <id>make-full-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly-full.xml</descriptor>
+                            </descriptors>
+                            <archiverConfig>
+                                <duplicateBehavior>skip</duplicateBehavior>
+                            </archiverConfig>
+                        </configuration>
+                    </execution>
+                   <execution>
+                        <id>make-exe</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly-exe.xml</descriptor>
+                            </descriptors>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.legstar.cob2xsd.exe.CobolStructureToXsdMain</mainClass>
+                                </manifest>
+                            </archive>
+                            <archiverConfig>
+                                <duplicateBehavior>skip</duplicateBehavior>
+                            </archiverConfig>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                            <archiverConfig>
+                                <duplicateBehavior>skip</duplicateBehavior>
+                            </archiverConfig>
+                        </configuration>
+                    </execution>
+                 </executions>
+            </plugin>
+         </plugins>
+   </build>
 
     <reporting>
         <plugins>

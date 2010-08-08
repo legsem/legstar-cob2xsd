@@ -320,13 +320,6 @@ public class XsdEmitterTest extends AbstractXsdEmitterTester {
         struct.getChildren().add(getACobolElementaryItem("A-STRING", "X(5)", Usage.DISPLAY));
         emitAndCheck(
                 ""
-                + "<annotation>"
-                + "<appinfo>"
-                + "<jaxb:schemaBindings>"
-                + "<jaxb:package name=\"com.legstar.test\"/>"
-                + "</jaxb:schemaBindings>"
-                + "</appinfo>"
-                + "</annotation>"
                 + "<complexType name=\"Filler0\">"
                 + "<sequence>"
                 + "<element name=\"aString\">"

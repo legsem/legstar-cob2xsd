@@ -26,6 +26,7 @@ import com.legstar.antlr.RecognizerException;
 import com.legstar.cob2xsd.Cob2XsdContext;
 import com.legstar.cob2xsd.CobolStructureToXsd;
 import com.legstar.cob2xsd.XsdGenerationException;
+import com.legstar.cob2xsd.Cob2XsdContext.CodeFormat;
 
 
 /**
@@ -150,6 +151,51 @@ public class CobolStructureToXsdTask extends Task {
     }
 
     /* -------------------------------------------------------------------
+     * COBOL source format related options
+     * */
+    /**
+     * @return the Fixed or Free format COBOL source
+     */
+    public CodeFormat getCodeFormat() {
+        return getContext().getCodeFormat();
+    }
+
+    /**
+     * @param cobolFormat the Fixed or Free format COBOL source to set
+     */
+    public void setCodeFormat(CodeFormat cobolFormat) {
+        getContext().setCodeFormat(cobolFormat);
+    }
+
+    /**
+     * @return the position of the indicator area for fixed format COBOL
+     */
+    public int getStartColumn() {
+        return getContext().getStartColumn();
+    }
+
+    /**
+     * @param startColumn the position of the indicator area for fixed format COBOL
+     */
+    public void setStartColumn(int startColumn) {
+        getContext().setStartColumn(startColumn);
+    }
+
+    /**
+     * @return the position of the right margin for fixed format COBOL
+     */
+    public int getEndColumn() {
+        return getContext().getEndColumn();
+    }
+
+    /**
+     * @param endColumn the position of the right margin for fixed format COBOL
+     */
+    public void setEndColumn(int endColumn) {
+        getContext().setEndColumn(endColumn);
+    }
+
+    /* -------------------------------------------------------------------
      * XML Schema related options
      * */
 
@@ -260,34 +306,6 @@ public class CobolStructureToXsdTask extends Task {
      */
     public void setAddLegStarAnnotations(final boolean addLegStarAnnotations) {
         getContext().setAddLegStarAnnotations(addLegStarAnnotations);
-    }
-
-    /**
-     * @return the JAXB package name for generated Java classes
-     */
-    public String getJaxbPackageName() {
-        return getContext().getJaxbPackageName();
-    }
-
-    /**
-     * @return the JAXB type name prefix (generated JAXB class names will have this suffix)
-     */
-    public String getJaxbTypeClassesSuffix() {
-        return getContext().getJaxbTypeClassesSuffix();
-    }
-
-    /**
-     * @param jaxbPackageName the JAXB package name for generated Java classes
-     */
-    public void setJaxbPackageName(final String jaxbPackageName) {
-        getContext().setJaxbPackageName(jaxbPackageName);
-    }
-
-    /**
-     * @param jaxbTypeClassesSuffix the JAXB type name prefix (generated JAXB class names will have this suffix)
-     */
-    public void setJaxbTypeClassesSuffix(final String jaxbTypeClassesSuffix) {
-        getContext().setJaxbTypeClassesSuffix(jaxbTypeClassesSuffix);
     }
 
     /* -------------------------------------------------------------------

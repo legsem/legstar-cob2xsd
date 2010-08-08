@@ -12,6 +12,8 @@ package com.legstar.cob2xsd.exe;
 
 import org.apache.commons.cli.Options;
 
+import com.legstar.cob2xsd.Cob2XsdContext.CodeFormat;
+
 import junit.framework.TestCase;
 
 /**
@@ -225,21 +227,6 @@ public class CobolStructureToXsdMainTest extends TestCase {
     }
 
     /**
-     * Test with jaxbPackageName argument.
-     */
-    public void testJaxbPackageNameArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals("com.acme.test", main.getContext().getJaxbPackageName());
-            assertTrue(main.collectOptions(options, new String[] {"-p my.pack.age"}));
-            assertEquals("my.pack.age", main.getContext().getJaxbPackageName());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
      * Test with quoteIsApost argument.
      */
     public void testQuoteIsApostArgument() {
@@ -249,21 +236,6 @@ public class CobolStructureToXsdMainTest extends TestCase {
             assertEquals(true, main.getContext().quoteIsQuote());
             assertTrue(main.collectOptions(options, new String[] {"-q"}));
             assertEquals(false, main.getContext().quoteIsQuote());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with jaxbTypeClassesSuffix argument.
-     */
-    public void testJaxbTypeClassesSuffixArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals(null, main.getContext().getJaxbTypeClassesSuffix());
-            assertTrue(main.collectOptions(options, new String[] {"-s Type"}));
-            assertEquals("Type", main.getContext().getJaxbTypeClassesSuffix());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -309,6 +281,26 @@ public class CobolStructureToXsdMainTest extends TestCase {
             assertEquals(null, main.getContext().getCustomXsltFileName());
             assertTrue(main.collectOptions(options, new String[] {"-x src/main/resources/xslt/custom.xsl"}));
             assertEquals("src/main/resources/xslt/custom.xsl", main.getContext().getCustomXsltFileName());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Test with code format arguments.
+     */
+    public void testCodeFormatArgument() {
+        try {
+            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
+            Options options = main.createOptions();
+            assertEquals(CodeFormat.FIXED_FORMAT, main.getContext().getCodeFormat());
+            assertTrue(main.collectOptions(options, new String[] {"-f free"}));
+            assertEquals(CodeFormat.FREE_FORMAT.toString(), main.getContext().getCodeFormat().toString());
+            assertEquals(7, main.getContext().getStartColumn());
+            assertEquals(72, main.getContext().getEndColumn());
+            assertTrue(main.collectOptions(options, new String[] {"-l 1", "-r 66"}));
+            assertEquals(1, main.getContext().getStartColumn());
+            assertEquals(66, main.getContext().getEndColumn());
         } catch (Exception e) {
             fail(e.getMessage());
         }
