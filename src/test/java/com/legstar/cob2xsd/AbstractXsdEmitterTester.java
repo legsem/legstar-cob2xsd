@@ -26,6 +26,7 @@ import org.custommonkey.xmlunit.XMLTestCase;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import com.legstar.cobol.RecognizerErrorHandler;
 import com.legstar.cobol.model.CobolDataItem;
 
 /**
@@ -36,6 +37,9 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
 
     /** DOM document factory. */
     private DocumentBuilder _docBuilder;
+
+    /** Handles error messages.*/
+    private RecognizerErrorHandler _errorHandler = new RecognizerErrorHandler();
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
@@ -90,7 +94,7 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
         context.setMapConditionsToFacets(mapConditionsToFacets);
         XmlSchema xsd = getXmlSchema();
         XsdEmitter emitter = new XsdEmitter(xsd, context);
-        XsdDataItem xsdDataItem = new XsdDataItem(dataItem, context, null, new ArrayList < String >());
+        XsdDataItem xsdDataItem = new XsdDataItem(dataItem, context, null, new ArrayList < String >(), _errorHandler);
         emitter.createXmlSchemaType(xsdDataItem);
         check(expected, xsd, withLegStarAnnotations);
     }

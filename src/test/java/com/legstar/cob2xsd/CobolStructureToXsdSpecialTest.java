@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 import com.legstar.antlr.RecognizerException;
+import com.legstar.cob2xsd.Cob2XsdContext.CodeFormat;
 
 import junit.framework.TestCase;
 
@@ -529,6 +530,65 @@ public class CobolStructureToXsdSpecialTest extends TestCase {
                     + "    </complexType>" + LS
                     + "</schema>" + LS
 
+                    ,
+                    xmlSchema);
+        } catch (RecognizerException e) {
+            e.printStackTrace();
+            fail();
+        } catch (XsdGenerationException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    /**
+     * Test a COBOL source that is not fixed.
+     */
+    public void testFreeFormat() {
+        try {
+            Cob2XsdContext context = new Cob2XsdContext();
+            context.setCodeFormat(CodeFormat.FREE_FORMAT);
+            context.setTargetNamespace("http://www.mycompany.com/test");
+            context.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            String xmlSchema = cob2xsd.translate(
+                    "*\n"
+                    + "01  WS71-HEADER.\n"
+                    + "      05  WS71-HEADER-ID        PIC X(4)  VALUE '$HD$'.\n"
+                    + "*    05  WS71-TRANS-DESC       PIC X(43) VALUE SPACES.\n"
+                    + "      05  WS73-INVOICE-NO.\n"
+                    + "*234567890123456789012345678901234567890123456789012345678901234567890123456789\n"
+                    + "                                           07  WS73-INVOICE-PREF     PIC X(4).\n"
+                    );
+            assertEquals(
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" + LS
+                    + "<schema xmlns=\"http://www.w3.org/2001/XMLSchema\""
+                    + " xmlns:tns=\"http://www.mycompany.com/test\""
+                    + " elementFormDefault=\"qualified\""
+                    + " targetNamespace=\"http://www.mycompany.com/test\">" + LS
+                    + "    <complexType name=\"Ws71Header\">" + LS
+                    + "        <sequence>" + LS
+                    + "            <element name=\"ws71HeaderId\">" + LS
+                    + "                <simpleType>" + LS
+                    + "                    <restriction base=\"string\">" + LS
+                    + "                        <maxLength value=\"4\"/>" + LS
+                    + "                    </restriction>" + LS
+                    + "                </simpleType>" + LS
+                    + "            </element>" + LS
+                    + "            <element name=\"ws73InvoiceNo\" type=\"tns:Ws73InvoiceNo\"/>" + LS
+                    + "        </sequence>" + LS
+                    + "    </complexType>" + LS
+                    + "    <complexType name=\"Ws73InvoiceNo\">" + LS
+                    + "        <sequence>" + LS
+                    + "            <element name=\"ws73InvoicePref\">" + LS
+                    + "                <simpleType>" + LS
+                    + "                    <restriction base=\"string\">" + LS
+                    + "                        <maxLength value=\"4\"/>" + LS
+                    + "                    </restriction>" + LS
+                    + "                </simpleType>" + LS
+                    + "            </element>" + LS
+                    + "        </sequence>" + LS
+                    + "    </complexType>" + LS
+                    + "</schema>" + LS
                     ,
                     xmlSchema);
         } catch (RecognizerException e) {

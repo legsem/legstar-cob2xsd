@@ -17,6 +17,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.legstar.cobol.RecognizerErrorHandler;
 import com.legstar.cobol.model.CobolDataItem;
 import com.legstar.cobol.model.CobolDataItem.DataEntryType;
 import com.legstar.cobol.model.CobolDataItem.Range;
@@ -108,6 +109,9 @@ public class XsdDataItem {
     /** A prefix to use when a COBOL name starts with an illegal XML character. */
     public static final String SAFE_NAME_PREFIX = "C";
 
+    /** Handles error messages.*/
+    private RecognizerErrorHandler _errorHandler;
+
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
 
@@ -124,8 +128,10 @@ public class XsdDataItem {
             final CobolDataItem cobolDataItem,
             final Cob2XsdContext context,
             final XsdDataItem parent,
-            final List < String > nonUniqueCobolNames) {
+            final List < String > nonUniqueCobolNames,
+            RecognizerErrorHandler errorHandler) {
 
+        _errorHandler = errorHandler;
         _cobolDataItem = cobolDataItem;
         _parent = parent;
         _xsdElementName = formatElementName(cobolDataItem, context);
@@ -138,18 +144,18 @@ public class XsdDataItem {
             break;
         case RENAMES:
             /* COBOL renames don't map to an XSD type. */
-            _log.warn("Unhandled data entry type " + cobolDataItem.toString());
+            addMessageToHistory("Unhandled data entry type " + cobolDataItem.toString(), "warn");
             break;
         case CONDITION:
             /* Will map to an enumeration facet. */
             _xsdType = XsdType.ENUM;
             if (context.mapConditionsToFacets() && getConditionRanges().size() > 1) {
-                _log.warn("Condition with multiple ranges cannot be mapped to enumeration facet "
-                        + cobolDataItem.toString());
+                addMessageToHistory("Condition with multiple ranges cannot be mapped to enumeration facet "
+                        + cobolDataItem.toString(), "warn");
             }
             break;
         default:
-            _log.error("Unrecognized data entry type " + cobolDataItem.toString());
+            addMessageToHistory("Unrecognized data entry type " + cobolDataItem.toString(), "error");
         }
 
 
@@ -192,9 +198,9 @@ public class XsdDataItem {
                 && cobolDataItem.getChildren().size() > 0) {
             for (CobolDataItem child : cobolDataItem.getChildren()) {
                 if (child.getDataEntryType() == DataEntryType.DATA_DESCRIPTION) {
-                    _log.warn("Group item with PICTURE clause will be treated as elementary (children are ignored) "
-                                    + cobolDataItem.toString());
-                }
+                    addMessageToHistory("Group item with PICTURE clause will be treated as elementary (children are ignored) "
+                            + cobolDataItem.toString(), "warn");
+             }
             }
         }
 
@@ -210,7 +216,8 @@ public class XsdDataItem {
 
         /* Create the list of children by decorating the COBOL item children. */
         for (CobolDataItem child : cobolDataItem.getChildren()) {
-            XsdDataItem xsdChild = new XsdDataItem(child, context, this, nonUniqueCobolNames);
+            XsdDataItem xsdChild = new XsdDataItem(child, context, this,
+                    nonUniqueCobolNames, _errorHandler);
             _children.add(xsdChild);
         }
 
@@ -1044,6 +1051,21 @@ public class XsdDataItem {
         default:
             return false;
         }
+    }
+    
+    /**
+     * @param msg the last error message recorded
+     * @param a simple level to trace the error
+     */
+    private void addMessageToHistory(final String msg, final String level ) {
+        if (level.equalsIgnoreCase("warn")) {
+            _log.warn(msg);
+        } else if (level.equalsIgnoreCase("error")) {
+            _log.error(msg);
+        } else {
+            _log.info(msg);
+        }
+        _errorHandler.addMessageToHistory(msg);
     }
 
     /** {@inheritDoc}*/

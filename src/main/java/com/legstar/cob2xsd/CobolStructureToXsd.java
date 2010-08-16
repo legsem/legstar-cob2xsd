@@ -343,8 +343,8 @@ public class CobolStructureToXsd {
         XsdEmitter emitter = new XsdEmitter(xsd, getContext());
         for (CobolDataItem cobolDataItem : cobolDataItems) {
             if (cobolDataItem.getChildren().size() > 0) {
-                XsdDataItem xsdDataItem = new XsdDataItem(
-                        cobolDataItem, getContext(), null, nonUniqueCobolNames);
+                XsdDataItem xsdDataItem = new XsdDataItem(cobolDataItem,
+                        getContext(), null, nonUniqueCobolNames, _errorHandler);
                 emitter.createXmlSchemaType(xsdDataItem);
             }
         }

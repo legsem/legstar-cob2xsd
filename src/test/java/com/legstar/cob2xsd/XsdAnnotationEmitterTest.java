@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotation;
 
+import com.legstar.cobol.RecognizerErrorHandler;
 import com.legstar.cobol.model.CobolDataItem;
 import com.legstar.cobol.model.CobolDataItem.Usage;
 
@@ -23,6 +24,9 @@ import com.legstar.cobol.model.CobolDataItem.Usage;
  *
  */
 public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
+
+    /** Handles error messages.*/
+    private RecognizerErrorHandler _errorHandler = new RecognizerErrorHandler();
 
     /**
      * Test a group item.
@@ -396,7 +400,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         XmlSchema xsd = getXmlSchema();
         XsdAnnotationEmitter emitter = new XsdAnnotationEmitter(xsd, context);
         XsdDataItem xsdDataItem = new XsdDataItem(
-                dataItem, context, null, new ArrayList < String >());
+                dataItem, context, null, new ArrayList < String >(),_errorHandler);
         XmlSchemaAnnotation annotation = emitter.createLegStarAnnotation(xsdDataItem);
         xsd.setAnnotation(annotation);
         check(
