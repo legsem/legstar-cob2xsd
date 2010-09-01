@@ -12,12 +12,9 @@ package com.legstar.cob2xsd;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,10 +24,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotation;
 import org.apache.ws.commons.schema.XmlSchemaAppInfo;
-import org.apache.ws.commons.schema.constants.Constants;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 import org.apache.ws.commons.schema.utils.NamespacePrefixList;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -42,13 +37,7 @@ import com.legstar.coxb.CobolType;
  * This class is used to generate LegStar annotations to be included
  * in an XML schema.
  * <p/>
- * There are 2 levels of annotations:
- * <ul>
- * <li>At the schema level. It is mainly the JAXB package name for generated classes</li>
- * <li>At the element level. These are the COBOL annotations per se.</li>
- * </ul>
- * There are 2 XML namespaces involved, JAXB and LegStar. LegStar being a JAXB plugin,
- * it is important that both be present.
+ * The COBOL annotations are at the element level and belong to the LegStar namespace.
  * <p/>
  * We expect elementFormDefault="qualified" and attributeFormDefault="unqualified"
  */
@@ -101,7 +90,7 @@ public class XsdAnnotationEmitter {
                 DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
                 docFac.setNamespaceAware(true);
                 _docBuilder = docFac.newDocumentBuilder();
-                addSchemaData();
+                addNamespaceContext();
                 _initialized = true;
             }
         } catch (IOException e) {
@@ -109,19 +98,6 @@ public class XsdAnnotationEmitter {
         } catch (ParserConfigurationException e) {
             _log.error("Unable to get DOM document builder ", e);
         }
-    }
-
-    /**
-     * Adds schema level LegStar and JAXB markup.
-     * <ul>
-     * <li>Adds the JAXB and COXB namespaces to the target schema</li>
-     * <li>Adds JAXB extension attributes to the target schema</li>
-     * <li>Adds JAXB annotations to the target schema</li>
-     * </ul>
-     */
-    protected void addSchemaData() {
-        addNamespaceContext();
-        addMetaInfo();
     }
 
     /**
@@ -226,8 +202,7 @@ public class XsdAnnotationEmitter {
     }
 
     /**
-     * Adds the JAXB and COXB namespaces and associated prefixes to the
-     * XML schema.
+     * Adds the COXB namespace and associated prefixes to the XML schema.
      */
     protected void addNamespaceContext() {
         NamespaceMap prefixmap = new NamespaceMap();
@@ -242,73 +217,10 @@ public class XsdAnnotationEmitter {
             }
         }
         prefixmap.add(getCOXBNamespacePrefix(), getCOXBNamespace());
-        prefixmap.add(getJAXBNamespacePrefix(), getJAXBNamespace());
         getXsd().setNamespaceContext(prefixmap);
 
     }
 
-    /**
-     * JAXB requires that certain attribute are added directly to the schema. The
-     * Apache XmlSchema metaInfo allow to do so.
-     */
-    protected void addMetaInfo() {
-        Document doc = _docBuilder.newDocument();
-        Map < QName, Attr > extensionMap = new HashMap < QName, Attr >();
-        Attr attrib = doc.createAttributeNS(getJAXBNamespace(), getJAXBVersionAttribute());
-        attrib.setValue(getJAXBVersionValue());
-        extensionMap.put(new QName(getJAXBNamespace(), getJAXBVersionAttribute()), attrib);
-
-        attrib = doc.createAttributeNS(getJAXBNamespace(), getJAXBExtensionBindingPrefixesAttribute());
-        attrib.setValue(getCOXBNamespacePrefix());
-        extensionMap.put(
-                new QName(getJAXBNamespace(), getJAXBExtensionBindingPrefixesAttribute()), attrib);
-
-        getXsd().addMetaInfo(
-                Constants.MetaDataConstants.EXTERNAL_ATTRIBUTES, extensionMap);
-    }
-
-    /**
-     * @return the JAXB namespace
-     */
-    public String getJAXBNamespace() {
-        return _annotations.getProperty("jaxb-namespace");
-    }
-
-    /**
-     * @return the JAXB namespace prefix
-     */
-    public String getJAXBNamespacePrefix() {
-        return _annotations.getProperty("jaxb-ns-prefix");
-    }
-
-    /**
-     * @return the JAXB version attribute
-     */
-    public String getJAXBVersionAttribute() {
-        return _annotations.getProperty("jaxb-version-attr");
-    }
-
-    /**
-     * @return the JAXB version value
-     */
-    public String getJAXBVersionValue() {
-        return _annotations.getProperty("jaxb-version-value");
-    }
-
-    /**
-     * @return the JAXB extension binding prefixes attribute
-     */
-    public String getJAXBExtensionBindingPrefixesAttribute() {
-        return _annotations.getProperty("jaxb-extbpfx-attr");
-    }
-
-    /**
-     * @return the qualified JAXB elements element
-     */
-    public String getJAXBElementsElement() {
-        return getJAXBNamespacePrefix() + ':'
-        + _annotations.getProperty("jaxb-elements");
-    }
     /**
      * @return the COXB namespace
      */

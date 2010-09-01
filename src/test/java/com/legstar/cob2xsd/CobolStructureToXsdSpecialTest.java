@@ -175,11 +175,8 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
                     "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>" + LS
                     + "<schema xmlns=\"http://www.w3.org/2001/XMLSchema\""
                     + " xmlns:cb=\"http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd\""
-                    + " xmlns:jaxb=\"http://java.sun.com/xml/ns/jaxb\""
                     + " xmlns:tns=\"http://www.mycompany.com/test\""
                     + " elementFormDefault=\"qualified\""
-                    + " jaxb:extensionBindingPrefixes=\"cb\""
-                    + " jaxb:version=\"2.0\""
                     + " targetNamespace=\"http://www.mycompany.com/test\">" + LS
                     + "    <complexType name=\"A\">" + LS
                     + "        <sequence>" + LS

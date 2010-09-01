@@ -150,11 +150,6 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
                 + " targetNamespace=\"http://legstar.com/test\"");
         if (withLegStarAnnotations) {
             sb.append(" xmlns:cb=\"http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd\"");
-            sb.append(" xmlns:jaxb=\"http://java.sun.com/xml/ns/jaxb\"");
-            sb.append(" xmlns:ns0=\"http://java.sun.com/xml/ns/jaxb\"");
-            sb.append(" ns0:extensionBindingPrefixes=\"cb\"");
-            sb.append(" xmlns:ns1=\"http://java.sun.com/xml/ns/jaxb\"");
-            sb.append(" ns1:version=\"2.0\"");
         }
         sb.append(">");
         sb.append(expected);
