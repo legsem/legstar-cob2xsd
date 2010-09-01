@@ -95,7 +95,14 @@ public class CobolStructureToXsdModel extends SourceToXsdCobolModel {
      * @return the target XML schema file
      */
     public final File getTargetXsdFile() {
-        return new File(getTargetDir(), getTargetXsdFileName());
+        if (getTargetXsdFileName() == null) {
+            return null;
+        }
+        if (getTargetDir() == null) {
+            return new File(getTargetXsdFileName());
+        } else {
+            return new File(getTargetDir(), getTargetXsdFileName());
+        }
     }
 
     /**

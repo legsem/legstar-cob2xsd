@@ -22,25 +22,16 @@ import java.io.OutputStreamWriter;
 import com.legstar.antlr.RecognizerException;
 import com.legstar.cob2xsd.Cob2XsdContext.CodeFormat;
 
-import junit.framework.TestCase;
-
 /**
  * Additional tests for CobolStructureToXsd. These are kept outside
  *  {@link CobolStructureToXsdTest} to keep things simple.
  *
  */
-public class CobolStructureToXsdSpecialTest extends TestCase {
+public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
 
     /** Line separator (OS specific).*/
     public static final String LS = System.getProperty("line.separator");
 
-    /** Where generated schemas are stored (cleanable location).*/
-    private static final File XSD_GEN_DIR = new File("target/generated-sources/schema");
-
-    /** {@inheritDoc}*/
-    public void setUp() {
-        XSD_GEN_DIR.mkdir();
-    }
     /**
      * Check input file validation.
      */
@@ -240,7 +231,7 @@ public class CobolStructureToXsdSpecialTest extends TestCase {
             out.flush();
             out.close();
             File xmlSchema = cob2xsd.translate(
-                    tempCobolFile, "UTF-8", XSD_GEN_DIR);
+                    tempCobolFile, "UTF-8", GEN_XSD_DIR);
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(
                             new FileInputStream(xmlSchema), "UTF8"));
@@ -250,6 +241,7 @@ public class CobolStructureToXsdSpecialTest extends TestCase {
                     assertTrue(line.contains("value=\"牛年快乐\""));
                 }
             }
+            in.close();
             
         } catch (XsdGenerationException e) {
             e.printStackTrace();

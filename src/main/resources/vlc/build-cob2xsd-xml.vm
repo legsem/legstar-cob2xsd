@@ -32,6 +32,15 @@
     <target name="generateXSD" depends="init">
         <cob2xsd target="${antModel.targetXsdFile}"
 ## -------------------------------------------------------------------
+## COBOL source format related options
+##
+            codeFormat="${antModel.context.getCodeFormat().toString()}"
+#if(${antModel.context.getCodeFormat().toString().equals("FIXED_FORMAT")})
+            startColumn="${antModel.context.startColumn}"
+            endColumn="${antModel.context.endColumn}"
+#end
+
+## -------------------------------------------------------------------
 ## XML Schema related options
 ##
 #if(${antModel.context.xsdEncoding})

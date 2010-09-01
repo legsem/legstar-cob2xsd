@@ -168,6 +168,13 @@ public class CobolStructureToXsdTask extends Task {
     }
 
     /**
+     * @param cobolFormat the Fixed or Free format COBOL source to set
+     */
+    public void setCodeFormat(String cobolFormat) {
+        getContext().setCodeFormat(CodeFormat.valueOf(cobolFormat));
+    }
+
+    /**
      * @return the position of the indicator area for fixed format COBOL
      */
     public int getStartColumn() {
