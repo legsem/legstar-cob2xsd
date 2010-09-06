@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:cb="http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd" xmlns:tns="http://legstar.com/test/coxb/lsfileal" elementFormDefault="qualified" targetNamespace="http://legstar.com/test/coxb/lsfileal">
+    <element name="WVisitMode">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="W-VISIT-MODE" levelNumber="1" picture="9(4)" signed="false" srceLine="31" totalDigits="4" type="BINARY_ITEM" usage="BINARY" value="0"/>
+            </appinfo>
+        </annotation>
+        <simpleType>
+            <restriction base="unsignedShort">
+                <totalDigits value="4"/>
+            </restriction>
+        </simpleType>
+    </element>
+    <element name="WNameMatch">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="W-NAME-MATCH" levelNumber="1" picture="9(4)" signed="false" srceLine="34" totalDigits="4" type="BINARY_ITEM" usage="BINARY" value="0"/>
+            </appinfo>
+        </annotation>
+        <simpleType>
+            <restriction base="unsignedShort">
+                <totalDigits value="4"/>
+            </restriction>
+        </simpleType>
+    </element>
     <complexType name="RequestParms">
         <sequence>
             <element name="RequestName">
@@ -16,6 +40,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="RequestParms" type="tns:RequestParms">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="REQUEST-PARMS" levelNumber="1" srceLine="50" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="ReplyData">
         <sequence>
             <element name="ReplyType">
@@ -257,4 +288,11 @@
             </element>
         </sequence>
     </complexType>
+    <element name="ReplyData" type="tns:ReplyData">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="REPLY-DATA" levelNumber="1" srceLine="53" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
 </schema>

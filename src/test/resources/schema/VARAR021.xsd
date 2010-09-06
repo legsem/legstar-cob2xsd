@@ -30,6 +30,13 @@
             </choice>
         </sequence>
     </complexType>
+    <element name="Filler23" type="tns:Filler23">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="FILLER" levelNumber="1" srceLine="23" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="SearchGrplst">
         <sequence>
             <element name="Payload" type="tns:Payload">
@@ -208,4 +215,11 @@
             </element>
         </sequence>
     </complexType>
+    <element name="SearchGrplst" type="tns:SearchGrplst">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="SEARCH-GRPLST" levelNumber="1" srceLine="31" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
 </schema>

@@ -46,7 +46,9 @@
 #if(${antModel.context.xsdEncoding})
             xsdEncoding="${antModel.context.xsdEncoding}"
 #end
+#if(${antModel.context.targetNamespace})
             targetNamespace="${antModel.context.targetNamespace}"
+#end
             mapConditionsToFacets="${antModel.context.mapConditionsToFacets()}"
 #if(${antModel.context.customXsltFileName})
             customXsltFileName="${antModel.context.customXsltFileName}"

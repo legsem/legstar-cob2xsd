@@ -28,6 +28,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="WsTs" type="tns:WsTs">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-TS" levelNumber="1" srceLine="20" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="WsTc">
         <sequence>
             <element name="Filler24">
@@ -56,6 +63,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="WsTc" type="tns:WsTc">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-TC" levelNumber="1" srceLine="23" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="WsTc2">
         <sequence>
             <element name="Filler27">
@@ -84,6 +98,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="WsTc2" type="tns:WsTc2">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-TC2" levelNumber="1" srceLine="26" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="Dfhcommarea">
         <sequence>
             <element maxOccurs="2" minOccurs="2" name="TableSimple">
@@ -158,4 +179,11 @@
             </element>
         </sequence>
     </complexType>
+    <element name="Dfhcommarea" type="tns:Dfhcommarea">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="DFHCOMMAREA" levelNumber="1" srceLine="31" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
 </schema>

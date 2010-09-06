@@ -30,11 +30,21 @@
     <!-- Generate XML Schemas
     -->
     <target name="cob2xsd" depends="init">
-        <cob2xsd target="${xsd.dir}">
-            <fileset dir="${cobol.dir}">
-                <include name="*"/>
-            </fileset>
+
+    	<cob2xsd target="${xsd.dir}"
+            targetNamespace="http://legstar.com/test/coxb/lsfileae"
+            addLegStarAnnotations="true"
+        >
+        	<fileset file="${cobol.dir}/LSFILEAE"/>
         </cob2xsd>
+
+    	<cob2xsd target="${xsd.dir}"
+            targetNamespace="http://legstar.com/test/coxb/lsfileaq"
+            addLegStarAnnotations="true"
+        >
+            <fileset file="${cobol.dir}/LSFILEAQ"/>
+        </cob2xsd>
+
     </target>
   
 </project>

@@ -82,6 +82,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="WsSignedNative" type="tns:WsSignedNative">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-SIGNED-NATIVE" levelNumber="1" srceLine="28" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="Dfhcommarea">
         <sequence>
             <element name="LsUnsignedNative" type="tns:LsUnsignedNative">
@@ -228,4 +235,11 @@
             </element>
         </sequence>
     </complexType>
+    <element name="Dfhcommarea" type="tns:Dfhcommarea">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="DFHCOMMAREA" levelNumber="1" srceLine="40" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
 </schema>

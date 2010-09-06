@@ -100,4 +100,11 @@
             </element>
         </sequence>
     </complexType>
+    <element name="Dfhcommarea" type="tns:Dfhcommarea">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="DFHCOMMAREA" levelNumber="1" srceLine="20" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
 </schema>

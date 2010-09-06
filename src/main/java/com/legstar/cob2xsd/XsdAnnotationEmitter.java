@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 LegSem.
+ * Copyright (c) 2010 LegSem.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -37,9 +37,8 @@ import com.legstar.coxb.CobolType;
  * This class is used to generate LegStar annotations to be included
  * in an XML schema.
  * <p/>
- * The COBOL annotations are at the element level and belong to the LegStar namespace.
- * <p/>
- * We expect elementFormDefault="qualified" and attributeFormDefault="unqualified"
+ * The COBOL annotations are at the element level and belong to the LegStar
+ * namespace.
  */
 public class XsdAnnotationEmitter {
 
@@ -49,28 +48,32 @@ public class XsdAnnotationEmitter {
     /** The XML Schema being built. */
     private XmlSchema _xsd;
 
-    /** Holds the annotations values.*/
+    /** Holds the annotations values. */
     private Properties _annotations = new Properties();;
 
     /** This builder is used for annotation markup elements. */
     private DocumentBuilder _docBuilder;
 
-    /** True if properly initialized.*/
+    /** True if properly initialized. */
     private boolean _initialized = false;
 
-    /** The translator options in effect.*/
+    /** The translator options in effect. */
     private Cob2XsdContext _context;
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
 
     /**
-     * All annotations are externalized in a properties file loaded from the classpath.
+     * All annotations are externalized in a properties file loaded from the
+     * classpath.
      * We also create a DOM document builder that is needed to create the custom
      * annotations markup.
-     * Errors, which are unlikely, are signaled by logging appropriate messages but
-     * no exceptions are raised. Rather, the class disables itself and no annotations
+     * Errors, which are unlikely, are signaled by logging appropriate messages
+     * but
+     * no exceptions are raised. Rather, the class disables itself and no
+     * annotations
      * are produced.
+     * 
      * @param xsd the XML Schema to be populated.
      * @param context the translator options in effect
      */
@@ -82,12 +85,15 @@ public class XsdAnnotationEmitter {
             _context = context;
 
             InputStream is =
-                XsdAnnotationEmitter.class.getResourceAsStream(ANNOTATIONS_FILE_NAME);
+                    XsdAnnotationEmitter.class
+                            .getResourceAsStream(ANNOTATIONS_FILE_NAME);
             if (is == null) {
-                _log.error("Was unable to locate file " + ANNOTATIONS_FILE_NAME + " from the classpath");
+                _log.error("Was unable to locate file " + ANNOTATIONS_FILE_NAME
+                        + " from the classpath");
             } else {
                 _annotations.load(is);
-                DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
+                DocumentBuilderFactory docFac = DocumentBuilderFactory
+                        .newInstance();
                 docFac.setNamespaceAware(true);
                 _docBuilder = docFac.newDocumentBuilder();
                 addNamespaceContext();
@@ -101,12 +107,15 @@ public class XsdAnnotationEmitter {
     }
 
     /**
-     * Create an XML Schema annotation with markup corresponding to the original COBOL
-     * data item attributes. 
+     * Create an XML Schema annotation with markup corresponding to the original
+     * COBOL
+     * data item attributes.
+     * 
      * @param xsdDataItem COBOL data item decorated with XSD attributes
      * @return an XML schema annotation
      */
-    public XmlSchemaAnnotation createLegStarAnnotation(final XsdDataItem xsdDataItem) {
+    public XmlSchemaAnnotation createLegStarAnnotation(
+            final XsdDataItem xsdDataItem) {
 
         Document doc = _docBuilder.newDocument();
         Element el = doc.createElementNS(getCOXBNamespace(), getCOXBElements());
@@ -118,7 +127,6 @@ public class XsdAnnotationEmitter {
                 xsdDataItem.getCobolName());
         elc.setAttribute(CobolMarkup.TYPE,
                 xsdDataItem.getCobolType().toString());
-
 
         if (xsdDataItem.getCobolType() != CobolType.GROUP_ITEM) {
             if (xsdDataItem.getPicture() != null) {
@@ -150,8 +158,10 @@ public class XsdAnnotationEmitter {
             }
         }
 
-        /* Annotations transfer the COBOL occurs semantic (as opposed to
-         * the XSD semantic). No depending on => fixed size array*/
+        /*
+         * Annotations transfer the COBOL occurs semantic (as opposed to
+         * the XSD semantic). No depending on => fixed size array
+         */
         if (xsdDataItem.getCobolMaxOccurs() > 0) {
             elc.setAttribute(CobolMarkup.MAX_OCCURS,
                     Integer.toString(xsdDataItem.getCobolMaxOccurs()));
@@ -177,7 +187,8 @@ public class XsdAnnotationEmitter {
             elc.setAttribute(CobolMarkup.UNMARSHAL_CHOICE_STRATEGY, "");
         }
 
-        if (xsdDataItem.getValue() != null && xsdDataItem.getValue().length() > 0) {
+        if (xsdDataItem.getValue() != null
+                && xsdDataItem.getValue().length() > 0) {
             elc.setAttribute(CobolMarkup.VALUE,
                     ValueUtil.resolveFigurative(
                             xsdDataItem.getValue(),
@@ -212,7 +223,8 @@ public class XsdAnnotationEmitter {
             prefixmap.add("", XMLConstants.W3C_XML_SCHEMA_NS_URI);
         } else {
             for (int i = 0; i < npl.getDeclaredPrefixes().length; i++) {
-                prefixmap.add(npl.getDeclaredPrefixes()[i], npl.getNamespaceURI(
+                prefixmap.add(npl.getDeclaredPrefixes()[i], npl
+                        .getNamespaceURI(
                         npl.getDeclaredPrefixes()[i]));
             }
         }
@@ -240,7 +252,7 @@ public class XsdAnnotationEmitter {
      */
     public String getCOXBElements() {
         return getCOXBNamespacePrefix() + ':'
-        + _annotations.getProperty("coxb-elements");
+                + _annotations.getProperty("coxb-elements");
     }
 
     /**
@@ -248,7 +260,7 @@ public class XsdAnnotationEmitter {
      */
     public String getCOXBElement() {
         return getCOXBNamespacePrefix() + ':'
-        + _annotations.getProperty("coxb-element");
+                + _annotations.getProperty("coxb-element");
     }
 
     /**

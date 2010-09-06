@@ -28,6 +28,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="WsOdo" type="tns:WsOdo">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-ODO" levelNumber="1" srceLine="20" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="Dfhcommarea">
         <sequence>
             <element name="TableSize">
@@ -56,4 +63,11 @@
             </element>
         </sequence>
     </complexType>
+    <element name="Dfhcommarea" type="tns:Dfhcommarea">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="DFHCOMMAREA" levelNumber="1" srceLine="25" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
 </schema>

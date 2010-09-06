@@ -6,4 +6,5 @@
         <file-match-pattern match-pattern=".svn" include-pattern="false"/>
         <file-match-pattern match-pattern="target" include-pattern="false"/>
     </fileset>
+    <filter name="NonSrcDirs" enabled="true"/>
 </fileset-config>

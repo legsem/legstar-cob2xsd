@@ -52,6 +52,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="Filler20" type="tns:Filler20">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="FILLER" levelNumber="1" redefines="SEED-TIME" srceLine="20" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="Dfhcommarea">
         <sequence>
             <element name="COutputType">
@@ -152,4 +159,11 @@
             </element>
         </sequence>
     </complexType>
+    <element name="Dfhcommarea" type="tns:Dfhcommarea">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="DFHCOMMAREA" levelNumber="1" srceLine="30" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
 </schema>

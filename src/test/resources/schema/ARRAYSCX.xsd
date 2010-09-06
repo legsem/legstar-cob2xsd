@@ -16,6 +16,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="Filler23" type="tns:Filler23">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="FILLER" levelNumber="1" redefines="WS-ITEM" srceLine="23" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="Dfhcommarea">
         <sequence>
             <element name="TableThree" type="tns:TableThree">
@@ -102,4 +109,11 @@
             </choice>
         </sequence>
     </complexType>
+    <element name="Dfhcommarea" type="tns:Dfhcommarea">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="DFHCOMMAREA" levelNumber="1" srceLine="28" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
 </schema>

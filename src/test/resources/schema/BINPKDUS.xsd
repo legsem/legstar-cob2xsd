@@ -122,6 +122,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="WsExpectedIncomingData" type="tns:WsExpectedIncomingData">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-EXPECTED-INCOMING-DATA" levelNumber="1" srceLine="29" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="Filler45">
         <sequence>
             <element name="WsPs9X18Dis1">
@@ -178,6 +185,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="Filler45" type="tns:Filler45">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="FILLER" levelNumber="1" srceLine="45" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="Dfhcommarea">
         <sequence>
             <element name="LsUnsignedPackedDecimal" type="tns:LsUnsignedPackedDecimal">
@@ -300,4 +314,11 @@
             </element>
         </sequence>
     </complexType>
+    <element name="Dfhcommarea" type="tns:Dfhcommarea">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="DFHCOMMAREA" levelNumber="1" srceLine="55" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
 </schema>

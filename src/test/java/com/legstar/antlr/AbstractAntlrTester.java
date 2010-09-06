@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 LegSem.
+ * Copyright (c) 2010 LegSem.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  ******************************************************************************/
 package com.legstar.antlr;
 
+import junit.framework.TestCase;
+
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
@@ -19,22 +21,21 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import junit.framework.TestCase;
-
 /**
  * Generic test code for ANTLR based lexers parsers and tree walkers.
- *
+ * 
  */
 public abstract class AbstractAntlrTester extends TestCase {
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
 
-    /** Line separator (OS specific).*/
+    /** Line separator (OS specific). */
     public static final String LS = System.getProperty("line.separator");
-    
+
     /**
      * Cleanup source an compare to expected.
+     * 
      * @param source original source
      * @param expected expected result
      */
@@ -47,12 +48,13 @@ public abstract class AbstractAntlrTester extends TestCase {
             e.printStackTrace();
             fail(e.getMessage());
         }
-        
+
     }
 
     /**
      * Apply a lexer to a source and check that the token stream produced
      * is as expected.
+     * 
      * @param source the source code
      * @param expected the expected token stream
      */
@@ -72,6 +74,7 @@ public abstract class AbstractAntlrTester extends TestCase {
 
     /**
      * A generic test helper that takes a source fragment and checks the result.
+     * 
      * @param source the source fragment
      * @param expected the expected sub graph
      */
@@ -91,6 +94,7 @@ public abstract class AbstractAntlrTester extends TestCase {
     /**
      * A generic test helper that takes a source fragment and checks the result
      * when it should be an exception.
+     * 
      * @param source the source fragment
      * @param expected the expected exception
      */
@@ -104,8 +108,10 @@ public abstract class AbstractAntlrTester extends TestCase {
             assertEquals(expected.getMessage(), e.getMessage());
         }
     }
+
     /**
      * A generic test helper that takes a source fragment and checks the result.
+     * 
      * @param source the source fragment
      * @param expected the expected sub graph
      */
@@ -134,6 +140,7 @@ public abstract class AbstractAntlrTester extends TestCase {
 
     /**
      * Produce a dot source for an abstract syntax tree.
+     * 
      * @param ast the abstract syntax tree
      * @return a dot source
      */
@@ -145,30 +152,37 @@ public abstract class AbstractAntlrTester extends TestCase {
 
     /**
      * Perform initial source cleanup to keep ANLR grammar simple.
+     * 
      * @param source original source code
      * @return cleaned up source code
      * @throws RecognizerException if source cannot be read
      */
-    public abstract String clean(final String source) throws RecognizerException;
+    public abstract String clean(final String source)
+            throws RecognizerException;
 
     /**
      * Apply the lexer to produce a token stream from source.
+     * 
      * @param source the source code
      * @return an antlr token stream
-      * @throws RecognizerException if lexer fails
-    */
-    public abstract CommonTokenStream lex(final String source) throws RecognizerException;
-    
-    /**
-     * Apply Lexer + Parser to produce an abstract syntax tree from source. 
-     * @param source the source code
-     * @return an antlr abstract syntax tree
-      * @throws RecognizerException if parser fails
+     * @throws RecognizerException if lexer fails
      */
-    public abstract CommonTree parse(final String source) throws RecognizerException;
+    public abstract CommonTokenStream lex(final String source)
+            throws RecognizerException;
 
     /**
-     * Apply Lexer + Parser + Emitter to produce some translated content. 
+     * Apply Lexer + Parser to produce an abstract syntax tree from source.
+     * 
+     * @param source the source code
+     * @return an antlr abstract syntax tree
+     * @throws RecognizerException if parser fails
+     */
+    public abstract CommonTree parse(final String source)
+            throws RecognizerException;
+
+    /**
+     * Apply Lexer + Parser + Emitter to produce some translated content.
+     * 
      * @param source the source code
      * @return a translated result
      * @throws RecognizerException if emit fails

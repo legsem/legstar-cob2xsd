@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:cb="http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd" xmlns:tns="http://legstar.com/test/coxb/lsfileac" elementFormDefault="qualified" targetNamespace="http://legstar.com/test/coxb/lsfileac">
+    <element name="Filler25">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="FILLER" levelNumber="77" picture="X" srceLine="25" type="ALPHANUMERIC_ITEM" value="N"/>
+            </appinfo>
+        </annotation>
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="1"/>
+            </restriction>
+        </simpleType>
+    </element>
     <complexType name="WQueryData">
         <sequence>
             <element name="WQueryName">
@@ -40,6 +52,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="WQueryData" type="tns:WQueryData">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="W-QUERY-DATA" levelNumber="1" srceLine="31" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="WQueryLimit">
         <sequence>
             <element name="WMaxItemsRead">
@@ -68,6 +87,37 @@
             </element>
         </sequence>
     </complexType>
+    <element name="WQueryLimit" type="tns:WQueryLimit">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="W-QUERY-LIMIT" levelNumber="1" srceLine="36" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
+    <element name="WVisitMode">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="W-VISIT-MODE" levelNumber="1" picture="9(4)" signed="false" srceLine="42" totalDigits="4" type="BINARY_ITEM" usage="BINARY" value="0"/>
+            </appinfo>
+        </annotation>
+        <simpleType>
+            <restriction base="unsignedShort">
+                <totalDigits value="4"/>
+            </restriction>
+        </simpleType>
+    </element>
+    <element name="WNameMatch">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="W-NAME-MATCH" levelNumber="1" picture="9(4)" signed="false" srceLine="45" totalDigits="4" type="BINARY_ITEM" usage="BINARY" value="0"/>
+            </appinfo>
+        </annotation>
+        <simpleType>
+            <restriction base="unsignedShort">
+                <totalDigits value="4"/>
+            </restriction>
+        </simpleType>
+    </element>
     <complexType name="ReplyData">
         <sequence>
             <element name="ReplyItemscount">
@@ -190,6 +240,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="ReplyData" type="tns:ReplyData">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="REPLY-DATA" levelNumber="1" srceLine="63" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="ReplyStatus">
         <sequence>
             <element name="ReplyType">
@@ -266,6 +323,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="ReplyStatus" type="tns:ReplyStatus">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="REPLY-STATUS" levelNumber="1" srceLine="76" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="QueryData">
         <sequence>
             <element name="QueryName">
@@ -306,6 +370,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="QueryData" type="tns:QueryData">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="QUERY-DATA" levelNumber="1" srceLine="91" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="QueryLimit">
         <sequence>
             <element name="MaxItemsRead">
@@ -334,4 +405,11 @@
             </element>
         </sequence>
     </complexType>
+    <element name="QueryLimit" type="tns:QueryLimit">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="QUERY-LIMIT" levelNumber="1" srceLine="96" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
 </schema>

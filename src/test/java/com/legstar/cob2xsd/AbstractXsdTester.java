@@ -1,20 +1,28 @@
+/*******************************************************************************
+ * Copyright (c) 2010 LegSem.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     LegSem - initial API and implementation
+ ******************************************************************************/
 package com.legstar.cob2xsd;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.StringReader;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.Difference;
-import org.custommonkey.xmlunit.DifferenceConstants;
-import org.custommonkey.xmlunit.DifferenceListener;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 /**
@@ -33,21 +41,43 @@ public class AbstractXsdTester extends XMLTestCase {
     /** Folder holding test XSLT. */
     public static final String XSLT_SAMPLES_DIR = "src/test/resources/xslt";
 
-    /** Where generated schemas are stored (cleanable location).*/
+    /** Where generated schemas are stored (cleanable location). */
     public static final File GEN_XSD_DIR = new File("target/src/gen/schema");
 
     /** Ant scripts files will be generated here (cleanable location). */
     public static final File GEN_ANT_DIR = new File("target/src/gen/ant");
 
+    /** Used for XML validation. */
+    public static final String JAXP_SCHEMA_LANGUAGE =
+            "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+
+    /** Used for XML validation. */
+    public static final String W3C_XML_SCHEMA =
+            "http://www.w3.org/2001/XMLSchema";
+
+    /** Used for XML validation. */
+    public static final String JAXP_SCHEMA_SOURCE =
+            "http://java.sun.com/xml/jaxp/properties/schemaSource";
+
+    /** Used for XML validation. */
+    public static final String W3C_XML_SCHEMA_SOURCE =
+            "http://www.w3.org/2001/XMLSchema.xsd";
+
+    /** DOM document builder factory. */
+    protected DocumentBuilderFactory _docFac;
+
     /** DOM document factory. */
     protected DocumentBuilder _docBuilder;
 
-    /** {@inheritDoc}*/
+    /** {@inheritDoc} */
     public void setUp() throws Exception {
-        DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
-        docFac.setNamespaceAware(true);
-        docFac.setIgnoringElementContentWhitespace(true);
-        _docBuilder = docFac.newDocumentBuilder();
+        _docFac = DocumentBuilderFactory.newInstance();
+        _docFac.setNamespaceAware(true);
+        _docFac.setValidating(false);
+        _docFac.setIgnoringElementContentWhitespace(true);
+        _docFac.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+        _docFac.setAttribute(JAXP_SCHEMA_SOURCE, W3C_XML_SCHEMA_SOURCE);
+        _docBuilder = _docFac.newDocumentBuilder();
 
         GEN_XSD_DIR.mkdirs();
         FileUtils.cleanDirectory(GEN_XSD_DIR);
@@ -57,6 +87,7 @@ public class AbstractXsdTester extends XMLTestCase {
 
     /**
      * Customization of the XmlUnit assertXMLEqual.
+     * 
      * @param xsdFileName XML schema file name
      * @param expected expected result
      * @param result actual result
@@ -68,56 +99,38 @@ public class AbstractXsdTester extends XMLTestCase {
         boolean oldIgnore = XMLUnit.getIgnoreWhitespace();
         XMLUnit.setIgnoreWhitespace(true);
         try {
-            Diff d = new Diff(expected, result);
-            MyDifferenceListener listener = new MyDifferenceListener();
-            d.overrideDifferenceListener(listener);
-            assertTrue(xsdFileName + ": expected pieces to be similar, " + d.toString(), d.similar());
-//            if (!d.similar()) {
-//                _log.error("expected pieces to be similar, " + d.toString());
-//            }
+            DetailedDiff d = new DetailedDiff(new Diff(expected, result));
+            assertTrue(xsdFileName + ": expected pieces to be identical, "
+                    + d.toString(), d.identical());
         } finally {
             XMLUnit.setIgnoreWhitespace(oldIgnore);
         }
     }
 
     /**
-     * XmlUnit difference listener needed because attribute values in XML schema
-     * might be prefixed by a namespace prefix therefore failing comparison
-     * tests while actually identical.
-     *
+     * Compare result to expected in the case where the XML is serialized as
+     * strings (beware that results are pretty printed and therefore will hold
+     * CR and/or LF characters).
+     * 
+     * @param expected the expected XML Schema as a string
+     * @param result the result XML schema as a string
+     * @throws Exception if comparison fails
      */
-    class MyDifferenceListener implements DifferenceListener {
+    protected void compare(
+            final String expected,
+            final String result) throws Exception {
+        InputSource expectedSrce = new InputSource(new StringReader(expected));
+        InputSource resultSrce = new InputSource(new StringReader(result
+                .replace("\r", "").replace("\n", "")));
+        compare("",
+                _docBuilder.parse(expectedSrce),
+                _docBuilder.parse(resultSrce));
 
-        /** {@inheritDoc}*/
-        public int differenceFound(final Difference difference) {
-            if (difference.getId() == DifferenceConstants.ATTR_VALUE_ID) {
-                if (compareNoPrefix(difference.getControlNodeDetail().getValue(),
-                        difference.getTestNodeDetail().getValue())) {
-                    return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
-                }
-            }
-            return RETURN_ACCEPT_DIFFERENCE;
-        }
-
-        /** {@inheritDoc}*/
-        public void skippedComparison(final Node control, final Node test) {
-        }
-    }
-    
-    /**
-     * Compares 2 strings modulo a potential namespace prefix.
-     * @param expected the expected string
-     * @param result the actual result
-     * @return true if both strings are identical modulo a namespace prefix
-     */
-    private boolean compareNoPrefix(final String expected, final String result) {
-        String e = (expected.indexOf(":") > -1) ? expected.substring(expected.indexOf(":") + 1) : expected;
-        String r = (result.indexOf(":") > -1) ? result.substring(result.indexOf(":") + 1) : result;
-        return e.equals(r);
     }
 
     /**
      * Pick an XSD from the file system and return it as a DOM.
+     * 
      * @param xsdFile the XSD file
      * @return an XML DOM
      * @throws Exception if loaf fails
@@ -128,6 +141,5 @@ public class AbstractXsdTester extends XMLTestCase {
                 new FileReader(xsdFile));
         return _docBuilder.parse(is);
     }
-
 
 }

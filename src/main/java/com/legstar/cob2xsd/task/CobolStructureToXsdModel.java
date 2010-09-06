@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 LegSem.
+ * Copyright (c) 2010 LegSem.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -28,52 +28,63 @@ import com.legstar.codegen.models.SourceToXsdCobolModel;
  * At development time, this class collects a set of parameter that
  * are used to generate an ANT script.
  * <p/>
- * The main use case is for Eclipse plugins for instance which visually 
- * collect parameters and then use this class the generate a customized
- * ANT script which, in turn, translates a COBOL structure to an XML schema.
- *
+ * The main use case is for Eclipse plugins for instance which visually collect
+ * parameters and then use this class the generate a customized ANT script
+ * which, in turn, translates a COBOL structure to an XML schema.
+ * 
  */
 public class CobolStructureToXsdModel extends SourceToXsdCobolModel {
 
     /** The full path to the cobol source file. */
     private String _cobolSourceFilePath;
 
-    /** Set of translation options to use.    */
+    /** Set of translation options to use. */
     private Cob2XsdContext _context = new Cob2XsdContext();
 
     /** This generator name. */
     public static final String C2S_GENERATOR_NAME =
-        "LegStar COBOL to XML Schema generator";
+            "LegStar COBOL to XML Schema generator";
 
     /** This velocity template. */
     public static final String C2S_VELOCITY_MACRO_NAME =
-        "vlc/build-cob2xsd-xml.vm";
-    
-    /** Whether velocity is already initialized.*/
+            "vlc/build-cob2xsd-xml.vm";
+
+    /** Whether velocity is already initialized. */
     private boolean _velocityInitialized;
 
     /**
      * Creates an ant build script file ready for XSD generation.
+     * 
      * @param targetFile the script file that must be created
      * @throws CodeGenMakeException if generation fails
      */
     public final void generateBuild(
             final File targetFile) throws CodeGenMakeException {
+        Writer w = null;
         try {
             if (!_velocityInitialized) {
                 CodeGenUtil.initVelocity();
                 _velocityInitialized = true;
             }
-            VelocityContext context = CodeGenUtil.getContext(C2S_GENERATOR_NAME);
+            VelocityContext context = CodeGenUtil
+                    .getContext(C2S_GENERATOR_NAME);
             context.put("antModel", this);
-            Writer w = new OutputStreamWriter(
+            w = new OutputStreamWriter(
                     new FileOutputStream(targetFile), "UTF-8");
-            Velocity.mergeTemplate(C2S_VELOCITY_MACRO_NAME, "UTF-8", context, w);
-            w.close();
+            Velocity
+                    .mergeTemplate(C2S_VELOCITY_MACRO_NAME, "UTF-8", context, w);
         } catch (IOException e) {
             throw new CodeGenMakeException(e);
         } catch (Exception e) {
             throw new CodeGenMakeException(e);
+        } finally {
+            if (w != null) {
+                try {
+                    w.close();
+                } catch (IOException e) {
+                    throw new CodeGenMakeException(e);
+                }
+            }
         }
     }
 
@@ -107,6 +118,7 @@ public class CobolStructureToXsdModel extends SourceToXsdCobolModel {
 
     /**
      * Gather all parameters into a context object.
+     * 
      * @return a parameter context to be used throughout all code
      */
     public Cob2XsdContext getContext() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 LegSem.
+ * Copyright (c) 2010 LegSem.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
@@ -163,14 +163,14 @@ public class CobolStructureToXsdTask extends Task {
     /**
      * @param cobolFormat the Fixed or Free format COBOL source to set
      */
-    public void setCodeFormat(CodeFormat cobolFormat) {
+    public void setCodeFormat(final CodeFormat cobolFormat) {
         getContext().setCodeFormat(cobolFormat);
     }
 
     /**
      * @param cobolFormat the Fixed or Free format COBOL source to set
      */
-    public void setCodeFormat(String cobolFormat) {
+    public void setCodeFormat(final String cobolFormat) {
         getContext().setCodeFormat(CodeFormat.valueOf(cobolFormat));
     }
 
@@ -184,7 +184,7 @@ public class CobolStructureToXsdTask extends Task {
     /**
      * @param startColumn the position of the indicator area for fixed format COBOL
      */
-    public void setStartColumn(int startColumn) {
+    public void setStartColumn(final int startColumn) {
         getContext().setStartColumn(startColumn);
     }
 
@@ -198,7 +198,7 @@ public class CobolStructureToXsdTask extends Task {
     /**
      * @param endColumn the position of the right margin for fixed format COBOL
      */
-    public void setEndColumn(int endColumn) {
+    public void setEndColumn(final int endColumn) {
         getContext().setEndColumn(endColumn);
     }
 

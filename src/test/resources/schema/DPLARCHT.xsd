@@ -1,5 +1,41 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:cb="http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd" xmlns:tns="http://legstar.com/test/coxb/dplarcht" elementFormDefault="qualified" targetNamespace="http://legstar.com/test/coxb/dplarcht">
+    <element name="WsErrorStatus">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-ERROR-STATUS" levelNumber="1" picture="9(4)" signed="false" srceLine="40" totalDigits="4" type="BINARY_ITEM" usage="BINARY" value="0"/>
+            </appinfo>
+        </annotation>
+        <simpleType>
+            <restriction base="unsignedShort">
+                <totalDigits value="4"/>
+            </restriction>
+        </simpleType>
+    </element>
+    <element name="WsItemsSelection">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-ITEMS-SELECTION" levelNumber="1" picture="9(4)" signed="false" srceLine="43" totalDigits="4" type="BINARY_ITEM" usage="BINARY" value="0"/>
+            </appinfo>
+        </annotation>
+        <simpleType>
+            <restriction base="unsignedShort">
+                <totalDigits value="4"/>
+            </restriction>
+        </simpleType>
+    </element>
+    <element name="WsSearchStatus">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-SEARCH-STATUS" levelNumber="1" picture="9(4)" signed="false" srceLine="46" totalDigits="4" type="BINARY_ITEM" usage="BINARY" value="0"/>
+            </appinfo>
+        </annotation>
+        <simpleType>
+            <restriction base="unsignedShort">
+                <totalDigits value="4"/>
+            </restriction>
+        </simpleType>
+    </element>
     <complexType name="WsFileDescription">
         <sequence>
             <element name="WsFileStart">
@@ -52,6 +88,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="WsFileDescription" type="tns:WsFileDescription">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-FILE-DESCRIPTION" levelNumber="1" srceLine="53" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="WsProgramDescription">
         <sequence>
             <element name="WsProgramStart">
@@ -128,6 +171,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="WsProgramDescription" type="tns:WsProgramDescription">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-PROGRAM-DESCRIPTION" levelNumber="1" srceLine="59" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="WsTransactionDescription">
         <sequence>
             <element name="WsTransactionStart">
@@ -180,6 +230,13 @@
             </element>
         </sequence>
     </complexType>
+    <element name="WsTransactionDescription" type="tns:WsTransactionDescription">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="WS-TRANSACTION-DESCRIPTION" levelNumber="1" srceLine="67" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
     <complexType name="Dfhcommarea">
         <sequence>
             <element name="LsRequest" type="tns:LsRequest">
@@ -514,4 +571,11 @@
             </element>
         </sequence>
     </complexType>
+    <element name="Dfhcommarea" type="tns:Dfhcommarea">
+        <annotation>
+            <appinfo>
+                <cb:cobolElement cobolName="DFHCOMMAREA" levelNumber="1" srceLine="80" type="GROUP_ITEM"/>
+            </appinfo>
+        </annotation>
+    </element>
 </schema>
