@@ -13,42 +13,62 @@ package com.legstar.cobol;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.legstar.antlr.CleanerException;
 
 /**
- * In order to reduce the lexer/parser grammar complexity, this class will remove
+ * In order to reduce the lexer/parser grammar complexity, this class will
+ * remove
  * all unnecessary characters from the original source.
  * This way, the ANTLR lexer will be presented with a purified source that only
  * contains data division entries.
  * <p/>
- * This allows users to submit complete COBOL programs or fragments of COBOL programs
- * with non data description statements to the parser without the need to add
- * grammar rules for all these cases.
- *
+ * This allows users to submit complete COBOL programs or fragments of COBOL
+ * programs with non data description statements to the parser without the need
+ * to add grammar rules for all these cases.
+ * 
  */
 public abstract class AbstractCobolSourceCleaner {
 
-    /** Line separator (OS specific).*/
+    /** Line separator (OS specific). */
     public static final String LS = System.getProperty("line.separator");
 
+    /** Cobol sentences are assumed to be terminated by this character. */
+    public static final char COBOL_DELIMITER = '.';
+
     /** Pattern that recognizes the start of a data description entry. */
-    public static final Pattern DATA_DESCRIPTION_START = Pattern.compile("(^|\\s|\\.)\\d(\\d)?(\\s|\\.|$)");
+    public static final Pattern DATA_DESCRIPTION_START = Pattern
+            .compile("(^|\\s|\\" + COBOL_DELIMITER + ")\\d(\\d)?(\\s|\\"
+                    + COBOL_DELIMITER + "|$)");
 
     /** Pattern that recognizes the end of a data description entry. */
-    public static final Pattern DATA_DESCRIPTION_END = Pattern.compile("(\\.$)|(\\.\\s)");
+    public static final Pattern DATA_DESCRIPTION_END = Pattern
+            .compile("(\\" + COBOL_DELIMITER + "$)|(\\" + COBOL_DELIMITER
+                    + "\\s)");
 
     /** Pattern that recognizes the start of a procedure division. */
     public static final Pattern PROCEDURE_DIVISION =
-        Pattern.compile("^(\\s)*PROCEDURE DIVISION", Pattern.CASE_INSENSITIVE);
-    
-    /** Handles error messages.*/
+            Pattern.compile("^(\\s)*PROCEDURE DIVISION",
+                    Pattern.CASE_INSENSITIVE);
+
+    /**
+     * List of compiler directives (they can be period delimited but
+     * are guaranteed to be alone on a line).
+     */
+    public static final List < String > COMPILER_DIRECTIVES =
+            Arrays.asList("EJECT", "SKIP", "SKIP1", "SKIP2", "SKIP3");
+
+    /** Handles error messages. */
     private RecognizerErrorHandler _errorHandler;
-    
+
     /**
      * Construct with a shared error handler.
+     * 
      * @param errorHandler handles error messages
      */
     public AbstractCobolSourceCleaner(
@@ -65,7 +85,7 @@ public abstract class AbstractCobolSourceCleaner {
      * Statements which are not data descriptions become empty lines in order to
      * preserve original line numbering.
      * 
-     * @param cobolSource  the raw COBOL source
+     * @param cobolSource the raw COBOL source
      * @return the source cleaned up
      * @throws CleanerException if source cannot be read
      */
@@ -75,7 +95,7 @@ public abstract class AbstractCobolSourceCleaner {
             BufferedReader reader = new BufferedReader(
                     new StringReader(cobolSource));
             String line;
-            StringBuilder cleanedSource =  new StringBuilder();
+            StringBuilder cleanedSource = new StringBuilder();
             CleaningContext context = new CleaningContext();
             try {
                 while ((line = reader.readLine()) != null) {
@@ -98,16 +118,17 @@ public abstract class AbstractCobolSourceCleaner {
             throw new CleanerException("COBOL source was null");
         }
     }
-    
+
     /**
      * Remove characters that should not be passed to the lexer.
      * <p/>
-     * Replace token separators such as ", " and "; " which complicate
-     * matters uselessly. Replacement should not change column numbers though
-     * so we simply replace the extra separators with a whitespace.
+     * Replace token separators such as ", " and "; " which complicate matters
+     * uselessly. Replacement should not change column numbers though so we
+     * simply replace the extra separators with a whitespace.
      * <p/>
-     * Clear comment lines. We don't remove the line so that line numbers
-     * are preserved.
+     * Clear comment lines. We don't remove the line so that line numbers are
+     * preserved.
+     * 
      * @param line before cleaning
      * @return a cleaner line of code
      */
@@ -119,34 +140,37 @@ public abstract class AbstractCobolSourceCleaner {
 
         /* Remove comments and special lines */
         char indicatorArea = line.charAt(getIndicatorAreaPos());
-        if (indicatorArea == '*' || indicatorArea == '/' || indicatorArea == '$') {
+        if (indicatorArea == '*' || indicatorArea == '/'
+                || indicatorArea == '$') {
             return "";
         }
-        
+
         String cleanedLine = extendedCleanLine(line);
- 
+
         /* Replace long separator forms */
         cleanedLine = cleanedLine.replace(", ", "  ").replace("; ", "  ");
 
-        /* Right trim, no need to over burden the lexer with spaces*/
+        /* Right trim, no need to over burden the lexer with spaces */
         cleanedLine = ("a" + cleanedLine).trim().substring(1);
         return cleanedLine;
     }
-    
+
     /**
      * Derived classes can extend this method to further clean a line of code.
+     * 
      * @param line the current line of code
      * @return a cleaner line of code
      */
     public String extendedCleanLine(final String line) {
         return line;
     }
-    
 
     /**
-     * Rough triage of statements which are not strictly part of the data division.
+     * Rough triage of statements which are not strictly part of the data
+     * division.
      * <ul>
      * <li>Removes comments</li>
+     * <li>Removes compiler directives</li>
      * <li>Detects end of DATA DIVISION by looking for PROCEDURE DIVISION.</li>
      * </ul>
      * 
@@ -169,39 +193,56 @@ public abstract class AbstractCobolSourceCleaner {
                             || line.charAt(commentPos) == '/')) {
                     return false;
                 }
+
+                /*
+                 * If there is a single token on this line, make sure it is
+                 * not a compiler directive.
+                 */
+                String[] tokens = line.trim().split("[\\s\\.]+");
+                if (tokens.length == 1) {
+                    if (COMPILER_DIRECTIVES.contains(tokens[0]
+                            .toUpperCase(Locale.getDefault()))) {
+                        return false;
+                    }
+                }
             }
         }
         return context.isDataDivision();
     }
-    
+
     /**
-     * @return the zero-based position of the indicator area 
+     * @return the zero-based position of the indicator area
      */
     public abstract int getIndicatorAreaPos();
 
     /**
      * Removes characters which are not part of a data description entry.
      * <p/>
+     * The fragment received as a parameter is assumed to be cleaned from
+     * sequence numbers.
+     * <p/>
      * Data description entries start with an integer (the level) and end with a
      * period followed by either space, newline or EOF.
      * <p/>
-     * A single line might hold multiple data descriptions. This method is recursive,
-     * and is called multiple times for each line fragment holding a new data
-     * description.
+     * A single line might hold multiple data descriptions. This method is
+     * recursive, and is called multiple times for each line fragment holding a
+     * new data description.
      * <p/>
-     * Data description entries might span multiple lines which is why we need to keep
-     * a context. Context tells us if we need to start by looking for a level (no data
-     * description has started on some previous line) or for a period.
+     * Data description entries might span multiple lines which is why we need
+     * to keep a context. Context tells us if we need to start by looking for a
+     * level (no data description has started on some previous line) or for a
+     * period.
      * <p/>
-     * Unsupported data description instructions such as COPY might appear on the same
-     * line as data instructions. They also can span multiple lines. This code blanks
-     * out such "non data description" statements.
+     * Unsupported data description instructions such as COPY might appear on
+     * the same line as data instructions. They also can span multiple lines.
+     * This code blanks out such "non data description" statements.
      * 
      * @param fragment a fragment of a line which might hold a data description
      * @param context the data description detection context
      * @return a line holding only data description parts or blank
      */
-    public String removeExtraneousCharacters(final String fragment, final CleaningContext context) {
+    public String removeExtraneousCharacters(final String fragment,
+            final CleaningContext context) {
         if (fragment == null || fragment.length() == 0) {
             return fragment;
         }
@@ -210,27 +251,61 @@ public abstract class AbstractCobolSourceCleaner {
         if (context.isLookingForLevel()) {
             matcher = DATA_DESCRIPTION_START.matcher(fragment);
             if (matcher.find()) {
-                               
-                /* if the level does not start on the first character, the regex
-                 * starts on the space or period character that precedes the level.*/
-                int start = (matcher.start() > 0) ? matcher.start() + 1 : matcher.start();
-                
-                /* If there are non blank extraneous characters, issue a warning. */
-                String extraneous = fragment.substring(0, start).trim();
-                if (start > 0 && extraneous.length() > 0) {
-                    emitErrorMessage("Extraneous characters ignored: " + extraneous);
+
+                /*
+                 * if the level does not start on the first character, the regex
+                 * starts on the space or period character that precedes the
+                 * level.
+                 */
+                int start = (matcher.start() > 0) ? matcher.start() + 1
+                        : matcher.start();
+
+                int endClean = start;
+
+                if (start > 0) {
+                    /*
+                     * If there are non blank characters before the level, make
+                     * sure they are period terminated otherwise assume this is
+                     * not a level but more likely an argument for a keyword. In
+                     * this last case, we need to clean the argument as well as
+                     * all the previous characters.
+                     */
+                    if (isArgument(fragment.substring(0, start))) {
+                        endClean = matcher.end() - 1;
+                    }
+
+                    /*
+                     * Warn that we are about to get rid of these extra
+                     * characters.
+                     */
+                    String extraneous = fragment.substring(0, endClean).trim();
+                    if (extraneous.length() > 0) {
+                        emitErrorMessage("Extraneous characters ignored: "
+                                + extraneous);
+                    }
                 }
+
                 /* Any extraneous character is replaced with spaces. */
-                for (int i = 0; i < start; i++) {
+                for (int i = 0; i < endClean; i++) {
                     cleanedLine.append(' ');
                 }
-                cleanedLine.append(fragment.substring(start, matcher.end() - 1));
-                context.setLookingForLevel(false);
+
+                /*
+                 * If we actually found a level, keep it and start looking
+                 * for a delimiter.
+                 */
+                if (endClean == start) {
+                    cleanedLine.append(fragment.substring(start,
+                            matcher.end() - 1));
+                    context.setLookingForLevel(false);
+                }
+
                 cleanedLine.append(removeExtraneousCharacters(
                         fragment.substring(matcher.end() - 1), context));
             } else {
                 if (fragment.trim().length() > 0) {
-                    emitErrorMessage("Extraneous characters ignored: " + fragment);
+                    emitErrorMessage("Extraneous characters ignored: "
+                            + fragment);
                 }
             }
         } else {
@@ -252,11 +327,14 @@ public abstract class AbstractCobolSourceCleaner {
      * Because data description sentences can be multiline or because it
      * does not make sense to look for data description entries once we
      * past a PROCEDURE DIVISION section, we need to keep track of the context.
-     *
+     * 
      */
     public static class CleaningContext {
 
-        /** True when we are looking for a level (start of a data description entry). */
+        /**
+         * True when we are looking for a level (start of a data description
+         * entry).
+         */
         private boolean _lookingForLevel = true;
 
         /** True if we are likely to be in a COBOL DATA DIVISION section. */
@@ -271,7 +349,7 @@ public abstract class AbstractCobolSourceCleaner {
 
         /**
          * @param isLookingForLevel set to true when we are looking for
-         *  a level (start of a data description entry)
+         *            a level (start of a data description entry)
          */
         public void setLookingForLevel(final boolean isLookingForLevel) {
             _lookingForLevel = isLookingForLevel;
@@ -285,17 +363,34 @@ public abstract class AbstractCobolSourceCleaner {
         }
 
         /**
-         * @param dataDivision set to true if we are likely to be in a COBOL DATA DIVISION section
+         * @param dataDivision set to true if we are likely to be in a COBOL
+         *            DATA DIVISION section
          */
         public void setDataDivision(final boolean dataDivision) {
             _inDataDivision = dataDivision;
         }
 
-
     }
 
-    /** 
+    /**
+     * Examine characters before an assumed level. If these characters
+     * are not terminated by a COBOL delimiter then the level is actually
+     * an argument to a previous keyword, not an actual level.
+     * 
+     * @param fragment a fragment of code preceding an assumed level
+     * @return true if the assumed level is an argument
+     */
+    protected boolean isArgument(final String fragment) {
+        String s = fragment.trim();
+        if (s.length() > 0) {
+            return s.charAt(s.length() - 1) != COBOL_DELIMITER;
+        }
+        return false;
+    }
+
+    /**
      * Add an error message to the history.
+     * 
      * @param msg the error message
      * */
     public void emitErrorMessage(final String msg) {

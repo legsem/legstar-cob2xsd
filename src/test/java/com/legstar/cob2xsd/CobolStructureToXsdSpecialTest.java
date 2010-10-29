@@ -645,4 +645,47 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
         }
     }
 
+    /**
+     * Test for issue 40 Parsing error on RECORD CONTAINS 58 TO 183 CHARACTERS.
+     */
+    public void testRecordContainsTo() {
+        try {
+            Cob2XsdContext context = new Cob2XsdContext();
+            context.setCodeFormat(CodeFormat.FREE_FORMAT);
+            context.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            String xmlSchema = cob2xsd
+                    .translate(
+                    "*\n"
+                            + "FD OUTPUT-FILE\n"
+                            + "RECORDING MODE IS V\n"
+                            + "BLOCK CONTAINS 2 RECORDS\n"
+                            + "RECORD CONTAINS 58 TO 183 CHARACTERS.\n"
+                            + "COPY ABCD.01  CUSTOMER-DATA.\n"
+                            + "  COPY EFG .  05 CUSTOMER-ID             PIC 9(6).\n"
+                            );
+            compare(
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+                            + "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                            + " elementFormDefault=\"unqualified\">"
+                            + "    <xsd:complexType name=\"CustomerData\">"
+                            + "        <xsd:sequence>"
+                            + "            <xsd:element name=\"customerId\">"
+                            + "                <xsd:simpleType>"
+                            + "                    <xsd:restriction base=\"xsd:unsignedInt\">"
+                            + "                        <xsd:totalDigits value=\"6\"/>"
+                            + "                    </xsd:restriction>"
+                            + "                </xsd:simpleType>"
+                            + "            </xsd:element>"
+                            + "        </xsd:sequence>"
+                            + "    </xsd:complexType>"
+                            + "    <xsd:element name=\"customerData\" type=\"CustomerData\"/>"
+                            + "</xsd:schema>"
+                    ,
+                    xmlSchema);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 }
