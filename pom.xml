@@ -8,7 +8,7 @@
     <description>legstar-cob2xsd is a COBOL structure to XML Schema translator</description>
     <url>http://code.google.com/p/legstar-cob2xsd</url>
     <properties>
-        <legstarVersion>1.3.2</legstarVersion>
+        <legstarVersion>1.4.0</legstarVersion>
         <antlrVersion>3.2</antlrVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
