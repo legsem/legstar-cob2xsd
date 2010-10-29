@@ -17,6 +17,7 @@ Assembly descriptor for the executable jar.
                 <exclude>org.antlr:antlr</exclude>
                 <exclude>antlr:antlr</exclude>
                 <exclude>org.antlr:stringtemplate</exclude>
+                <exclude>org.codehaus.jackson:*</exclude>
             </excludes>
         </dependencySet>
      </dependencySets>

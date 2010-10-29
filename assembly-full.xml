@@ -23,6 +23,7 @@ use by third party products.
                 <exclude>org.antlr:antlr</exclude>
                 <exclude>antlr:antlr</exclude>
                 <exclude>org.antlr:stringtemplate</exclude>
+                <exclude>org.codehaus.jackson:*</exclude>
                 <exclude>log4j:log4j</exclude>
                 <exclude>org.apache.velocity:velocity</exclude>
                 <exclude>commons-collections:commons-collections</exclude>
