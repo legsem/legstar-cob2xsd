@@ -10,26 +10,30 @@
  ******************************************************************************/
 package com.legstar.cobol;
 
-import com.legstar.cob2xsd.Cob2XsdContext;
+import com.legstar.cob2xsd.Cob2XsdModel;
 
 /**
  * Clean a fixed format COBOL source.
  * <p/>
- * Fixed format is the traditional IBM z/OS format where columns 1-6 contain sequence numbers,
- * column 7 is the indicator area, area A spans from column 8 to 11 and area B 
- * from 12 to 72. 
- *
+ * Fixed format is the traditional IBM z/OS format where columns 1-6 contain
+ * sequence numbers, column 7 is the indicator area, area A spans from column 8
+ * to 11 and area B from 12 to 72.
+ * 
  */
 public class CobolFixedFormatSourceCleaner extends AbstractCobolSourceCleaner {
 
-    /** Column where code starts (inclusive, based 1). This is the indicator area column. */
-    private int _startColumn = Cob2XsdContext.DEFAULT_START_COLUMN;
-    
-    /** Column where code ends (inclusive, based 1).*/
-    private int _endColumn = Cob2XsdContext.DEFAULT_END_COLUMN;
+    /**
+     * Column where code starts (inclusive, based 1). This is the indicator area
+     * column.
+     */
+    private int _startColumn = Cob2XsdModel.DEFAULT_START_COLUMN;
+
+    /** Column where code ends (inclusive, based 1). */
+    private int _endColumn = Cob2XsdModel.DEFAULT_END_COLUMN;
 
     /**
      * Construct with a shared error handler.
+     * 
      * @param errorHandler handles error messages
      */
     public CobolFixedFormatSourceCleaner(
@@ -40,6 +44,7 @@ public class CobolFixedFormatSourceCleaner extends AbstractCobolSourceCleaner {
 
     /**
      * Construct with a shared error handler.
+     * 
      * @param errorHandler handles error messages
      * @param startColumn column where code starts (indicator area)
      * @param endColumn column where code ends (right margin)
@@ -53,13 +58,13 @@ public class CobolFixedFormatSourceCleaner extends AbstractCobolSourceCleaner {
         _endColumn = endColumn;
     }
 
-    /** {@inheritDoc}*/
+    /** {@inheritDoc} */
     @Override
     public String extendedCleanLine(final String line) {
         return cleanFixedLine(line);
-     }
-    
-    /** {@inheritDoc}*/
+    }
+
+    /** {@inheritDoc} */
     @Override
     public int getIndicatorAreaPos() {
         return _startColumn - 1;
@@ -68,6 +73,7 @@ public class CobolFixedFormatSourceCleaner extends AbstractCobolSourceCleaner {
     /**
      * Clear sequence numbers in column 1-6 and anything
      * beyond column 72.
+     * 
      * @param line the line of code
      * @return a line of code without sequence numbers
      */
@@ -88,6 +94,5 @@ public class CobolFixedFormatSourceCleaner extends AbstractCobolSourceCleaner {
         cleanedLine.append(areaA);
         return cleanedLine.toString();
     }
-
 
 }

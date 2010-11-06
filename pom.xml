@@ -100,11 +100,13 @@
             <groupId>com.legsem.legstar</groupId>
             <artifactId>Legstar-coxbapi</artifactId>
             <version>${legstarVersion}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.legsem.legstar</groupId>
             <artifactId>Legstar-codegen</artifactId>
             <version>${legstarVersion}</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- ANT -->    
@@ -317,7 +319,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
+		            <!-- 
+		                JAR with test classifier for use by other projects who need COBOL and XML SChema samples
+		              -->
                     <execution>
+                        <id>bundle-test-jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
@@ -332,12 +338,38 @@
                             </includes>
                         </configuration>
                     </execution>
+ 
+                    <!-- 
+                        Executable jar
+                      -->
+                   <execution>
+                        <id>bundle-exe-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>exe</classifier>
+                            <archive>
+                                <manifest>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                    <mainClass>com.legstar.cob2xsd.exe.CobolStructureToXsdMain</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+
                 </executions>
             </plugin>
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId> 
                 <executions>
+
+		            <!-- 
+		                Main ZIP distribution (includes executable jar)
+		              -->
                     <execution>
                         <id>make-full-assembly</id>
                         <phase>package</phase>
@@ -353,26 +385,10 @@
                             </archiverConfig>
                         </configuration>
                     </execution>
-                   <execution>
-                        <id>make-exe</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>assembly-exe.xml</descriptor>
-                            </descriptors>
-                            <archive>
-                                <manifest>
-                                    <mainClass>com.legstar.cob2xsd.exe.CobolStructureToXsdMain</mainClass>
-                                </manifest>
-                            </archive>
-                            <archiverConfig>
-                                <duplicateBehavior>skip</duplicateBehavior>
-                            </archiverConfig>
-                        </configuration>
-                    </execution>
+
+                    <!-- 
+                        Full jar which contains dependencies
+                      -->
                     <execution>
                         <id>make-assembly</id>
                         <phase>package</phase>

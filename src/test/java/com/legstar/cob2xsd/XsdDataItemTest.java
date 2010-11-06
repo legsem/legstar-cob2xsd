@@ -28,7 +28,7 @@ import com.legstar.cobol.model.CobolDataItem.Usage;
 public class XsdDataItemTest extends TestCase {
 
     /** Translator options. */
-    private Cob2XsdContext _context = new Cob2XsdContext();
+    private Cob2XsdModel _model = new Cob2XsdModel();
 
     /** Handles error messages. */
     private RecognizerErrorHandler _errorHandler = new RecognizerErrorHandler();
@@ -37,26 +37,26 @@ public class XsdDataItemTest extends TestCase {
      * Test XML element name derived from COBOL name.
      */
     public void testFormatElementName() {
-        Cob2XsdContext context = new Cob2XsdContext();
+        Cob2XsdModel model = new Cob2XsdModel();
 
         assertEquals("", XsdDataItem.formatElementName(new CobolDataItem(""),
-                context));
+                model));
         assertEquals("a", XsdDataItem.formatElementName(new CobolDataItem("A"),
-                context));
+                model));
         assertEquals("ab", XsdDataItem.formatElementName(
-                new CobolDataItem("AB"), context));
+                new CobolDataItem("AB"), model));
         assertEquals("ab9C", XsdDataItem.formatElementName(new CobolDataItem(
-                "AB9C"), context));
+                "AB9C"), model));
         assertEquals("ab9Cd", XsdDataItem.formatElementName(new CobolDataItem(
-                "AB9CD"), context));
+                "AB9CD"), model));
         assertEquals("ab9CdE", XsdDataItem.formatElementName(new CobolDataItem(
-                "AB9CD-E"), context));
+                "AB9CD-E"), model));
         assertEquals("ab9CdEf", XsdDataItem.formatElementName(
-                new CobolDataItem("AB9CD-EF"), context));
+                new CobolDataItem("AB9CD-EF"), model));
 
-        context.setElementNamesStartWithUppercase(true);
+        model.setElementNamesStartWithUppercase(true);
         assertEquals("Ab9CdEf", XsdDataItem.formatElementName(
-                new CobolDataItem("AB9CD-EF"), context));
+                new CobolDataItem("AB9CD-EF"), model));
 
     }
 
@@ -66,23 +66,23 @@ public class XsdDataItemTest extends TestCase {
     public void testFormatTypeName() {
 
         List < String > nonUniqueCobolNames = new ArrayList < String >();
-        Cob2XsdContext context = new Cob2XsdContext();
+        Cob2XsdModel model = new Cob2XsdModel();
 
         /* Test name conflict resolution (append srce line) */
         nonUniqueCobolNames.add("AB9CD-EF");
         CobolDataItem cobolDataItem = new CobolDataItem("AB9CD-EF");
         cobolDataItem.setSrceLine(18);
         assertEquals("Ab9CdEf18", XsdDataItem.formatTypeName(
-                "ab9CdEf", cobolDataItem, nonUniqueCobolNames, context, null));
+                "ab9CdEf", cobolDataItem, nonUniqueCobolNames, model, null));
 
         /* Test name conflict resolution (prepend parent type name) */
-        context.setNameConflictPrependParentName(true);
+        model.setNameConflictPrependParentName(true);
 
         CobolDataItem cobolParent = new CobolDataItem("COBOL-PARENT");
-        XsdDataItem xsdParent = new XsdDataItem(cobolParent, _context, null,
+        XsdDataItem xsdParent = new XsdDataItem(cobolParent, _model, null,
                 nonUniqueCobolNames, _errorHandler);
         assertEquals("CobolParentAb9CdEf", XsdDataItem.formatTypeName(
-                "ab9CdEf", cobolDataItem, nonUniqueCobolNames, context,
+                "ab9CdEf", cobolDataItem, nonUniqueCobolNames, model,
                 xsdParent));
     }
 
@@ -94,7 +94,7 @@ public class XsdDataItemTest extends TestCase {
 
         dataItem.setCobolName("COBOL-NAME");
         dataItem.getChildren().add(new CobolDataItem());
-        XsdDataItem mapper = new XsdDataItem(dataItem, _context, null,
+        XsdDataItem mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("GROUP_ITEM", mapper.getCobolType().toString());
         assertEquals("COMPLEX", mapper.getXsdType().toString());
@@ -109,73 +109,73 @@ public class XsdDataItemTest extends TestCase {
         CobolDataItem dataItem = new CobolDataItem();
 
         dataItem.setUsage(Usage.BINARY);
-        XsdDataItem mapper = new XsdDataItem(dataItem, _context, null,
+        XsdDataItem mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("BINARY_ITEM", mapper.getCobolType().toString());
         assertEquals("INTEGER", mapper.getXsdType().toString());
 
         dataItem.setUsage(Usage.NATIVEBINARY);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("NATIVE_BINARY_ITEM", mapper.getCobolType().toString());
         assertEquals("INTEGER", mapper.getXsdType().toString());
 
         dataItem.setUsage(Usage.SINGLEFLOAT);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("SINGLE_FLOAT_ITEM", mapper.getCobolType().toString());
         assertEquals("FLOAT", mapper.getXsdType().toString());
 
         dataItem.setUsage(Usage.DOUBLEFLOAT);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("DOUBLE_FLOAT_ITEM", mapper.getCobolType().toString());
         assertEquals("DOUBLE", mapper.getXsdType().toString());
 
         dataItem.setUsage(Usage.PACKEDDECIMAL);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("PACKED_DECIMAL_ITEM", mapper.getCobolType().toString());
         assertEquals("DECIMAL", mapper.getXsdType().toString());
 
         dataItem.setUsage(Usage.INDEX);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("INDEX_ITEM", mapper.getCobolType().toString());
         assertEquals("HEXBINARY", mapper.getXsdType().toString());
 
         dataItem.setUsage(Usage.POINTER);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("POINTER_ITEM", mapper.getCobolType().toString());
         assertEquals("HEXBINARY", mapper.getXsdType().toString());
 
         dataItem.setUsage(Usage.PROCEDUREPOINTER);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("PROC_POINTER_ITEM", mapper.getCobolType().toString());
         assertEquals("HEXBINARY", mapper.getXsdType().toString());
 
         dataItem.setUsage(Usage.FUNCTIONPOINTER);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("FUNC_POINTER_ITEM", mapper.getCobolType().toString());
         assertEquals("HEXBINARY", mapper.getXsdType().toString());
 
         dataItem.setUsage(Usage.DISPLAY);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("ALPHANUMERIC_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
 
         dataItem.setUsage(Usage.DISPLAY1);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("DBCS_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
 
         dataItem.setUsage(Usage.NATIONAL);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("NATIONAL_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
@@ -189,56 +189,56 @@ public class XsdDataItemTest extends TestCase {
         CobolDataItem dataItem = new CobolDataItem();
 
         dataItem.setPicture("A");
-        XsdDataItem mapper = new XsdDataItem(dataItem, _context, null,
+        XsdDataItem mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("ALPHABETIC_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
 
         dataItem.setPicture("X");
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("ALPHANUMERIC_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
 
         dataItem.setPicture("X9");
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("ALPHANUMERIC_EDITED_ITEM", mapper.getCobolType()
                 .toString());
         assertEquals("STRING", mapper.getXsdType().toString());
 
         dataItem.setPicture("G");
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("DBCS_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
 
         dataItem.setPicture("N");
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("NATIONAL_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
 
         dataItem.setPicture("E");
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("EXTERNAL_FLOATING_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
 
         dataItem.setPicture("BZ0,+-CRDB$");
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("NUMERIC_EDITED_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
 
         dataItem.setPicture("99");
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("ZONED_DECIMAL_ITEM", mapper.getCobolType().toString());
         assertEquals("USHORT", mapper.getXsdType().toString());
 
         dataItem.setPicture("99.9");
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("NUMERIC_EDITED_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
@@ -253,7 +253,7 @@ public class XsdDataItemTest extends TestCase {
 
         dataItem.setPicture("99V9");
         dataItem.setUsage(Usage.DISPLAY);
-        XsdDataItem mapper = new XsdDataItem(dataItem, _context, null,
+        XsdDataItem mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("ZONED_DECIMAL_ITEM", mapper.getCobolType().toString());
         assertEquals("DECIMAL", mapper.getXsdType().toString());
@@ -263,7 +263,7 @@ public class XsdDataItemTest extends TestCase {
 
         dataItem.setPicture("99.9");
         dataItem.setUsage(Usage.DISPLAY);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("NUMERIC_EDITED_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
@@ -273,7 +273,7 @@ public class XsdDataItemTest extends TestCase {
 
         dataItem.setPicture("S99V9");
         dataItem.setUsage(Usage.PACKEDDECIMAL);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("PACKED_DECIMAL_ITEM", mapper.getCobolType().toString());
         assertEquals("DECIMAL", mapper.getXsdType().toString());
@@ -282,7 +282,7 @@ public class XsdDataItemTest extends TestCase {
 
         dataItem.setPicture("S999");
         dataItem.setUsage(Usage.BINARY);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("BINARY_ITEM", mapper.getCobolType().toString());
         assertEquals("SHORT", mapper.getXsdType().toString());
@@ -291,7 +291,7 @@ public class XsdDataItemTest extends TestCase {
 
         dataItem.setPicture("999999999");
         dataItem.setUsage(Usage.NATIVEBINARY);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("NATIVE_BINARY_ITEM", mapper.getCobolType().toString());
         assertEquals("UINT", mapper.getXsdType().toString());
@@ -300,7 +300,7 @@ public class XsdDataItemTest extends TestCase {
 
         dataItem.setPicture("S99999999999");
         dataItem.setUsage(Usage.BINARY);
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("BINARY_ITEM", mapper.getCobolType().toString());
         assertEquals("LONG", mapper.getXsdType().toString());
@@ -317,7 +317,7 @@ public class XsdDataItemTest extends TestCase {
 
         dataItem.setPicture("99.9");
         dataItem.setUsage(Usage.DISPLAY);
-        XsdDataItem mapper = new XsdDataItem(dataItem, _context, null,
+        XsdDataItem mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals("NUMERIC_EDITED_ITEM", mapper.getCobolType().toString());
         assertEquals("STRING", mapper.getXsdType().toString());
@@ -325,10 +325,10 @@ public class XsdDataItemTest extends TestCase {
         assertEquals(1, mapper.getFractionDigits());
         assertEquals("99.9", mapper.getPicture());
 
-        Cob2XsdContext context = new Cob2XsdContext();
-        context.setCurrencySign("USD");
+        Cob2XsdModel model = new Cob2XsdModel();
+        model.setCurrencySign("USD");
         dataItem.setPicture("$$$$.99");
-        mapper = new XsdDataItem(dataItem, context, null,
+        mapper = new XsdDataItem(dataItem, model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals(5, mapper.getTotalDigits());
         assertEquals(2, mapper.getFractionDigits());
@@ -336,19 +336,19 @@ public class XsdDataItemTest extends TestCase {
         assertEquals(9, mapper.getMaxStorageLength());
 
         dataItem.setPicture("+,+++,999.99");
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals(8, mapper.getTotalDigits());
         assertEquals(2, mapper.getFractionDigits());
 
         dataItem.setPicture("$B*,***,***.**BBDB");
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals(9, mapper.getTotalDigits());
         assertEquals(2, mapper.getFractionDigits());
 
         dataItem.setPicture("$Z,ZZZ,ZZZ.ZZCR");
-        mapper = new XsdDataItem(dataItem, _context, null,
+        mapper = new XsdDataItem(dataItem, _model, null,
                 new ArrayList < String >(), _errorHandler);
         assertEquals(9, mapper.getTotalDigits());
         assertEquals(2, mapper.getFractionDigits());
@@ -365,7 +365,7 @@ public class XsdDataItemTest extends TestCase {
         dataItem.getChildren().add(child1);
 
         new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
 
     }
@@ -385,7 +385,7 @@ public class XsdDataItemTest extends TestCase {
         dataItem.getChildren().add(child2);
 
         XsdDataItem xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertFalse(xsdDataItem.getChildren().get(0).isODOObject());
         assertTrue(xsdDataItem.getChildren().get(1).isODOObject());
@@ -409,7 +409,7 @@ public class XsdDataItemTest extends TestCase {
         grandParent.getChildren().add(parent);
 
         XsdDataItem xsdGrandParent = new XsdDataItem(
-                grandParent, _context, null, new ArrayList < String >(),
+                grandParent, _model, null, new ArrayList < String >(),
                 _errorHandler);
 
         assertTrue(xsdGrandParent.getChildren().get(0).isODOObject());
@@ -432,7 +432,7 @@ public class XsdDataItemTest extends TestCase {
         grandParent.getChildren().add(parent);
 
         XsdDataItem xsdGrandParent = new XsdDataItem(
-                grandParent, _context, null, new ArrayList < String >(),
+                grandParent, _model, null, new ArrayList < String >(),
                 _errorHandler);
 
         assertTrue(xsdGrandParent.getChildren().get(0).isRedefined());
@@ -447,7 +447,7 @@ public class XsdDataItemTest extends TestCase {
         dataItem.setDataEntryType(DataEntryType.RENAMES);
 
         XsdDataItem xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertTrue(xsdDataItem.getXsdType() == null);
 
@@ -461,7 +461,7 @@ public class XsdDataItemTest extends TestCase {
         dataItem.setDataEntryType(DataEntryType.CONDITION);
 
         XsdDataItem xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(XsdType.ENUM, xsdDataItem.getXsdType());
 
@@ -475,14 +475,14 @@ public class XsdDataItemTest extends TestCase {
         CobolDataItem dataItem = new CobolDataItem("COBOL-NAME");
         dataItem.setUsage(Usage.SINGLEFLOAT);
         XsdDataItem xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(4, xsdDataItem.getMinStorageLength());
         assertEquals(4, xsdDataItem.getMaxStorageLength());
 
         dataItem.setUsage(Usage.DOUBLEFLOAT);
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(8, xsdDataItem.getMinStorageLength());
         assertEquals(8, xsdDataItem.getMaxStorageLength());
@@ -490,42 +490,42 @@ public class XsdDataItemTest extends TestCase {
         dataItem.setUsage(Usage.DISPLAY);
         dataItem.setPicture("X(5)");
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(5, xsdDataItem.getMinStorageLength());
         assertEquals(5, xsdDataItem.getMaxStorageLength());
 
         dataItem.setPicture("A(5)G(2)99");
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(11, xsdDataItem.getMinStorageLength());
         assertEquals(11, xsdDataItem.getMaxStorageLength());
 
         dataItem.setPicture("G(3)");
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(6, xsdDataItem.getMinStorageLength());
         assertEquals(6, xsdDataItem.getMaxStorageLength());
 
         dataItem.setPicture("N(5)");
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(10, xsdDataItem.getMinStorageLength());
         assertEquals(10, xsdDataItem.getMaxStorageLength());
 
         dataItem.setPicture("+++99V99$");
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(8, xsdDataItem.getMinStorageLength());
         assertEquals(8, xsdDataItem.getMaxStorageLength());
 
         dataItem.setPicture("9(18)V99");
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(20, xsdDataItem.getMinStorageLength());
         assertEquals(20, xsdDataItem.getMaxStorageLength());
@@ -533,7 +533,7 @@ public class XsdDataItemTest extends TestCase {
         dataItem.setUsage(Usage.BINARY);
         dataItem.setPicture("9(4)");
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(2, xsdDataItem.getMinStorageLength());
         assertEquals(2, xsdDataItem.getMaxStorageLength());
@@ -541,7 +541,7 @@ public class XsdDataItemTest extends TestCase {
         dataItem.setUsage(Usage.BINARY);
         dataItem.setPicture("9(8)");
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(4, xsdDataItem.getMinStorageLength());
         assertEquals(4, xsdDataItem.getMaxStorageLength());
@@ -549,7 +549,7 @@ public class XsdDataItemTest extends TestCase {
         dataItem.setUsage(Usage.NATIVEBINARY);
         dataItem.setPicture("S9(18)");
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(8, xsdDataItem.getMinStorageLength());
         assertEquals(8, xsdDataItem.getMaxStorageLength());
@@ -557,7 +557,7 @@ public class XsdDataItemTest extends TestCase {
         dataItem.setUsage(Usage.PACKEDDECIMAL);
         dataItem.setPicture("S9(7)V99");
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(5, xsdDataItem.getMinStorageLength());
         assertEquals(5, xsdDataItem.getMaxStorageLength());
@@ -565,7 +565,7 @@ public class XsdDataItemTest extends TestCase {
         dataItem.setMinOccurs(0);
         dataItem.setMaxOccurs(2);
         xsdDataItem = new XsdDataItem(
-                dataItem, _context, null, new ArrayList < String >(),
+                dataItem, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(0, xsdDataItem.getMinStorageLength());
         assertEquals(10, xsdDataItem.getMaxStorageLength());
@@ -596,7 +596,7 @@ public class XsdDataItemTest extends TestCase {
         struct.getChildren().add(child2);
 
         XsdDataItem xsdDataItem = new XsdDataItem(
-                struct, _context, null, new ArrayList < String >(),
+                struct, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(16, xsdDataItem.getMinStorageLength());
         assertEquals(16, xsdDataItem.getMaxStorageLength());
@@ -605,14 +605,14 @@ public class XsdDataItemTest extends TestCase {
         child1.setMaxOccurs(5);
 
         xsdDataItem = new XsdDataItem(
-                struct, _context, null, new ArrayList < String >(),
+                struct, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(24, xsdDataItem.getMinStorageLength());
         assertEquals(48, xsdDataItem.getMaxStorageLength());
 
         struct.setMaxOccurs(2);
         xsdDataItem = new XsdDataItem(
-                struct, _context, null, new ArrayList < String >(),
+                struct, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(48, xsdDataItem.getMinStorageLength());
         assertEquals(96, xsdDataItem.getMaxStorageLength());
@@ -648,7 +648,7 @@ public class XsdDataItemTest extends TestCase {
         struct.getChildren().add(child4);
 
         XsdDataItem xsdDataItem = new XsdDataItem(
-                struct, _context, null, new ArrayList < String >(),
+                struct, _model, null, new ArrayList < String >(),
                 _errorHandler);
         assertEquals(16, xsdDataItem.getMinStorageLength());
         assertEquals(16, xsdDataItem.getMaxStorageLength());

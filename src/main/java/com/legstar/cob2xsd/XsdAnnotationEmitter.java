@@ -58,7 +58,7 @@ public class XsdAnnotationEmitter {
     private boolean _initialized = false;
 
     /** The translator options in effect. */
-    private Cob2XsdContext _context;
+    private Cob2XsdModel _cob2xsdModel;
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
@@ -75,14 +75,14 @@ public class XsdAnnotationEmitter {
      * are produced.
      * 
      * @param xsd the XML Schema to be populated.
-     * @param context the translator options in effect
+     * @param model the translator options in effect
      */
     public XsdAnnotationEmitter(
             final XmlSchema xsd,
-            final Cob2XsdContext context) {
+            final Cob2XsdModel model) {
         try {
             _xsd = xsd;
-            _context = context;
+            _cob2xsdModel = model;
 
             InputStream is =
                     XsdAnnotationEmitter.class
@@ -193,7 +193,7 @@ public class XsdAnnotationEmitter {
                     ValueUtil.resolveFigurative(
                             xsdDataItem.getValue(),
                             xsdDataItem.getMaxStorageLength(),
-                            getContext().quoteIsQuote()));
+                            getModel().quoteIsQuote()));
         }
 
         if (xsdDataItem.getSrceLine() > 0) {
@@ -280,8 +280,8 @@ public class XsdAnnotationEmitter {
     /**
      * @return the translator options in effect
      */
-    public Cob2XsdContext getContext() {
-        return _context;
+    public Cob2XsdModel getModel() {
+        return _cob2xsdModel;
     }
 
 }

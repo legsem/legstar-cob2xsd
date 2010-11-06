@@ -10,16 +10,51 @@
  ******************************************************************************/
 package com.legstar.cob2xsd;
 
-import java.io.Serializable;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Properties;
+
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+
+import com.legstar.codegen.CodeGenMakeException;
+import com.legstar.codegen.CodeGenUtil;
+import com.legstar.codegen.models.SourceToXsdCobolModel;
 
 /**
  * This class gathers execution parameters for the COBOL to XML Schema utility.
+ * <p/>
+ * The class is also capable of generating a fully configured ANT script to run
+ * the ant version of the utility with the current parameter set.
  * 
  */
-public class Cob2XsdContext implements Serializable {
+public class Cob2XsdModel extends SourceToXsdCobolModel {
 
-    /** serial ID. */
-    private static final long serialVersionUID = 3689777932172778788L;
+    /** This generator name. */
+    public static final String C2S_GENERATOR_NAME =
+            "LegStar COBOL to XML Schema generator";
+
+    /** This velocity template. */
+    public static final String C2S_VELOCITY_MACRO_NAME =
+            "vlc/build-cob2xsd-xml.vm";
+
+    /**
+     * Source can be in fixed format (sequence numbers, indicator area, area A,
+     * area B) or free format.
+     */
+    public enum CodeFormat {
+        /**
+         * Fixed is the legacy format, free, the more recent one.
+         */
+        FIXED_FORMAT, FREE_FORMAT
+    };
+
+    /* ====================================================================== */
+    /* Following are default field values. = */
+    /* ====================================================================== */
 
     /**
      * Default column where fixed format COBOL code starts (inclusive, based 1).
@@ -41,33 +76,78 @@ public class Cob2XsdContext implements Serializable {
      */
     public static final String DEFAULT_CURRENCY_SYMBOL = DEFAULT_CURRENCY_SIGN;
 
+    /* ====================================================================== */
+    /* Following are key identifiers for this model persistence. = */
+    /* ====================================================================== */
+
+    /** Fixed or Free format COBOL source. */
+    public static final String CODE_FORMAT = "codeFormat";
+
+    /** For fixed format COBOL, position of the indicator area. */
+    public static final String START_COLUMN = "startColumn";
+
+    /** For fixed format COBOL position of the right margin. */
+    public static final String END_COLUMN = "endColumn";
+
+    /** Character set used to encode the output XML Schema. */
+    public static final String XSD_ENCODING = "xsdEncoding";
+
+    /** Target namespace for generated XML schema. */
+    public static final String TARGET_NAMESPACE = "targetNamespace";
+
+    /** Whether COBOL conditions (level 88) should be mapped to facets. */
+    public static final String MAP_CONDITIONS_TO_FACETS = "mapConditionsToFacets";
+
+    /**
+     * True if parent complex type name should be prepended in case of name
+     * conflict.
+     */
+    public static final String NAME_CONFLICT_PREPEND_PARENT_NAME = "nameConflictPrependParentName";
+
+    /** True if XSD element names should start with an uppercase. */
+    public static final String ELEMENT_NAMES_START_WITH_UPPERCASE = "elementNamesStartWithUppercase";
+
+    /** An optional XSLT transform for XML schema customization. */
+    public static final String CUSTOM_XSLT_FILENAME = "customXsltFileName";
+
+    /** Whether we should generate COBOL/JAXB annotations. */
+    public static final String ADD_LEGSTAR_ANNOTATIONS = "addLegStarAnnotations";
+
+    /** Currency sign used (CURRENCY SIGN clause in the SPECIAL-NAMES). */
+    public static final String CURRENCY_SIGN = "currencySign";
+
+    /** Currency symbol used (CURRENCY PICTURE SYMBOL clause). */
+    public static final String CURRENCY_SYMBOL = "currencySymbol";
+
+    /** Whether comma is the decimal point (DECIMAL-POINT IS COMMA clause). */
+    public static final String DECIMAL_POINT_IS_COMMA = "decimalPointIsComma";
+
+    /** COBOL NSYMBOL(DBCS) compiler option. */
+    public static final String NSYMBOL_DBCS = "nSymbolDbcs";
+
+    /** COBOL QUOTE|APOST compiler option. */
+    public static final String QUOTE_IS_QUOTE = "quoteIsQuote";
+
+    /* ====================================================================== */
+    /* Following are this class fields that are persistent. = */
+    /* ====================================================================== */
+
     /*
-     * -------------------------------------------------------------------
+     * ----------------------------------------------------------------------
      * COBOL source format related options
      */
 
-    /**
-     * Source can be in fixed format (sequence numbers, indicator area, area A,
-     * area B) or free format.
-     */
-    public enum CodeFormat {
-        /**
-         * Fixed is the legacy format, free, the more recent one.
-         */
-        FIXED_FORMAT, FREE_FORMAT
-    };
-
     /** Fixed or Free format COBOL source. */
-    public CodeFormat _codeFormat = CodeFormat.FIXED_FORMAT;
+    private CodeFormat _codeFormat = CodeFormat.FIXED_FORMAT;
 
     /** For fixed format COBOL, position of the indicator area. */
-    public int _startColumn = DEFAULT_START_COLUMN;
+    private int _startColumn = DEFAULT_START_COLUMN;
 
-    /** For fixed format COBOL position of the right margin. */
-    public int _endColumn = DEFAULT_END_COLUMN;
+    /** For fixed format COBOL, position of the right margin. */
+    private int _endColumn = DEFAULT_END_COLUMN;
 
     /*
-     * -------------------------------------------------------------------
+     * ----------------------------------------------------------------------
      * XML Schema related options
      */
 
@@ -100,15 +180,15 @@ public class Cob2XsdContext implements Serializable {
     private String _customXsltFileName;
 
     /*
-     * -------------------------------------------------------------------
+     * ----------------------------------------------------------------------
      * LegStar annotations related options
      */
 
-    /** Whether we should generate COBOL/JAXB annotations. */
+    /** Whether we should generate COBOL annotations. */
     private boolean _addLegStarAnnotations = false;
 
     /*
-     * -------------------------------------------------------------------
+     * ----------------------------------------------------------------------
      * COBOL compiler related options
      */
 
@@ -132,6 +212,115 @@ public class Cob2XsdContext implements Serializable {
 
     /** COBOL QUOTE|APOST compiler option. False means APOST. */
     private boolean _quoteIsQuote = true;
+
+    /* ====================================================================== */
+    /* Following are this class fields that are non persistent. = */
+    /* ====================================================================== */
+
+    /** The full path to the cobol source file. */
+    private String _cobolSourceFilePath;
+
+    /** Whether velocity is already initialized. */
+    private boolean _velocityInitialized;
+
+    /**
+     * A no-Arg constructor.
+     */
+    public Cob2XsdModel() {
+    }
+
+    /**
+     * Construct from a properties file.
+     * 
+     * @param props the property file
+     */
+    public Cob2XsdModel(final Properties props) {
+        setCodeFormat(CodeFormat.valueOf(getString(props, CODE_FORMAT,
+                CodeFormat.FIXED_FORMAT.toString())));
+        setStartColumn(getInt(props, START_COLUMN, DEFAULT_START_COLUMN));
+        setEndColumn(getInt(props, END_COLUMN, DEFAULT_END_COLUMN));
+        setXsdEncoding(getString(props, XSD_ENCODING, DEFAULT_XSD_ENCODING));
+        setTargetNamespace(getString(props, TARGET_NAMESPACE, null));
+        setMapConditionsToFacets(getBoolean(props, MAP_CONDITIONS_TO_FACETS,
+                false));
+        setNameConflictPrependParentName(getBoolean(props,
+                NAME_CONFLICT_PREPEND_PARENT_NAME, false));
+        setElementNamesStartWithUppercase(getBoolean(props,
+                ELEMENT_NAMES_START_WITH_UPPERCASE, false));
+        setCustomXsltFileName(getString(props, CUSTOM_XSLT_FILENAME, null));
+        setAddLegStarAnnotations(getBoolean(props, ADD_LEGSTAR_ANNOTATIONS,
+                false));
+        setCurrencySign(getString(props, CURRENCY_SIGN, DEFAULT_CURRENCY_SIGN));
+        setCurrencySymbol(getString(props, CURRENCY_SYMBOL,
+                DEFAULT_CURRENCY_SYMBOL));
+        setDecimalPointIsComma(getBoolean(props, DECIMAL_POINT_IS_COMMA, false));
+        setNSymbolDbcs(getBoolean(props, NSYMBOL_DBCS, false));
+        setQuoteIsQuote(getBoolean(props, QUOTE_IS_QUOTE, true));
+    }
+
+    /**
+     * Creates an ant build script file ready for XSD generation.
+     * 
+     * @param targetFile the script file that must be created
+     * @throws CodeGenMakeException if generation fails
+     */
+    public final void generateBuild(
+            final File targetFile) throws CodeGenMakeException {
+        Writer w = null;
+        try {
+            if (!_velocityInitialized) {
+                CodeGenUtil.initVelocity();
+                _velocityInitialized = true;
+            }
+            VelocityContext context = CodeGenUtil
+                    .getContext(C2S_GENERATOR_NAME);
+            context.put("antModel", this);
+            w = new OutputStreamWriter(
+                    new FileOutputStream(targetFile), "UTF-8");
+            Velocity
+                    .mergeTemplate(C2S_VELOCITY_MACRO_NAME, "UTF-8", context, w);
+        } catch (IOException e) {
+            throw new CodeGenMakeException(e);
+        } catch (Exception e) {
+            throw new CodeGenMakeException(e);
+        } finally {
+            if (w != null) {
+                try {
+                    w.close();
+                } catch (IOException e) {
+                    throw new CodeGenMakeException(e);
+                }
+            }
+        }
+    }
+
+    /**
+     * @return the full path to the COBOL source file
+     */
+    public final String getCobolSourceFilePath() {
+        return _cobolSourceFilePath;
+    }
+
+    /**
+     * @param cobolSourceFilePath the full path to the COBOL source file to set
+     */
+    public final void setCobolSourceFilePath(final String cobolSourceFilePath) {
+        _cobolSourceFilePath = cobolSourceFilePath;
+    }
+
+    /**
+     * @return the target XML schema file
+     */
+    public final File getTargetXsdFile() {
+        if (getTargetXsdFileName() == null) {
+            return null;
+        }
+        if (getTargetDir() == null) {
+            return new File(getTargetXsdFileName());
+        } else {
+            return new File(getTargetDir(), getTargetXsdFileName());
+        }
+    }
 
     /*
      * -------------------------------------------------------------------
@@ -420,29 +609,40 @@ public class Cob2XsdContext implements Serializable {
         _quoteIsQuote = quoteIsQuote;
     }
 
-    /** {@inheritDoc} */
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        sb.append("sourceFormat: " + getCodeFormat() + ", ");
-        sb.append("startColumn: " + getStartColumn() + ", ");
-        sb.append("endColumn: " + getEndColumn() + ", ");
-        sb.append("xsdEncoding: " + getXsdEncoding() + ", ");
-        sb.append("targetNamespace: " + getTargetNamespace() + ", ");
-        sb.append("mapConditionsToFacets: " + mapConditionsToFacets() + ", ");
-        sb.append("nameConflictPrependParentName: "
-                + nameConflictPrependParentName() + ", ");
-        sb.append("elementNamesStartWithUppercase: "
-                + elementNamesStartWithUppercase() + ", ");
-        sb.append("customXslt: " + getCustomXsltFileName() + ", ");
-        sb.append("addLegStarAnnotations: " + addLegStarAnnotations() + ", ");
-        sb.append("currencySign: " + getCurrencySign() + ", ");
-        sb.append("currencySymbol: " + getCurrencySymbol() + ", ");
-        sb.append("decimalPointIsComma: " + decimalPointIsComma() + ", ");
-        sb.append("nSymbolDbcs: " + nSymbolDbcs() + ", ");
-        sb.append("quoteIsQuote: " + quoteIsQuote() + ", ");
-        sb.append("}");
-        return sb.toString();
+    /**
+     * @return a properties file holding the values of this object fields
+     */
+    public Properties toProperties() {
+        Properties props = super.toProperties();
+        if (getCodeFormat() != null) {
+            putString(props, CODE_FORMAT, getCodeFormat().toString());
+        }
+        putInt(props, START_COLUMN, getStartColumn());
+        putInt(props, END_COLUMN, getEndColumn());
+        if (getXsdEncoding() != null) {
+            putString(props, XSD_ENCODING, getXsdEncoding());
+        }
+        if (getTargetNamespace() != null) {
+            putString(props, TARGET_NAMESPACE, getTargetNamespace());
+        }
+        putBoolean(props, MAP_CONDITIONS_TO_FACETS, mapConditionsToFacets());
+        putBoolean(props, NAME_CONFLICT_PREPEND_PARENT_NAME,
+                nameConflictPrependParentName());
+        putBoolean(props, ELEMENT_NAMES_START_WITH_UPPERCASE,
+                elementNamesStartWithUppercase());
+        if (getCustomXsltFileName() != null) {
+            putString(props, CUSTOM_XSLT_FILENAME, getCustomXsltFileName());
+        }
+        putBoolean(props, ADD_LEGSTAR_ANNOTATIONS, addLegStarAnnotations());
+        if (getCurrencySign() != null) {
+            putString(props, CURRENCY_SIGN, getCurrencySign());
+        }
+        if (getCurrencySymbol() != null) {
+            putString(props, CURRENCY_SYMBOL, getCurrencySymbol());
+        }
+        putBoolean(props, DECIMAL_POINT_IS_COMMA, decimalPointIsComma());
+        putBoolean(props, NSYMBOL_DBCS, nSymbolDbcs());
+        putBoolean(props, QUOTE_IS_QUOTE, quoteIsQuote());
+        return props;
     }
-
 }

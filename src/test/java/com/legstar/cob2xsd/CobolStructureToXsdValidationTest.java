@@ -11,7 +11,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import com.legstar.cob2xsd.Cob2XsdContext.CodeFormat;
+import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
 
 /**
  * These tests check that the XML Schemas that we generate are validating.
@@ -73,10 +73,10 @@ public class CobolStructureToXsdValidationTest extends AbstractXsdTester {
     protected void genSchemaAndParseInstance(final String targetNamespace,
             final String xmlInstance) {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setCodeFormat(CodeFormat.FREE_FORMAT);
-            context.setTargetNamespace(targetNamespace);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setCodeFormat(CodeFormat.FREE_FORMAT);
+            model.setTargetNamespace(targetNamespace);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd.translate(COBOL_SOURCE);
 
             // First make sure the XML Schema itself is valid XML

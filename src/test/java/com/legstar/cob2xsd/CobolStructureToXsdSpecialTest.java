@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import com.legstar.cob2xsd.Cob2XsdContext.CodeFormat;
+import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
 
 /**
  * Additional tests for CobolStructureToXsd. These are kept outside
@@ -86,9 +86,9 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testSampleSnippet() {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setTargetNamespace("http://www.mycompany.com/test");
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setTargetNamespace("http://www.mycompany.com/test");
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd
                     .translate("       01 A.\n           02 B PIC X.");
             compare(
@@ -123,10 +123,10 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testOutputEncoding() {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setTargetNamespace("http://www.mycompany.com/test");
-            context.setXsdEncoding("ISO-8859-1");
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setTargetNamespace("http://www.mycompany.com/test");
+            model.setXsdEncoding("ISO-8859-1");
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd
                     .translate("       01 A.\n           02 B PIC X.");
             compare(
@@ -161,13 +161,13 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testOutputEncodingPlusCustomization() {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setTargetNamespace("http://www.mycompany.com/test");
-            context.setXsdEncoding("ISO-8859-1");
-            context.setAddLegStarAnnotations(true);
-            context
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setTargetNamespace("http://www.mycompany.com/test");
+            model.setXsdEncoding("ISO-8859-1");
+            model.setAddLegStarAnnotations(true);
+            model
                     .setCustomXsltFileName("src/test/resources/xslt/alltypes.xsl");
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd
                     .translate("       01 A.\n           02 S-BINARY PIC X.");
             compare(
@@ -220,11 +220,11 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
     public void testFileOutputEncoding() {
         BufferedReader in = null;
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setTargetNamespace("http://www.mycompany.com/test");
-            context.setXsdEncoding("UTF-8");
-            context.setAddLegStarAnnotations(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setTargetNamespace("http://www.mycompany.com/test");
+            model.setXsdEncoding("UTF-8");
+            model.setAddLegStarAnnotations(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             File tempCobolFile = File.createTempFile("test", ".cob");
             tempCobolFile.deleteOnExit();
             BufferedWriter out = new BufferedWriter(
@@ -266,10 +266,10 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testConditionsWithFigurativeConstants() {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setTargetNamespace("http://www.mycompany.com/test");
-            context.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setTargetNamespace("http://www.mycompany.com/test");
+            model.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd
                     .translate(
                     "       01 DFHCOMMAREA.\n"
@@ -320,10 +320,10 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testIdentifierStartsWithDigit() {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setTargetNamespace("http://www.mycompany.com/test");
-            context.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setTargetNamespace("http://www.mycompany.com/test");
+            model.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd.translate(
                     "        01  5500-REC-01.\n"
                             + "          05 5500-REC-TYPE      PIC X(01).\n"
@@ -369,10 +369,10 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testPrimitiveTypesNameConflict() {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setTargetNamespace("http://www.mycompany.com/test");
-            context.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setTargetNamespace("http://www.mycompany.com/test");
+            model.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd.translate(
                     "        01  REC-01.\n"
                             + "            05 REC-TYPE      PIC X(01).\n"
@@ -425,10 +425,10 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testComplexTypesNameConflict() {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setTargetNamespace("http://www.mycompany.com/test");
-            context.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setTargetNamespace("http://www.mycompany.com/test");
+            model.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd.translate(
                     "        01  REC-01.\n"
                             + "            05 REC-TYPE.\n"
@@ -495,10 +495,10 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testGroupItemWithPictureClause() {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setTargetNamespace("http://www.mycompany.com/test");
-            context.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setTargetNamespace("http://www.mycompany.com/test");
+            model.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd.translate(
                     "        01  REC-01.\n"
                             + "            05 REC-TYPE      PIC X(01).\n"
@@ -537,11 +537,11 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testFreeFormat() {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setCodeFormat(CodeFormat.FREE_FORMAT);
-            context.setTargetNamespace("http://www.mycompany.com/test");
-            context.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setCodeFormat(CodeFormat.FREE_FORMAT);
+            model.setTargetNamespace("http://www.mycompany.com/test");
+            model.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd
                     .translate(
                     "*\n"
@@ -596,10 +596,10 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testNoTargetNamespace() {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setCodeFormat(CodeFormat.FREE_FORMAT);
-            context.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setCodeFormat(CodeFormat.FREE_FORMAT);
+            model.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd
                     .translate(
                     "*\n"
@@ -650,10 +650,10 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testRecordContainsTo() {
         try {
-            Cob2XsdContext context = new Cob2XsdContext();
-            context.setCodeFormat(CodeFormat.FREE_FORMAT);
-            context.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(context);
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setCodeFormat(CodeFormat.FREE_FORMAT);
+            model.setMapConditionsToFacets(true);
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
             String xmlSchema = cob2xsd
                     .translate(
                     "*\n"

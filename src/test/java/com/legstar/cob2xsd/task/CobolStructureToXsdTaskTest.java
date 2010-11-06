@@ -25,17 +25,18 @@ import org.apache.tools.ant.ProjectHelper;
 import org.w3c.dom.Document;
 
 import com.legstar.cob2xsd.AbstractXsdTester;
-import com.legstar.cob2xsd.Cob2XsdContext.CodeFormat;
+import com.legstar.cob2xsd.Cob2XsdModel;
+import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
 import com.legstar.codegen.CodeGenUtil;
 
 /**
  * Test the generation model.
  * 
  */
-public class CobolStructureToXsdModelTest extends AbstractXsdTester {
+public class CobolStructureToXsdTaskTest extends AbstractXsdTester {
 
     /** The parameters set. */
-    private CobolStructureToXsdModel _model;
+    private Cob2XsdModel _model;
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
@@ -49,7 +50,7 @@ public class CobolStructureToXsdModelTest extends AbstractXsdTester {
             throw new RuntimeException(e);
         }
         CodeGenUtil.checkDirectory(GEN_ANT_DIR, true);
-        _model = new CobolStructureToXsdModel();
+        _model = new Cob2XsdModel();
     }
 
     /**
@@ -65,12 +66,12 @@ public class CobolStructureToXsdModelTest extends AbstractXsdTester {
         _model.setTargetDir(GEN_XSD_DIR);
         _model.setTargetXsdFileName("lsfileae.xsd");
 
-        _model.getContext().setTargetNamespace(
+        _model.setTargetNamespace(
                 "http://legstar.com/test/coxb/lsfileae");
-        _model.getContext().setAddLegStarAnnotations(true);
+        _model.setAddLegStarAnnotations(true);
         /* Backward compatibility */
-        _model.getContext().setElementNamesStartWithUppercase(true);
-        _model.getContext().setQuoteIsQuote(false);
+        _model.setElementNamesStartWithUppercase(true);
+        _model.setQuoteIsQuote(false);
 
         runAnt(genAntScriptAsFile());
 
@@ -92,13 +93,13 @@ public class CobolStructureToXsdModelTest extends AbstractXsdTester {
         assertTrue(result.contains("startColumn=\"7\""));
         assertTrue(result.contains("endColumn=\"72\""));
 
-        _model.getContext().setStartColumn(1);
-        _model.getContext().setEndColumn(66);
+        _model.setStartColumn(1);
+        _model.setEndColumn(66);
         result = genAntScriptAsString();
         assertTrue(result.contains("startColumn=\"1\""));
         assertTrue(result.contains("endColumn=\"66\""));
 
-        _model.getContext().setCodeFormat(CodeFormat.FREE_FORMAT);
+        _model.setCodeFormat(CodeFormat.FREE_FORMAT);
         result = genAntScriptAsString();
         assertTrue(result.contains("codeFormat=\"FREE_FORMAT\""));
 
@@ -118,11 +119,11 @@ public class CobolStructureToXsdModelTest extends AbstractXsdTester {
         assertTrue(result.contains("nameConflictPrependParentName=\"false\""));
         assertTrue(result.contains("elementNamesStartWithUppercase=\"false\""));
 
-        _model.getContext().setXsdEncoding("ISO-8859-1");
-        _model.getContext().setTargetNamespace("test/targetNamespace");
-        _model.getContext().setMapConditionsToFacets(true);
-        _model.getContext().setNameConflictPrependParentName(true);
-        _model.getContext().setElementNamesStartWithUppercase(true);
+        _model.setXsdEncoding("ISO-8859-1");
+        _model.setTargetNamespace("test/targetNamespace");
+        _model.setMapConditionsToFacets(true);
+        _model.setNameConflictPrependParentName(true);
+        _model.setElementNamesStartWithUppercase(true);
         result = genAntScriptAsString();
         assertTrue(result.contains("xsdEncoding=\"ISO-8859-1\""));
         assertTrue(result.contains("targetNamespace=\"test/targetNamespace\""));
@@ -130,7 +131,7 @@ public class CobolStructureToXsdModelTest extends AbstractXsdTester {
         assertTrue(result.contains("nameConflictPrependParentName=\"true\""));
         assertTrue(result.contains("elementNamesStartWithUppercase=\"true\""));
 
-        _model.getContext().setCustomXsltFileName(
+        _model.setCustomXsltFileName(
                 "src/test/resources/xslt/alltypes.xsl");
         result = genAntScriptAsString();
         assertTrue(result
@@ -147,7 +148,7 @@ public class CobolStructureToXsdModelTest extends AbstractXsdTester {
         String result = genAntScriptAsString();
         assertTrue(result.contains("addLegStarAnnotations=\"false\""));
 
-        _model.getContext().setAddLegStarAnnotations(true);
+        _model.setAddLegStarAnnotations(true);
         result = genAntScriptAsString();
         assertTrue(result.contains("addLegStarAnnotations=\"true\""));
 
@@ -166,11 +167,11 @@ public class CobolStructureToXsdModelTest extends AbstractXsdTester {
         assertTrue(result.contains("decimalPointIsComma=\"false\""));
         assertTrue(result.contains("quoteIsQuote=\"true\""));
 
-        _model.getContext().setCurrencySign("£");
-        _model.getContext().setCurrencySymbol("€");
-        _model.getContext().setNSymbolDbcs(true);
-        _model.getContext().setDecimalPointIsComma(true);
-        _model.getContext().setQuoteIsQuote(false);
+        _model.setCurrencySign("£");
+        _model.setCurrencySymbol("€");
+        _model.setNSymbolDbcs(true);
+        _model.setDecimalPointIsComma(true);
+        _model.setQuoteIsQuote(false);
         result = genAntScriptAsString();
         assertTrue(result.contains("currencySign=\"£\""));
         assertTrue(result.contains("currencySymbol=\"€\""));

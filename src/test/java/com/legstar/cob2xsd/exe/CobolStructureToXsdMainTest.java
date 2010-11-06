@@ -10,14 +10,14 @@
  ******************************************************************************/
 package com.legstar.cob2xsd.exe;
 
+import java.io.File;
+
 import junit.framework.TestCase;
 
 import org.apache.commons.cli.Options;
 
-import com.legstar.cob2xsd.Cob2XsdContext.CodeFormat;
-
 /**
- * Test the standalone jar.
+ * Test the executable jar.
  * 
  */
 public class CobolStructureToXsdMainTest extends TestCase {
@@ -80,21 +80,6 @@ public class CobolStructureToXsdMainTest extends TestCase {
     }
 
     /**
-     * Test with addLegStarAnnotations argument.
-     */
-    public void testAddLegStarAnnotationsArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals(false, main.getContext().addLegStarAnnotations());
-            assertTrue(main.collectOptions(options, new String[] { "-a" }));
-            assertEquals(true, main.getContext().addLegStarAnnotations());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
      * Test with cobolSourceFileEncoding argument.
      */
     public void testCobolSourceFileEncodingArgument() {
@@ -103,7 +88,7 @@ public class CobolStructureToXsdMainTest extends TestCase {
             Options options = main.createOptions();
             assertEquals(null, main.getCobolSourceFileEncoding());
             assertTrue(main.collectOptions(options,
-                    new String[] { "-c ISO-8859-1" }));
+                    new String[] { "-e ISO-8859-1" }));
             assertEquals("ISO-8859-1", main.getCobolSourceFileEncoding());
         } catch (Exception e) {
             fail(e.getMessage());
@@ -111,214 +96,17 @@ public class CobolStructureToXsdMainTest extends TestCase {
     }
 
     /**
-     * Test with currencySymbol argument.
+     * Test with configuration argument.
      */
-    public void testCurrencySymbolArgument() {
+    public void testConfigurationArgument() {
+        CobolStructureToXsdMain main = new CobolStructureToXsdMain();
         try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals("$", main.getContext().getCurrencySymbol());
-            assertTrue(main.collectOptions(options, new String[] { "-w £" }));
-            assertEquals("£", main.getContext().getCurrencySymbol());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with decimalPointIsComma argument.
-     */
-    public void testDecimalPointIsCommaArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals(false, main.getContext().decimalPointIsComma());
-            assertTrue(main.collectOptions(options, new String[] { "-d" }));
-            assertEquals(true, main.getContext().decimalPointIsComma());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with xsdEncoding argument.
-     */
-    public void testXsdEncodingArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals("UTF-8", main.getContext().getXsdEncoding());
-            assertTrue(main.collectOptions(options,
-                    new String[] { "-e ISO-8859-1" }));
-            assertEquals("ISO-8859-1", main.getContext().getXsdEncoding());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with input argument.
-     */
-    public void testInputEncodingArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals("cobol", main.getInput().getName());
-            assertTrue(main.collectOptions(options,
-                    new String[] { "-i target" }));
-            assertEquals("target", main.getInput().getName());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with mapConditionsToFacets argument.
-     */
-    public void testMapConditionsToFacetsArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals(false, main.getContext().mapConditionsToFacets());
-            assertTrue(main.collectOptions(options, new String[] { "-m" }));
-            assertEquals(true, main.getContext().mapConditionsToFacets());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with nameConflictPrependParentName argument.
-     */
-    public void testNameConflictPrependParentNameArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals(false, main.getContext()
-                    .nameConflictPrependParentName());
-            assertTrue(main.collectOptions(options, new String[] { "-n" }));
-            assertEquals(true, main.getContext()
-                    .nameConflictPrependParentName());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with nSymbolDbcs argument.
-     */
-    public void testNSymbolDbcsArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals(false, main.getContext().nSymbolDbcs());
-            assertTrue(main.collectOptions(options, new String[] { "-z" }));
-            assertEquals(true, main.getContext().nSymbolDbcs());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with output argument.
-     */
-    public void testOutputEncodingArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals("schema", main.getOutput().getName());
-            assertTrue(main.collectOptions(options,
-                    new String[] { "-o target" }));
-            assertEquals("target", main.getOutput().getName());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with quoteIsApost argument.
-     */
-    public void testQuoteIsApostArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals(true, main.getContext().quoteIsQuote());
-            assertTrue(main.collectOptions(options, new String[] { "-q" }));
-            assertEquals(false, main.getContext().quoteIsQuote());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with targetNamespace argument.
-     */
-    public void testTargetNamespaceArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertNull(main.getContext().getTargetNamespace());
-            assertTrue(main.collectOptions(options,
-                    new String[] { "-t http://zombi.org" }));
-            assertEquals("http://zombi.org", main.getContext()
-                    .getTargetNamespace());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with elementNamesStartWithUppercase argument.
-     */
-    public void testElementNamesStartWithUppercaseArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals(false, main.getContext()
-                    .elementNamesStartWithUppercase());
-            assertTrue(main.collectOptions(options, new String[] { "-u" }));
-            assertEquals(true, main.getContext()
-                    .elementNamesStartWithUppercase());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with customXsltFileName argument.
-     */
-    public void testCustomXsltFileNameArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals(null, main.getContext().getCustomXsltFileName());
-            assertTrue(main.collectOptions(options,
-                    new String[] { "-x src/main/resources/xslt/custom.xsl" }));
-            assertEquals("src/main/resources/xslt/custom.xsl", main
-                    .getContext().getCustomXsltFileName());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test with code format arguments.
-     */
-    public void testCodeFormatArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals(CodeFormat.FIXED_FORMAT, main.getContext()
-                    .getCodeFormat());
-            assertTrue(main.collectOptions(options, new String[] { "-f free" }));
-            assertEquals(CodeFormat.FREE_FORMAT.toString(), main.getContext()
-                    .getCodeFormat().toString());
-            assertEquals(7, main.getContext().getStartColumn());
-            assertEquals(72, main.getContext().getEndColumn());
-            assertTrue(main.collectOptions(options, new String[] { "-l 1",
-                    "-r 66" }));
-            assertEquals(1, main.getContext().getStartColumn());
-            assertEquals(66, main.getContext().getEndColumn());
+            main.execute(new String[] {
+                    "-p", "src/main/resources/conf/cob2xsd.properties",
+                    "-i", "src/test/resources/cobol/LSFILEAE",
+                    "-o", "target/gen/myfile.xsd"
+                    });
+            assertTrue(new File("target/gen/myfile.xsd").exists());
         } catch (Exception e) {
             fail(e.getMessage());
         }

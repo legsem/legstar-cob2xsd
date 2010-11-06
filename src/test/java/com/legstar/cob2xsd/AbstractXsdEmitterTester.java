@@ -31,20 +31,20 @@ import com.legstar.cobol.model.CobolDataItem;
 
 /**
  * General purpose testing helpers.
- *
+ * 
  */
 public class AbstractXsdEmitterTester extends XMLTestCase {
 
     /** DOM document factory. */
     private DocumentBuilder _docBuilder;
 
-    /** Handles error messages.*/
+    /** Handles error messages. */
     private RecognizerErrorHandler _errorHandler = new RecognizerErrorHandler();
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
 
-    /** {@inheritDoc}*/
+    /** {@inheritDoc} */
     public void setUp() throws Exception {
         DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
         docFac.setNamespaceAware(true);
@@ -53,7 +53,9 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
 
     /**
      * Helper that emits XML schema from a COBOL data item and checks result.
-     * @param expected the expected XML Schema (without the schema element for simplicity)
+     * 
+     * @param expected the expected XML Schema (without the schema element for
+     *            simplicity)
      * @param dataItem the COBOL data item
      */
     public void emitAndCheck(
@@ -64,7 +66,9 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
 
     /**
      * Helper that emits XML schema from a COBOL data item and checks result.
-     * @param expected the expected XML Schema (without the schema element for simplicity)
+     * 
+     * @param expected the expected XML Schema (without the schema element for
+     *            simplicity)
      * @param dataItem the COBOL data item
      * @param withLegStarAnnotations true if LegStar annotations are to be added
      */
@@ -77,40 +81,47 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
 
     /**
      * Helper that emits XML schema from a COBOL data item and checks result.
-     * @param expected the expected XML Schema (without the schema element for simplicity)
+     * 
+     * @param expected the expected XML Schema (without the schema element for
+     *            simplicity)
      * @param dataItem the COBOL data item
      * @param withLegStarAnnotations true if LegStar annotations are to be added
-     * @param mapConditionsToFacets true if facets must be generated for conditions
+     * @param mapConditionsToFacets true if facets must be generated for
+     *            conditions
      */
     public void emitAndCheck(
             final String expected,
             final CobolDataItem dataItem,
             final boolean withLegStarAnnotations,
             final boolean mapConditionsToFacets) {
-        Cob2XsdContext context = new Cob2XsdContext();
+        Cob2XsdModel model = new Cob2XsdModel();
         if (withLegStarAnnotations) {
-            context.setAddLegStarAnnotations(true);
+            model.setAddLegStarAnnotations(true);
         }
-        context.setMapConditionsToFacets(mapConditionsToFacets);
+        model.setMapConditionsToFacets(mapConditionsToFacets);
         XmlSchema xsd = getXmlSchema();
-        XsdEmitter emitter = new XsdEmitter(xsd, context);
-        XsdDataItem xsdDataItem = new XsdDataItem(dataItem, context, null, new ArrayList < String >(), _errorHandler);
+        XsdEmitter emitter = new XsdEmitter(xsd, model);
+        XsdDataItem xsdDataItem = new XsdDataItem(dataItem, model, null,
+                new ArrayList < String >(), _errorHandler);
         emitter.createXmlSchemaType(xsdDataItem);
         check(expected, xsd, withLegStarAnnotations);
     }
-    
+
     /**
      * @return an empty XML schema for testing
      */
     public XmlSchema getXmlSchema() {
-        XmlSchema xsd = new XmlSchema("http://legstar.com/test", new XmlSchemaCollection());
+        XmlSchema xsd = new XmlSchema("http://legstar.com/test",
+                new XmlSchemaCollection());
         xsd.setElementFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
         return xsd;
     }
 
     /**
      * Helper that checks a result XML schema against an expected one.
-     * @param expected the expected XML Schema (without the schema element for simplicity)
+     * 
+     * @param expected the expected XML Schema (without the schema element for
+     *            simplicity)
      * @param xsd the XML schema result
      * @param withLegStarAnnotations true if LegStar annotations are to be added
      */
@@ -132,8 +143,10 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
             fail();
         }
     }
+
     /**
      * Wrap the expected content in a complete XML schema and make it a DOM.
+     * 
      * @param expected the XML Schema content
      * @param withLegStarAnnotations true if LegStar annotations are to be added
      * @return a DOM document
@@ -149,7 +162,8 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
                 + " elementFormDefault=\"qualified\""
                 + " targetNamespace=\"http://legstar.com/test\"");
         if (withLegStarAnnotations) {
-            sb.append(" xmlns:cb=\"http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd\"");
+            sb
+                    .append(" xmlns:cb=\"http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd\"");
         }
         sb.append(">");
         sb.append(expected);

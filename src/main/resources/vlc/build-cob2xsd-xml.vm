@@ -34,41 +34,41 @@
 ## -------------------------------------------------------------------
 ## COBOL source format related options
 ##
-            codeFormat="${antModel.context.getCodeFormat().toString()}"
-#if(${antModel.context.getCodeFormat().toString().equals("FIXED_FORMAT")})
-            startColumn="${antModel.context.startColumn}"
-            endColumn="${antModel.context.endColumn}"
+            codeFormat="${antModel.getCodeFormat().toString()}"
+#if(${antModel.getCodeFormat().toString().equals("FIXED_FORMAT")})
+            startColumn="${antModel.startColumn}"
+            endColumn="${antModel.endColumn}"
 #end
 
 ## -------------------------------------------------------------------
 ## XML Schema related options
 ##
-#if(${antModel.context.xsdEncoding})
-            xsdEncoding="${antModel.context.xsdEncoding}"
+#if(${antModel.xsdEncoding})
+            xsdEncoding="${antModel.xsdEncoding}"
 #end
-#if(${antModel.context.targetNamespace})
-            targetNamespace="${antModel.context.targetNamespace}"
+#if(${antModel.targetNamespace})
+            targetNamespace="${antModel.targetNamespace}"
 #end
-            mapConditionsToFacets="${antModel.context.mapConditionsToFacets()}"
-#if(${antModel.context.customXsltFileName})
-            customXsltFileName="${antModel.context.customXsltFileName}"
+            mapConditionsToFacets="${antModel.mapConditionsToFacets()}"
+#if(${antModel.customXsltFileName})
+            customXsltFileName="${antModel.customXsltFileName}"
 #end
-            nameConflictPrependParentName="${antModel.context.nameConflictPrependParentName()}"
-            elementNamesStartWithUppercase="${antModel.context.elementNamesStartWithUppercase()}"
+            nameConflictPrependParentName="${antModel.nameConflictPrependParentName()}"
+            elementNamesStartWithUppercase="${antModel.elementNamesStartWithUppercase()}"
 
 ## -------------------------------------------------------------------
 ## LegStar annotations related options
 ##
-            addLegStarAnnotations="${antModel.context.addLegStarAnnotations()}"
+            addLegStarAnnotations="${antModel.addLegStarAnnotations()}"
 
 ## -------------------------------------------------------------------
 ## COBOL compiler related options
 ##
-            currencySign="${antModel.context.currencySign}"
-            currencySymbol="${antModel.context.currencySymbol}"
-            nSymbolDbcs="${antModel.context.nSymbolDbcs()}"
-            decimalPointIsComma="${antModel.context.decimalPointIsComma()}"
-            quoteIsQuote="${antModel.context.quoteIsQuote()}"
+            currencySign="${antModel.currencySign}"
+            currencySymbol="${antModel.currencySymbol}"
+            nSymbolDbcs="${antModel.nSymbolDbcs()}"
+            decimalPointIsComma="${antModel.decimalPointIsComma()}"
+            quoteIsQuote="${antModel.quoteIsQuote()}"
         >
             <fileset file="${antModel.cobolSourceFilePath}"/>
         </cob2xsd>

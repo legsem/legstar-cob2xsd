@@ -125,7 +125,7 @@ public class XsdDataItem {
      * derived from the COBOL attributes.
      * 
      * @param cobolDataItem the COBOL elementary data item
-     * @param context the translator options in effect
+     * @param model the translator options in effect
      * @param parent the parent data item or null if root
      * @param nonUniqueCobolNames a list of non unique COBOL names used to
      *            detect name collisions
@@ -133,7 +133,7 @@ public class XsdDataItem {
      */
     public XsdDataItem(
             final CobolDataItem cobolDataItem,
-            final Cob2XsdContext context,
+            final Cob2XsdModel model,
             final XsdDataItem parent,
             final List < String > nonUniqueCobolNames,
             final RecognizerErrorHandler errorHandler) {
@@ -141,13 +141,13 @@ public class XsdDataItem {
         _errorHandler = errorHandler;
         _cobolDataItem = cobolDataItem;
         _parent = parent;
-        _xsdElementName = formatElementName(cobolDataItem, context);
+        _xsdElementName = formatElementName(cobolDataItem, model);
         _xsdTypeName = formatTypeName(_xsdElementName, cobolDataItem,
-                nonUniqueCobolNames, context, parent);
+                nonUniqueCobolNames, model, parent);
 
         switch (cobolDataItem.getDataEntryType()) {
         case DATA_DESCRIPTION:
-            setDataDescription(cobolDataItem, context, nonUniqueCobolNames);
+            setDataDescription(cobolDataItem, model, nonUniqueCobolNames);
             break;
         case RENAMES:
             /* COBOL renames don't map to an XSD type. */
@@ -157,7 +157,7 @@ public class XsdDataItem {
         case CONDITION:
             /* Will map to an enumeration facet. */
             _xsdType = XsdType.ENUM;
-            if (context.mapConditionsToFacets()
+            if (model.mapConditionsToFacets()
                     && getConditionRanges().size() > 1) {
                 addMessageToHistory(
                         "Condition with multiple ranges cannot be mapped to enumeration facet "
@@ -175,13 +175,13 @@ public class XsdDataItem {
      * Setup a regular data description entry, elementary data items and groups.
      * 
      * @param cobolDataItem the COBOL elementary data item
-     * @param context the translator options in effect
+     * @param model the translator options in effect
      * @param nonUniqueCobolNames a list of non unique COBOL names used to
      *            detect name collisions
      */
     protected void setDataDescription(
             final CobolDataItem cobolDataItem,
-            final Cob2XsdContext context,
+            final Cob2XsdModel model,
             final List < String > nonUniqueCobolNames) {
 
         if (cobolDataItem.getUsage() != null) {
@@ -192,10 +192,10 @@ public class XsdDataItem {
                     cobolDataItem.getPicture(),
                     cobolDataItem.isSignSeparate(),
                     cobolDataItem.isBlankWhenZero(),
-                    context.getCurrencySign(),
-                    context.getCurrencySymbol().charAt(0),
-                    context.nSymbolDbcs(),
-                    context.decimalPointIsComma());
+                    model.getCurrencySign(),
+                    model.getCurrencySymbol().charAt(0),
+                    model.nSymbolDbcs(),
+                    model.decimalPointIsComma());
         }
         _maxStorageLength = _minStorageLength;
 
@@ -232,7 +232,7 @@ public class XsdDataItem {
 
         /* Create the list of children by decorating the COBOL item children. */
         for (CobolDataItem child : cobolDataItem.getChildren()) {
-            XsdDataItem xsdChild = new XsdDataItem(child, context, this,
+            XsdDataItem xsdChild = new XsdDataItem(child, model, this,
                     nonUniqueCobolNames, _errorHandler);
             _children.add(xsdChild);
         }
@@ -694,7 +694,7 @@ public class XsdDataItem {
      * @param cobolDataItem the COBOL data item
      * @param elementName the element name built from the COBOL name
      * @param nonUniqueCobolNames a list of non unique COBOL names
-     * @param context the translator options
+     * @param model the translator options
      * @param parent used to resolve potential name conflict
      * @return a nice XML type name
      */
@@ -702,7 +702,7 @@ public class XsdDataItem {
             final String elementName,
             final CobolDataItem cobolDataItem,
             final List < String > nonUniqueCobolNames,
-            final Cob2XsdContext context,
+            final Cob2XsdModel model,
             final XsdDataItem parent) {
 
         StringBuilder sb = new StringBuilder();
@@ -710,7 +710,7 @@ public class XsdDataItem {
         sb.append(elementName.substring(1));
 
         if (nonUniqueCobolNames.contains(cobolDataItem.getCobolName())) {
-            if (context.nameConflictPrependParentName()) {
+            if (model.nameConflictPrependParentName()) {
                 if (parent != null) {
                     sb.insert(0, parent.getXsdTypeName());
                 }
@@ -746,23 +746,23 @@ public class XsdDataItem {
      * XSD name but are used as word breakers.
      * 
      * @param cobolDataItem the original COBOL data item
-     * @param context the translator options
+     * @param model the translator options
      * @return an XML schema element name
      */
     public static String formatElementName(
             final CobolDataItem cobolDataItem,
-            final Cob2XsdContext context) {
+            final Cob2XsdModel model) {
 
         String cobolName = getXmlCompatibleCobolName(cobolDataItem
                 .getCobolName());
         if (cobolName.equalsIgnoreCase("FILLER")) {
-            String filler = (context.elementNamesStartWithUppercase()) ? "Filler"
+            String filler = (model.elementNamesStartWithUppercase()) ? "Filler"
                     : "filler";
             return filler + cobolDataItem.getSrceLine();
         }
 
         StringBuilder sb = new StringBuilder();
-        boolean wordBreaker = (context.elementNamesStartWithUppercase()) ? true
+        boolean wordBreaker = (model.elementNamesStartWithUppercase()) ? true
                 : false;
         for (int i = 0; i < cobolName.length(); i++) {
             char c = cobolName.charAt(i);

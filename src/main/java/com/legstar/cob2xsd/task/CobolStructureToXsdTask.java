@@ -23,17 +23,15 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 
 import com.legstar.antlr.RecognizerException;
-import com.legstar.cob2xsd.Cob2XsdContext;
+import com.legstar.cob2xsd.Cob2XsdModel;
 import com.legstar.cob2xsd.CobolStructureToXsd;
 import com.legstar.cob2xsd.XsdGenerationException;
-import com.legstar.cob2xsd.Cob2XsdContext.CodeFormat;
-
+import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
 
 /**
- * COBOL Structure to XSD ANT Task.
- * <code>
+ * COBOL Structure to XSD ANT Task. <code>
  * Usage:<br>
- *
+ * 
  * &lt;project ...&gt;<br>
  *   &lt;taskdef name="cob2xsd" classname="com.legstar.cob2xsd.task.CobolStructureToXsdTask" /&gt;<br>
  *   &lt;property name="cobol.dir" value="../cobol"/&gt;<br>
@@ -47,29 +45,32 @@ import com.legstar.cob2xsd.Cob2XsdContext.CodeFormat;
  *    &lt;/target&gt;<br>
  * &lt;/project&gt;<br>
  * </code>
- *
+ * 
  */
 public class CobolStructureToXsdTask extends Task {
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
 
-    /** The list of filesets that were setup.*/
+    /** The list of filesets that were setup. */
     private List < FileSet > _fileSets = new LinkedList < FileSet >();
 
-    /** The target can either be a folder where XML schema result is to be written
-     *  or a file in which case the XML schema is written there. */
+    /**
+     * The target can either be a folder where XML schema result is to be
+     * written
+     * or a file in which case the XML schema is written there.
+     */
     private File _target;
 
-    /** Set of translation options to use.    */
-    private Cob2XsdContext _context = new Cob2XsdContext();
-    
-    /** Character set used to encode the input COBOL source files.*/
+    /** Set of translation options to use. */
+    private Cob2XsdModel _model = new Cob2XsdModel();
+
+    /** Character set used to encode the input COBOL source files. */
     private String _cobolSourceFileEncoding;
 
     /**
-     *  The ant execution method.
-     *  Check parameters and produce XSD files.
+     * The ant execution method.
+     * Check parameters and produce XSD files.
      */
     public final void execute() {
         _log.info("Started translation from COBOL to XML Schema");
@@ -78,19 +79,22 @@ public class CobolStructureToXsdTask extends Task {
         _log.info("Taking COBOL from    : " + _fileSets);
         _log.info("COBOL files encoding : " + getCobolSourceFileEncoding());
         _log.info("Output XML Schema to : " + getTarget());
-        _log.info(getContext().toString());
+        _log.info(getModel().toString());
 
         try {
             Iterator < FileSet > itor = _fileSets.iterator();
             while (itor.hasNext()) {
                 FileSet fileset = itor.next();
 
-                DirectoryScanner scanner = fileset.getDirectoryScanner(getProject());
+                DirectoryScanner scanner = fileset
+                        .getDirectoryScanner(getProject());
                 scanner.scan();
                 String[] files = scanner.getIncludedFiles();
                 for (int i = 0; i < files.length; i++) {
-                    File cobolFile = new File(fileset.getDir(getProject()), files[i]);
-                    translate(cobolFile, getCobolSourceFileEncoding(), getTarget());
+                    File cobolFile = new File(fileset.getDir(getProject()),
+                            files[i]);
+                    translate(cobolFile, getCobolSourceFileEncoding(),
+                            getTarget());
                 }
             }
         } catch (IllegalStateException e) {
@@ -105,6 +109,7 @@ public class CobolStructureToXsdTask extends Task {
 
     /**
      * Translates a single COBOL source file.
+     * 
      * @param cobolFile COBOL source file
      * @param cobolSourceFileEncoding COBOL source file character encoding
      * @param target target file or folder
@@ -114,10 +119,12 @@ public class CobolStructureToXsdTask extends Task {
     protected void translate(
             final File cobolFile,
             final String cobolSourceFileEncoding,
-            final File target) throws RecognizerException, XsdGenerationException {
-        CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getContext());
+            final File target) throws RecognizerException,
+            XsdGenerationException {
+        CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getModel());
         _log.info("Translation started for: " + cobolFile);
-        File xmlSchemaFile = cob2xsd.translate(cobolFile, cobolSourceFileEncoding, target);
+        File xmlSchemaFile = cob2xsd.translate(cobolFile,
+                cobolSourceFileEncoding, target);
         for (String errorMessage : cob2xsd.getErrorHistory()) {
             _log.warn(errorMessage);
         }
@@ -135,7 +142,7 @@ public class CobolStructureToXsdTask extends Task {
 
         if (getTarget() == null) {
             throw (new IllegalArgumentException(
-            "You must provide a target directory or file"));
+                    "You must provide a target directory or file"));
         }
         if (_log.isDebugEnabled()) {
             _log.debug("Target folder or file: " + getTarget());
@@ -143,252 +150,279 @@ public class CobolStructureToXsdTask extends Task {
     }
 
     /**
-     * Gather all parameters into a context object.
-     * @return a parameter context to be used throughout all code
+     * Gather all parameters into a model object.
+     * 
+     * @return a parameter model to be used throughout all code
      */
-    private Cob2XsdContext getContext() {
-        return _context;
+    private Cob2XsdModel getModel() {
+        return _model;
     }
 
-    /* -------------------------------------------------------------------
+    /*
+     * -------------------------------------------------------------------
      * COBOL source format related options
-     * */
+     */
     /**
      * @return the Fixed or Free format COBOL source
      */
     public CodeFormat getCodeFormat() {
-        return getContext().getCodeFormat();
+        return getModel().getCodeFormat();
     }
 
     /**
      * @param cobolFormat the Fixed or Free format COBOL source to set
      */
     public void setCodeFormat(final CodeFormat cobolFormat) {
-        getContext().setCodeFormat(cobolFormat);
+        getModel().setCodeFormat(cobolFormat);
     }
 
     /**
      * @param cobolFormat the Fixed or Free format COBOL source to set
      */
     public void setCodeFormat(final String cobolFormat) {
-        getContext().setCodeFormat(CodeFormat.valueOf(cobolFormat));
+        getModel().setCodeFormat(CodeFormat.valueOf(cobolFormat));
     }
 
     /**
      * @return the position of the indicator area for fixed format COBOL
      */
     public int getStartColumn() {
-        return getContext().getStartColumn();
+        return getModel().getStartColumn();
     }
 
     /**
-     * @param startColumn the position of the indicator area for fixed format COBOL
+     * @param startColumn the position of the indicator area for fixed format
+     *            COBOL
      */
     public void setStartColumn(final int startColumn) {
-        getContext().setStartColumn(startColumn);
+        getModel().setStartColumn(startColumn);
     }
 
     /**
      * @return the position of the right margin for fixed format COBOL
      */
     public int getEndColumn() {
-        return getContext().getEndColumn();
+        return getModel().getEndColumn();
     }
 
     /**
      * @param endColumn the position of the right margin for fixed format COBOL
      */
     public void setEndColumn(final int endColumn) {
-        getContext().setEndColumn(endColumn);
+        getModel().setEndColumn(endColumn);
     }
 
-    /* -------------------------------------------------------------------
+    /*
+     * -------------------------------------------------------------------
      * XML Schema related options
-     * */
+     */
 
     /**
      * @return the character set used to encode the output XML Schema
      */
     public String getXsdEncoding() {
-        return getContext().getXsdEncoding();
+        return getModel().getXsdEncoding();
     }
 
     /**
-     * @param xsdEncoding the character set used to encode the output XML Schema to set
+     * @param xsdEncoding the character set used to encode the output XML Schema
+     *            to set
      */
     public void setXsdEncoding(final String xsdEncoding) {
-        getContext().setXsdEncoding(xsdEncoding);
+        getModel().setXsdEncoding(xsdEncoding);
     }
 
     /**
      * @return the target namespace for generated XML schema
      */
     public String getTargetNamespace() {
-        return getContext().getTargetNamespace();
+        return getModel().getTargetNamespace();
     }
 
     /**
      * @param targetNamespace the target namespace for generated XML schema
      */
     public void setTargetNamespace(final String targetNamespace) {
-        getContext().setTargetNamespace(targetNamespace);
-    }
-    /**
-     * @return whether COBOL conditions (level 88) should be mapped to facets. Facets 
-     * restrict the content which might not be desirable
-     */
-    public boolean mapConditionsToFacets() {
-        return getContext().mapConditionsToFacets();
+        getModel().setTargetNamespace(targetNamespace);
     }
 
     /**
-     * @param mapConditionsToFacets Whether COBOL conditions (level 88) should be mapped to facets. Facets 
-     * restrict the content which might not be desirable
+     * @return whether COBOL conditions (level 88) should be mapped to facets.
+     *         Facets
+     *         restrict the content which might not be desirable
+     */
+    public boolean mapConditionsToFacets() {
+        return getModel().mapConditionsToFacets();
+    }
+
+    /**
+     * @param mapConditionsToFacets Whether COBOL conditions (level 88) should
+     *            be mapped to facets. Facets
+     *            restrict the content which might not be desirable
      */
     public void setMapConditionsToFacets(final boolean mapConditionsToFacets) {
-        getContext().setMapConditionsToFacets(mapConditionsToFacets);
+        getModel().setMapConditionsToFacets(mapConditionsToFacets);
     }
 
     /**
      * @return an optional XSLT transform for XML schema customization
      */
     public String getCustomXsltFileName() {
-        return getContext().getCustomXsltFileName();
+        return getModel().getCustomXsltFileName();
     }
 
     /**
-     * @param customXsltFileName an optional XSLT transform for XML schema customization
+     * @param customXsltFileName an optional XSLT transform for XML schema
+     *            customization
      */
     public void setCustomXsltFileName(final String customXsltFileName) {
-        getContext().setCustomXsltFileName(customXsltFileName);
+        getModel().setCustomXsltFileName(customXsltFileName);
     }
 
     /**
-     * @return true if parent complex type name should be prepended in case of name conflict
-     * (otherwise, the COBOL source line will be appended)
+     * @return true if parent complex type name should be prepended in case of
+     *         name conflict
+     *         (otherwise, the COBOL source line will be appended)
      */
     public boolean nameConflictPrependParentName() {
-        return getContext().nameConflictPrependParentName();
+        return getModel().nameConflictPrependParentName();
     }
 
     /**
-     * @param nameConflictPrependParentName true if parent complex type name should be prepended
-     * in case of name conflict (otherwise, the COBOL source line will be appended)
+     * @param nameConflictPrependParentName true if parent complex type name
+     *            should be prepended
+     *            in case of name conflict (otherwise, the COBOL source line
+     *            will be appended)
      */
     public void setNameConflictPrependParentName(
             final boolean nameConflictPrependParentName) {
-        getContext().setNameConflictPrependParentName(nameConflictPrependParentName);
+        getModel().setNameConflictPrependParentName(
+                nameConflictPrependParentName);
     }
 
     /**
-     * @return true if XSD element names should start with an uppercase 
-     * (compatible with LegStar 1.2)
+     * @return true if XSD element names should start with an uppercase
+     *         (compatible with LegStar 1.2)
      */
     public boolean elementNamesStartWithUppercase() {
-        return getContext().elementNamesStartWithUppercase();
+        return getModel().elementNamesStartWithUppercase();
     }
 
     /**
-     * @param elementNamesStartWithUppercase true if XSD element names should start with an uppercase 
-     * (compatible with LegStar 1.2)
+     * @param elementNamesStartWithUppercase true if XSD element names should
+     *            start with an uppercase
+     *            (compatible with LegStar 1.2)
      */
     public void setElementNamesStartWithUppercase(
             final boolean elementNamesStartWithUppercase) {
-        getContext().setElementNamesStartWithUppercase(elementNamesStartWithUppercase);
+        getModel().setElementNamesStartWithUppercase(
+                elementNamesStartWithUppercase);
     }
 
-    /* -------------------------------------------------------------------
+    /*
+     * -------------------------------------------------------------------
      * LegStar annotations related options
-     * */
+     */
 
     /**
      * @return whether we should generate COBOL/JAXB annotations
      */
     public boolean addLegStarAnnotations() {
-        return getContext().addLegStarAnnotations();
+        return getModel().addLegStarAnnotations();
     }
 
     /**
-     * @param addLegStarAnnotations whether we should generate COBOL/JAXB annotations
+     * @param addLegStarAnnotations whether we should generate COBOL/JAXB
+     *            annotations
      */
     public void setAddLegStarAnnotations(final boolean addLegStarAnnotations) {
-        getContext().setAddLegStarAnnotations(addLegStarAnnotations);
+        getModel().setAddLegStarAnnotations(addLegStarAnnotations);
     }
 
-    /* -------------------------------------------------------------------
+    /*
+     * -------------------------------------------------------------------
      * COBOL compiler related options
-     * */
+     */
 
     /**
-     * @return the currency sign used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     * @return the currency sign used (CURRENCY SIGN clause in the
+     *         SPECIAL-NAMES)
      */
     public String getCurrencySign() {
-        return getContext().getCurrencySign();
+        return getModel().getCurrencySign();
     }
 
     /**
-     * @param currencySign the currency sign used (CURRENCY SIGN clause in the SPECIAL-NAMES)
+     * @param currencySign the currency sign used (CURRENCY SIGN clause in the
+     *            SPECIAL-NAMES)
      */
     public void setCurrencySign(final String currencySign) {
-        getContext().setCurrencySign(currencySign);
+        getModel().setCurrencySign(currencySign);
     }
 
     /**
-     * @return the currency symbol used (CURRENCY PICTURE SYMBOL clause in the SPECIAL-NAMES)
+     * @return the currency symbol used (CURRENCY PICTURE SYMBOL clause in the
+     *         SPECIAL-NAMES)
      */
     public String getCurrencySymbol() {
-        return getContext().getCurrencySymbol();
+        return getModel().getCurrencySymbol();
     }
 
     /**
-     * @param currencySymbol the currency symbol used (CURRENCY PICTURE SYMBOL clause in the SPECIAL-NAMES)
+     * @param currencySymbol the currency symbol used (CURRENCY PICTURE SYMBOL
+     *            clause in the SPECIAL-NAMES)
      */
     public void setCurrencySymbol(final String currencySymbol) {
-        getContext().setCurrencySymbol(currencySymbol);
+        getModel().setCurrencySymbol(currencySymbol);
     }
 
     /**
-     * @return the NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false
+     * @return the NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if
+     *         false
      */
     public boolean nSymbolDbcs() {
-        return getContext().nSymbolDbcs();
+        return getModel().nSymbolDbcs();
     }
 
     /**
-     * @param nSymbolDbcs the NSYMBOL(DBCS) compiler option. Assume NSYMBOL(NATIONAL) if false
+     * @param nSymbolDbcs the NSYMBOL(DBCS) compiler option. Assume
+     *            NSYMBOL(NATIONAL) if false
      */
     public void setNSymbolDbcs(final boolean nSymbolDbcs) {
-        getContext().setNSymbolDbcs(nSymbolDbcs);
+        getModel().setNSymbolDbcs(nSymbolDbcs);
     }
 
     /**
-     * @return whether comma is the decimal point (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)
+     * @return whether comma is the decimal point (DECIMAL-POINT IS COMMA clause
+     *         in the SPECIAL-NAMES)
      */
     public boolean decimalPointIsComma() {
-        return getContext().decimalPointIsComma();
+        return getModel().decimalPointIsComma();
     }
 
     /**
      * @param decimalPointIsComma whether comma is the decimal point
-     *  (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)
+     *            (DECIMAL-POINT IS COMMA clause in the SPECIAL-NAMES)
      */
     public void setDecimalPointIsComma(final boolean decimalPointIsComma) {
-        getContext().setDecimalPointIsComma(decimalPointIsComma);
+        getModel().setDecimalPointIsComma(decimalPointIsComma);
     }
 
     /**
      * The COBOL QUOTE|APOST compiler option. False means APOST.
+     * 
      * @return the COBOL QUOTE|APOST compiler option. False means APOST
      */
     public boolean quoteIsQuote() {
-        return getContext().quoteIsQuote();
+        return getModel().quoteIsQuote();
     }
 
     /**
-     * @param quoteIsQuote the COBOL QUOTE|APOST compiler option. False means APOST
+     * @param quoteIsQuote the COBOL QUOTE|APOST compiler option. False means
+     *            APOST
      */
     public void setQuoteIsQuote(final boolean quoteIsQuote) {
-        getContext().setQuoteIsQuote(quoteIsQuote);
+        getModel().setQuoteIsQuote(quoteIsQuote);
     }
 
     /**
@@ -398,7 +432,7 @@ public class CobolStructureToXsdTask extends Task {
         FileSet fileset = new FileSet();
         _fileSets.add(fileset);
         return fileset;
-    }    
+    }
 
     /**
      * @return the current folder or file to receive the XML schema(s)
@@ -422,7 +456,8 @@ public class CobolStructureToXsdTask extends Task {
     }
 
     /**
-     * @param cobolSourceFileEncoding the character set used to encode the input COBOL source files
+     * @param cobolSourceFileEncoding the character set used to encode the input
+     *            COBOL source files
      */
     public void setCobolSourceFileEncoding(final String cobolSourceFileEncoding) {
         this._cobolSourceFileEncoding = cobolSourceFileEncoding;

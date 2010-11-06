@@ -8,8 +8,7 @@
 ##   Use the following to set your own JVM arguments
 JVM_ARGS=
 
-##   Uncomment to run the translator in debug mode
-##   JVM_ARGS="$JVM_ARGS -Dlog4j.configuration=log4j.debug.properties"
-
+##   Update the log4j configuration to set debug mode
+JVM_ARGS="$JVM_ARGS -Dlog4j.configuration=file:conf/log4j.properties"
 
 java $JVM_ARGS -jar legstar-cob2xsd-${project.version}-exe.jar "$@"

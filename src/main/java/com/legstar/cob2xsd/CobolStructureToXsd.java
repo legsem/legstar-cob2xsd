@@ -77,8 +77,8 @@ import com.legstar.cobol.model.CobolDataItem;
  * <li>Writing the XML Schema, optionally applying a customization XSLT</li>
  * </ul>
  * <p/>
- * All options are bundled in {@link Cob2XsdContext} instance that is received
- * at construction time.
+ * All options are bundled in {@link Cob2XsdModel} instance that is received at
+ * construction time.
  * <p/>
  * To invoke the translator, you normally call one of:
  * <ul>
@@ -95,7 +95,7 @@ import com.legstar.cobol.model.CobolDataItem;
 public class CobolStructureToXsd {
 
     /** Execution parameters for the COBOL to XSD utility. */
-    private Cob2XsdContext _context;
+    private Cob2XsdModel _model;
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
@@ -107,14 +107,14 @@ public class CobolStructureToXsd {
      * Default constructor.
      */
     public CobolStructureToXsd() {
-        this(new Cob2XsdContext());
+        this(new Cob2XsdModel());
     }
 
     /**
-     * @param context execution parameters for the COBOL to XML Schema utility
+     * @param model execution parameters for the COBOL to XML Schema utility
      */
-    public CobolStructureToXsd(final Cob2XsdContext context) {
-        _context = context;
+    public CobolStructureToXsd(final Cob2XsdModel model) {
+        _model = model;
     }
 
     /**
@@ -129,7 +129,7 @@ public class CobolStructureToXsd {
             final String cobolSource) throws RecognizerException,
             XsdGenerationException {
         if (_log.isDebugEnabled()) {
-            debug("Translating with options:", getContext().toString());
+            debug("Translating with options:", getModel().toString());
         }
         return xsdToString(emitXsd(toModel(cobolSource)));
     }
@@ -188,7 +188,7 @@ public class CobolStructureToXsd {
             } else {
                 xsdFile = target;
             }
-            FileUtils.writeStringToFile(xsdFile, xsdString, getContext()
+            FileUtils.writeStringToFile(xsdFile, xsdString, getModel()
                     .getXsdEncoding());
             if (_log.isDebugEnabled()) {
                 _log.debug("Created XML schema file: " + xsdFile);
@@ -260,11 +260,11 @@ public class CobolStructureToXsd {
         if (_log.isDebugEnabled()) {
             debug("1. Cleaning COBOL source code:", cobolSource);
         }
-        switch (getContext().getCodeFormat()) {
+        switch (getModel().getCodeFormat()) {
         case FIXED_FORMAT:
             CobolFixedFormatSourceCleaner fixedCleaner = new CobolFixedFormatSourceCleaner(
-                    getErrorHandler(), getContext().getStartColumn(),
-                    getContext().getEndColumn());
+                    getErrorHandler(), getModel().getStartColumn(),
+                    getModel().getEndColumn());
             return fixedCleaner.clean(cobolSource);
         case FREE_FORMAT:
             CobolFreeFormatSourceCleaner freeCleaner = new CobolFreeFormatSourceCleaner(
@@ -272,7 +272,7 @@ public class CobolStructureToXsd {
             return freeCleaner.clean(cobolSource);
         default:
             throw new CleanerException("Unkown COBOL source format "
-                    + getContext().getCodeFormat());
+                    + getModel().getCodeFormat());
         }
     }
 
@@ -382,13 +382,13 @@ public class CobolStructureToXsd {
             debug("5. Emitting XML Schema from model: ", cobolDataItems
                     .toString());
         }
-        XmlSchema xsd = createXmlSchema(getContext().getXsdEncoding());
+        XmlSchema xsd = createXmlSchema(getModel().getXsdEncoding());
         List < String > nonUniqueCobolNames = getNonUniqueCobolNames(cobolDataItems);
-        XsdEmitter emitter = new XsdEmitter(xsd, getContext());
+        XsdEmitter emitter = new XsdEmitter(xsd, getModel());
         for (CobolDataItem cobolDataItem : cobolDataItems) {
             if (cobolDataItem.getChildren().size() > 0) {
                 XsdDataItem xsdDataItem = new XsdDataItem(cobolDataItem,
-                        getContext(), null, nonUniqueCobolNames, _errorHandler);
+                        getModel(), null, nonUniqueCobolNames, _errorHandler);
                 xsd.getItems().add(
                         emitter.createXmlSchemaElement(xsdDataItem));
             }
@@ -428,7 +428,7 @@ public class CobolStructureToXsd {
             Source source = new DOMSource(xsd.getAllSchemas()[0]);
             Result result = new StreamResult(writer);
             Transformer transformer;
-            String xsltFileName = getContext().getCustomXsltFileName();
+            String xsltFileName = getModel().getCustomXsltFileName();
             if (xsltFileName == null || xsltFileName.trim().length() == 0) {
                 transformer = tFactory.newTransformer();
             } else {
@@ -436,7 +436,7 @@ public class CobolStructureToXsd {
                 transformer = tFactory.newTransformer(xsltSource);
             }
             transformer.setOutputProperty(OutputKeys.ENCODING,
-                    getContext().getXsdEncoding());
+                    getModel().getXsdEncoding());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer
                     .setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
@@ -516,18 +516,18 @@ public class CobolStructureToXsd {
      * (usually XML Schema namespace).
      * 
      * @param encoding the character set used to encode this XML Schema
-     * @return a new empty XML schema using the context
+     * @return a new empty XML schema using the model
      */
     protected XmlSchema createXmlSchema(final String encoding) {
         XmlSchema xsd = new XmlSchema(
-                getContext().getTargetNamespace(), new XmlSchemaCollection());
-        if (getContext().getTargetNamespace() != null) {
+                getModel().getTargetNamespace(), new XmlSchemaCollection());
+        if (getModel().getTargetNamespace() != null) {
             xsd.setElementFormDefault(new XmlSchemaForm(
                             XmlSchemaForm.QUALIFIED));
         }
         xsd.setAttributeFormDefault(null);
         xsd.setInputEncoding(encoding);
-        if (getContext().getTargetNamespace() == null) {
+        if (getModel().getTargetNamespace() == null) {
             NamespaceMap prefixmap = new NamespaceMap();
             NamespacePrefixList npl = xsd.getNamespaceContext();
             if (npl == null) {
@@ -587,8 +587,8 @@ public class CobolStructureToXsd {
      * 
      * @return the execution parameters for the COBOL to XML Schema utility
      */
-    public Cob2XsdContext getContext() {
-        return _context;
+    public Cob2XsdModel getModel() {
+        return _model;
     }
 
     /**

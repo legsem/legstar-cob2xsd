@@ -402,12 +402,12 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
      */
     private void emitAnnotationAndCheck(final CobolDataItem dataItem,
             final String expected) {
-        Cob2XsdContext context = new Cob2XsdContext();
-        context.setAddLegStarAnnotations(true);
+        Cob2XsdModel model = new Cob2XsdModel();
+        model.setAddLegStarAnnotations(true);
         XmlSchema xsd = getXmlSchema();
-        XsdAnnotationEmitter emitter = new XsdAnnotationEmitter(xsd, context);
+        XsdAnnotationEmitter emitter = new XsdAnnotationEmitter(xsd, model);
         XsdDataItem xsdDataItem = new XsdDataItem(
-                dataItem, context, null, new ArrayList < String >(),
+                dataItem, model, null, new ArrayList < String >(),
                 _errorHandler);
         XmlSchemaAnnotation annotation = emitter
                 .createLegStarAnnotation(xsdDataItem);
