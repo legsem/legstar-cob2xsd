@@ -98,13 +98,13 @@
         <!-- LegStar development & runtime API -->    
         <dependency>
             <groupId>com.legsem.legstar</groupId>
-            <artifactId>Legstar-coxbapi</artifactId>
+            <artifactId>legstar-coxbapi</artifactId>
             <version>${legstarVersion}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.legsem.legstar</groupId>
-            <artifactId>Legstar-codegen</artifactId>
+            <artifactId>legstar-codegen</artifactId>
             <version>${legstarVersion}</version>
             <optional>true</optional>
         </dependency>
