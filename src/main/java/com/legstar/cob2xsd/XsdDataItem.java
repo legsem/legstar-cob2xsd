@@ -80,15 +80,14 @@ public class XsdDataItem {
 
     /**
      * Determines if a numeric item is signed or unsigned. This is different
-     * from
-     * the COBOL data item _isSign member which denotes the presence of the
+     * from the COBOL data item _isSign member which denotes the presence of the
      * special SIGN COBOL clause (position of the sign as leading or trailing).
      */
     private boolean _isSigned;
 
     /*
-     * Array boundaries have a different semantic in XSD. MinOccurs defaults
-     * to MaxOccurs in COBOL while, it defaults to 1 in XSD. The meaning of
+     * Array boundaries have a different semantic in XSD. MinOccurs defaults to
+     * MaxOccurs in COBOL while, it defaults to 1 in XSD. The meaning of
      * maxOccurs = 1 is also different: it is meant as an array of 1 dimension
      * in COBOL while it means "not an array" in XSD.
      */
@@ -121,8 +120,7 @@ public class XsdDataItem {
 
     /**
      * COBOL data item is analyzed at construction time and all XSD attributes
-     * are
-     * derived from the COBOL attributes.
+     * are derived from the COBOL attributes.
      * 
      * @param cobolDataItem the COBOL elementary data item
      * @param model the translator options in effect
@@ -131,10 +129,8 @@ public class XsdDataItem {
      *            detect name collisions
      * @param errorHandler collects translation errors
      */
-    public XsdDataItem(
-            final CobolDataItem cobolDataItem,
-            final Cob2XsdModel model,
-            final XsdDataItem parent,
+    public XsdDataItem(final CobolDataItem cobolDataItem,
+            final Cob2XsdModel model, final XsdDataItem parent,
             final List < String > nonUniqueCobolNames,
             final RecognizerErrorHandler errorHandler) {
 
@@ -151,8 +147,9 @@ public class XsdDataItem {
             break;
         case RENAMES:
             /* COBOL renames don't map to an XSD type. */
-            addMessageToHistory("Unhandled data entry type "
-                    + cobolDataItem.toString(), "warn");
+            addMessageToHistory(
+                    "Unhandled data entry type " + cobolDataItem.toString(),
+                    "warn");
             break;
         case CONDITION:
             /* Will map to an enumeration facet. */
@@ -165,8 +162,9 @@ public class XsdDataItem {
             }
             break;
         default:
-            addMessageToHistory("Unrecognized data entry type "
-                    + cobolDataItem.toString(), "error");
+            addMessageToHistory(
+                    "Unrecognized data entry type " + cobolDataItem.toString(),
+                    "error");
         }
 
     }
@@ -179,45 +177,45 @@ public class XsdDataItem {
      * @param nonUniqueCobolNames a list of non unique COBOL names used to
      *            detect name collisions
      */
-    protected void setDataDescription(
-            final CobolDataItem cobolDataItem,
-            final Cob2XsdModel model,
-            final List < String > nonUniqueCobolNames) {
+    protected void setDataDescription(final CobolDataItem cobolDataItem,
+            final Cob2XsdModel model, final List < String > nonUniqueCobolNames) {
 
-        if (cobolDataItem.getUsage() != null) {
-            setFromUsage(cobolDataItem.getUsage());
-        }
-        if (cobolDataItem.getPicture() != null) {
-            setFromPicture(
-                    cobolDataItem.getPicture(),
-                    cobolDataItem.isSignSeparate(),
-                    cobolDataItem.isBlankWhenZero(),
-                    model.getCurrencySign(),
-                    model.getCurrencySymbol().charAt(0),
-                    model.nSymbolDbcs(),
-                    model.decimalPointIsComma());
+        /* Group items have non level 88 children */
+        if (isGroup(cobolDataItem)) {
+            _xsdType = XsdType.COMPLEX;
+            _cobolType = CobolType.GROUP_ITEM;
+        } else {
+
+            if (cobolDataItem.getUsage() != null) {
+                setAttributesFromUsage(cobolDataItem.getUsage());
+            } else {
+                /* Check parent for any usage we should inherit from */
+                if (getParent() != null && getParent().getUsage() != null) {
+                    setAttributesFromUsage(getParent().getUsage());
+                }
+            }
+
+            if (cobolDataItem.getPicture() != null) {
+                setAttributesFromPicture(cobolDataItem.getPicture(),
+                        cobolDataItem.isSignSeparate(),
+                        cobolDataItem.isBlankWhenZero(),
+                        model.getCurrencySign(), model.getCurrencySymbol()
+                                .charAt(0), model.nSymbolDbcs(),
+                        model.decimalPointIsComma());
+            }
         }
         _maxStorageLength = _minStorageLength;
 
         /*
-         * If the xsdType is not set yet, then this is not an elementary data
-         * item.
+         * If the xsdType is not set yet, then this is likely some syntax we
+         * don't support.
          */
         if (_xsdType == null) {
+            addMessageToHistory(
+                    "Unable to determine type for " + cobolDataItem.toString()
+                            + ". Assuming group item.", "warn");
             _xsdType = XsdType.COMPLEX;
             _cobolType = CobolType.GROUP_ITEM;
-        }
-
-        /* A common COBOL mistake that we should warn about. */
-        if (_xsdType != XsdType.COMPLEX
-                && cobolDataItem.getChildren().size() > 0) {
-            for (CobolDataItem child : cobolDataItem.getChildren()) {
-                if (child.getDataEntryType() == DataEntryType.DATA_DESCRIPTION) {
-                    addMessageToHistory(
-                            "Group item with PICTURE clause will be treated as elementary (children are ignored) "
-                                    + cobolDataItem.toString(), "warn");
-                }
-            }
         }
 
         /* Inform object upstream that someone depends on him. */
@@ -279,8 +277,8 @@ public class XsdDataItem {
         }
 
         /*
-         * Set XSD minOccurs/maxOccurs from COBOL. If no minOccurs set
-         * in COBOL, this is a fixed size array.
+         * Set XSD minOccurs/maxOccurs from COBOL. If no minOccurs set in COBOL,
+         * this is a fixed size array.
          */
         if (cobolDataItem.getMaxOccurs() > 0) {
             _maxOccurs = cobolDataItem.getMaxOccurs();
@@ -296,12 +294,40 @@ public class XsdDataItem {
     }
 
     /**
+     * Items are identified as group items if they has at least one child that
+     * is not a condition.
+     * <p/>
+     * If a group item has a picture clause assume a COBOL syntax error issue a
+     * warning and ignore children.
+     * 
+     * @param cobolDataItem the COBOL data item to check for groupness
+     * @return true if this is a group item
+     */
+    protected boolean isGroup(final CobolDataItem cobolDataItem) {
+        boolean isGroup = false;
+        if (cobolDataItem.getChildren() != null) {
+            for (CobolDataItem child : cobolDataItem.getChildren()) {
+                if (child.getDataEntryType() != DataEntryType.CONDITION) {
+                    isGroup = true;
+                }
+            }
+        }
+        if (isGroup && cobolDataItem.getPicture() != null) {
+            addMessageToHistory("Group item with picture clause "
+                    + cobolDataItem.toString()
+                    + ". Assuming elementary item and children are ignored",
+                    "warn");
+            isGroup = false;
+        }
+        return isGroup;
+
+    }
+
+    /**
      * Called when some child (or child of a child) has a DEPENDING ON clause.
      * We look up our children for an item matching the COBOL name of the
-     * depending on
-     * object.
-     * If found, we update its isODOObject member, otherwise we propagate the
-     * request to our own parent.
+     * depending on object. If found, we update its isODOObject member,
+     * otherwise we propagate the request to our own parent.
      * 
      * @param cobolName the depending on object.
      */
@@ -320,12 +346,10 @@ public class XsdDataItem {
     }
 
     /**
-     * Called when some child (or child of a child) has a REDEFINES clause.
-     * We look up our children for an item matching the COBOL name of the
-     * REDEFINES
-     * object.
-     * If found, we update its isRedefined member, otherwise we propagate the
-     * request to our own parent.
+     * Called when some child (or child of a child) has a REDEFINES clause. We
+     * look up our children for an item matching the COBOL name of the REDEFINES
+     * object. If found, we update its isRedefined member, otherwise we
+     * propagate the request to our own parent.
      * 
      * @param cobolName the redefines object.
      */
@@ -344,16 +368,15 @@ public class XsdDataItem {
     }
 
     /**
-     * Derive XML schema attributes from a COBOL usage clause.
-     * This gives a rough approximation of the XSD type because the picture
-     * clause usually carries info that needs to be further analyzed to
-     * determine
-     * a more precise type.
-     * If no usage clause, we assume there will be a picture clause.
+     * Derive XML schema attributes from a COBOL usage clause. This gives a
+     * rough approximation of the XSD type because the picture clause usually
+     * carries info that needs to be further analyzed to determine a more
+     * precise type. If no usage clause, we assume there will be a picture
+     * clause.
      * 
      * @param usage COBOL usage clause
      */
-    private void setFromUsage(final Usage usage) {
+    private void setAttributesFromUsage(final Usage usage) {
         switch (usage) {
         case BINARY:
             _cobolType = CobolType.BINARY_ITEM;
@@ -427,23 +450,19 @@ public class XsdDataItem {
      * @param decimalPointIsComma if COBOL compiler option DECIMAL POINT IS
      *            COMMA
      */
-    private void setFromPicture(
-            final String picture,
-            final boolean isSignSeparate,
-            final boolean isBlankWhenZero,
-            final String currencySign,
-            final char currencySymbol,
-            final boolean nSymbolDbcs,
-            final boolean decimalPointIsComma) {
+    private void setAttributesFromPicture(final String picture,
+            final boolean isSignSeparate, final boolean isBlankWhenZero,
+            final String currencySign, final char currencySymbol,
+            final boolean nSymbolDbcs, final boolean decimalPointIsComma) {
 
         char comma = (decimalPointIsComma) ? '.' : ',';
         char decimalPoint = (decimalPointIsComma) ? ',' : '.';
 
-        Map < Character, Integer > charNum =
-                PictureUtil.getPictureCharOccurences(picture, currencySymbol);
+        Map < Character, Integer > charNum = PictureUtil
+                .getPictureCharOccurences(picture, currencySymbol);
 
-        _length = PictureUtil.calcLengthFromPicture(
-                charNum, isSignSeparate, currencySign, currencySymbol, false);
+        _length = PictureUtil.calcLengthFromPicture(charNum, isSignSeparate,
+                currencySign, currencySymbol, false);
         /*
          * storage is valid only for simple strings at this stage. will be
          * refined later.
@@ -463,20 +482,16 @@ public class XsdDataItem {
                 }
             }
             _xsdType = XsdType.STRING;
-            _minStorageLength = PictureUtil
-                    .calcLengthFromPicture(
-                            charNum, isSignSeparate, currencySign,
-                            currencySymbol, true);
+            _minStorageLength = PictureUtil.calcLengthFromPicture(charNum,
+                    isSignSeparate, currencySign, currencySymbol, true);
             return;
         }
 
         if (charNum.get('G') > 0) {
             _cobolType = CobolType.DBCS_ITEM;
             _xsdType = XsdType.STRING;
-            _minStorageLength = PictureUtil
-                    .calcLengthFromPicture(
-                            charNum, isSignSeparate, currencySign,
-                            currencySymbol, true);
+            _minStorageLength = PictureUtil.calcLengthFromPicture(charNum,
+                    isSignSeparate, currencySign, currencySymbol, true);
             return;
         }
 
@@ -487,10 +502,8 @@ public class XsdDataItem {
                 _cobolType = CobolType.NATIONAL_ITEM;
             }
             _xsdType = XsdType.STRING;
-            _minStorageLength = PictureUtil
-                    .calcLengthFromPicture(
-                            charNum, isSignSeparate, currencySign,
-                            currencySymbol, true);
+            _minStorageLength = PictureUtil.calcLengthFromPicture(charNum,
+                    isSignSeparate, currencySign, currencySymbol, true);
             return;
         }
 
@@ -506,19 +519,12 @@ public class XsdDataItem {
          * Numeric edited items are identified by their picture clause symbols
          * or the presence of the BLANK WHEN ZERO clause
          */
-        if (((charNum.get('/')
-                + charNum.get('B')
-                + charNum.get('/')
-                + charNum.get('Z')
-                + charNum.get('0')
-                + charNum.get(comma)
-                + charNum.get(decimalPoint)
-                + charNum.get('*')
-                + charNum.get('+')
-                + charNum.get('-')
-                + charNum.get('C') /* CR */
+        if (((charNum.get('/') + charNum.get('B') + charNum.get('/')
+                + charNum.get('Z') + charNum.get('0') + charNum.get(comma)
+                + charNum.get(decimalPoint) + charNum.get('*')
+                + charNum.get('+') + charNum.get('-') + charNum.get('C') /* CR */
                 + charNum.get('D') /* DB */
-                + charNum.get(currencySymbol)) > 0)
+        + charNum.get(currencySymbol)) > 0)
                 || isBlankWhenZero) {
             _cobolType = CobolType.NUMERIC_EDITED_ITEM;
             _xsdType = XsdType.STRING;
@@ -543,9 +549,9 @@ public class XsdDataItem {
     }
 
     /**
-     * Once we have identified the COBOL data item as being numeric, this
-     * will perform more analysis on the picture clause to extract such
-     * info as integer part, decimal part and sign.
+     * Once we have identified the COBOL data item as being numeric, this will
+     * perform more analysis on the picture clause to extract such info as
+     * integer part, decimal part and sign.
      * <p/>
      * The fractionDigits corresponds to digits past the decimal point. The
      * totalDigits is the integer part + fractionDigits;
@@ -557,10 +563,8 @@ public class XsdDataItem {
      * @param currencyChar the currency sign
      * @param decimalPointIsComma true if decimal point is comma
      */
-    private void setNumericAttributes(
-            final String picture,
-            final char currencyChar,
-            final boolean decimalPointIsComma) {
+    private void setNumericAttributes(final String picture,
+            final char currencyChar, final boolean decimalPointIsComma) {
 
         setDigitsAndSign(picture, currencyChar, decimalPointIsComma);
 
@@ -600,8 +604,8 @@ public class XsdDataItem {
     }
 
     /**
-     * Extracts total number of digits, fraction digits and
-     * sign from a picture clause.
+     * Extracts total number of digits, fraction digits and sign from a picture
+     * clause.
      * <p/>
      * Works for zoned decimals, binary and packed decimal.
      * <p/>
@@ -610,16 +614,14 @@ public class XsdDataItem {
      * @param currencySymbol the currency symbol
      * @param decimalPointIsComma true if decimal point is comma
      */
-    protected void setDigitsAndSign(
-            final String picture,
-            final char currencySymbol,
-            final boolean decimalPointIsComma) {
+    protected void setDigitsAndSign(final String picture,
+            final char currencySymbol, final boolean decimalPointIsComma) {
 
         char decimalPoint = (decimalPointIsComma) ? ',' : '.';
 
         /*
-         * Look for the integer part (digits before the decimal point)
-         * Decimal point is virtual or not.
+         * Look for the integer part (digits before the decimal point) Decimal
+         * point is virtual or not.
          */
         int iV = picture.indexOf('V');
         if (iV == -1) {
@@ -661,8 +663,7 @@ public class XsdDataItem {
      * @param currencySymbol the currency symbol in use
      * @return the maximum number of digits supported
      */
-    protected int getMaxDigits(
-            final Map < Character, Integer > intCharNum,
+    protected int getMaxDigits(final Map < Character, Integer > intCharNum,
             final char currencySymbol) {
         int maxDigits = intCharNum.get('9') + intCharNum.get('Z')
                 + intCharNum.get('*');
@@ -698,12 +699,10 @@ public class XsdDataItem {
      * @param parent used to resolve potential name conflict
      * @return a nice XML type name
      */
-    public static String formatTypeName(
-            final String elementName,
+    public static String formatTypeName(final String elementName,
             final CobolDataItem cobolDataItem,
             final List < String > nonUniqueCobolNames,
-            final Cob2XsdModel model,
-            final XsdDataItem parent) {
+            final Cob2XsdModel model, final XsdDataItem parent) {
 
         StringBuilder sb = new StringBuilder();
         sb.append(Character.toUpperCase(elementName.charAt(0)));
@@ -749,8 +748,7 @@ public class XsdDataItem {
      * @param model the translator options
      * @return an XML schema element name
      */
-    public static String formatElementName(
-            final CobolDataItem cobolDataItem,
+    public static String formatElementName(final CobolDataItem cobolDataItem,
             final Cob2XsdModel model) {
 
         String cobolName = getXmlCompatibleCobolName(cobolDataItem
@@ -786,9 +784,8 @@ public class XsdDataItem {
     }
 
     /**
-     * Transform the COBOL name to a valid XML Name.
-     * Does not do any beautification other than strictly complying with XML
-     * specifications.
+     * Transform the COBOL name to a valid XML Name. Does not do any
+     * beautification other than strictly complying with XML specifications.
      * 
      * @param cobolName the original COBOL data item name
      * @return a valid XML Name
@@ -922,9 +919,8 @@ public class XsdDataItem {
     }
 
     /**
-     * @return the Cobol generic usage.
-     *         This is needed because COBOL usage values are not accepted as
-     *         java identifiers.
+     * @return the Cobol generic usage. This is needed because COBOL usage
+     *         values are not accepted as java identifiers.
      */
     public String getUsageForCobol() {
         switch (getUsage()) {

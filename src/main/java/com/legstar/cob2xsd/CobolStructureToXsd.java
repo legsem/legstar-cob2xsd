@@ -56,15 +56,15 @@ import com.legstar.cobol.CobolStructureEmitterImpl;
 import com.legstar.cobol.CobolStructureLexer;
 import com.legstar.cobol.CobolStructureLexerImpl;
 import com.legstar.cobol.CobolStructureParser;
+import com.legstar.cobol.CobolStructureParser.cobdata_return;
 import com.legstar.cobol.CobolStructureParserImpl;
 import com.legstar.cobol.RecognizerErrorHandler;
-import com.legstar.cobol.CobolStructureParser.cobdata_return;
 import com.legstar.cobol.model.CobolDataItem;
 
 /**
- * Implements the COBOL Structure to XML Schema translator.
- * This is the API made available to invoke the COBOL to XML Schema translator
- * from your own java code.
+ * Implements the COBOL Structure to XML Schema translator. This is the API made
+ * available to invoke the COBOL to XML Schema translator from your own java
+ * code.
  * <p/>
  * There are 6 steps involved:
  * <ul>
@@ -125,9 +125,8 @@ public class CobolStructureToXsd {
      * @throws RecognizerException if COBOL recognition fails
      * @throws XsdGenerationException if XML schema generation process fails
      */
-    public String translate(
-            final String cobolSource) throws RecognizerException,
-            XsdGenerationException {
+    public String translate(final String cobolSource)
+            throws RecognizerException, XsdGenerationException {
         if (_log.isDebugEnabled()) {
             debug("Translating with options:", getModel().toString());
         }
@@ -139,16 +138,14 @@ public class CobolStructureToXsd {
      * 
      * @param cobolSourceFile the COBOL source code
      * @param target can either be a folder where XML schema result is to be
-     *            written
-     *            or a file in which case the XML schema is written there
+     *            written or a file in which case the XML schema is written
+     *            there
      * @return the XML Schema
      * @throws RecognizerException if COBOL recognition fails
      * @throws XsdGenerationException if XML schema generation process fails
      */
-    public File translate(
-            final File cobolSourceFile,
-            final File target) throws RecognizerException,
-            XsdGenerationException {
+    public File translate(final File cobolSourceFile, final File target)
+            throws RecognizerException, XsdGenerationException {
         return translate(cobolSourceFile, null, target);
     }
 
@@ -160,17 +157,15 @@ public class CobolStructureToXsd {
      * @param cobolSourceFileEncoding the character set used to encode the COBOL
      *            source file
      * @param target can either be a folder where XML schema result is to be
-     *            written
-     *            or a file in which case the XML schema is written there
+     *            written or a file in which case the XML schema is written
+     *            there
      * @return the XML Schema
      * @throws RecognizerException if COBOL recognition fails
      * @throws XsdGenerationException if XML schema generation process fails
      */
-    public File translate(
-            final File cobolSourceFile,
-            final String cobolSourceFileEncoding,
-            final File target) throws RecognizerException,
-            XsdGenerationException {
+    public File translate(final File cobolSourceFile,
+            final String cobolSourceFileEncoding, final File target)
+            throws RecognizerException, XsdGenerationException {
         try {
             if (_log.isDebugEnabled()) {
                 _log.debug("Translating COBOL file: " + cobolSourceFile);
@@ -178,9 +173,8 @@ public class CobolStructureToXsd {
             checkCobolSourceFile(cobolSourceFile);
             checkTarget(target);
 
-            String xsdString = translate(
-                    FileUtils.readFileToString(cobolSourceFile,
-                            cobolSourceFileEncoding));
+            String xsdString = translate(FileUtils.readFileToString(
+                    cobolSourceFile, cobolSourceFileEncoding));
             File xsdFile = null;
             if (target.isDirectory()) {
                 String xsdFileName = cobolSourceFile.getName() + ".xsd";
@@ -205,8 +199,8 @@ public class CobolStructureToXsd {
      * @param cobolSourceFile the COBOL source file
      * @throws IOException if file cannot be located
      */
-    protected void checkCobolSourceFile(
-            final File cobolSourceFile) throws IOException {
+    protected void checkCobolSourceFile(final File cobolSourceFile)
+            throws IOException {
         if (cobolSourceFile == null) {
             throw new IOException("You must provide a COBOL source file");
         }
@@ -217,15 +211,14 @@ public class CobolStructureToXsd {
     }
 
     /**
-     * make sure the target, folder or file, is valid.
-     * We consider that target files will have extensions. Its ok for a target
-     * file not to exist but target folders must exist.
+     * make sure the target, folder or file, is valid. We consider that target
+     * files will have extensions. Its ok for a target file not to exist but
+     * target folders must exist.
      * 
      * @param target the target folder or file
      * @throws IOException if file cannot be located
      */
-    protected void checkTarget(
-            final File target) throws IOException {
+    protected void checkTarget(final File target) throws IOException {
         if (target == null) {
             throw new IOException("You must provide a target directory or file");
         }
@@ -263,8 +256,8 @@ public class CobolStructureToXsd {
         switch (getModel().getCodeFormat()) {
         case FIXED_FORMAT:
             CobolFixedFormatSourceCleaner fixedCleaner = new CobolFixedFormatSourceCleaner(
-                    getErrorHandler(), getModel().getStartColumn(),
-                    getModel().getEndColumn());
+                    getErrorHandler(), getModel().getStartColumn(), getModel()
+                            .getEndColumn());
             return fixedCleaner.clean(cobolSource);
         case FREE_FORMAT:
             CobolFreeFormatSourceCleaner freeCleaner = new CobolFreeFormatSourceCleaner(
@@ -283,25 +276,21 @@ public class CobolStructureToXsd {
      * @return an antlr token stream
      * @throws RecognizerException if lexer failed to tokenize COBOL source
      */
-    public CommonTokenStream lex(
-            final String cleanedCobolSource) throws RecognizerException {
+    public CommonTokenStream lex(final String cleanedCobolSource)
+            throws RecognizerException {
         if (_log.isDebugEnabled()) {
             debug("2. Lexing COBOL source code:", cleanedCobolSource);
         }
         try {
             CobolStructureLexer lex = new CobolStructureLexerImpl(
-                    new ANTLRReaderStream(
-                            new StringReader(cleanedCobolSource)),
+                    new ANTLRReaderStream(new StringReader(cleanedCobolSource)),
                     getErrorHandler());
             CommonTokenStream tokens = new CommonTokenStream(lex);
             if (lex.getNumberOfSyntaxErrors() != 0 || tokens == null) {
-                throw (new RecognizerException(
-                        "Lexing failed. "
-                                + lex.getNumberOfSyntaxErrors()
-                                + " syntax errors."
-                                + " Last error was "
-                                + getErrorHistory().get(
-                                        getErrorHistory().size() - 1)));
+                throw (new RecognizerException("Lexing failed. "
+                        + lex.getNumberOfSyntaxErrors() + " syntax errors."
+                        + " Last error was "
+                        + getErrorHistory().get(getErrorHistory().size() - 1)));
             }
             return tokens;
         } catch (IOException e) {
@@ -322,17 +311,14 @@ public class CobolStructureToXsd {
             debug("3. Parsing tokens:", tokens.toString());
         }
         try {
-            CobolStructureParser parser = new CobolStructureParserImpl(
-                    tokens, getErrorHandler());
+            CobolStructureParser parser = new CobolStructureParserImpl(tokens,
+                    getErrorHandler());
             cobdata_return parserResult = parser.cobdata();
             if (parser.getNumberOfSyntaxErrors() != 0 || parserResult == null) {
-                throw (new RecognizerException(
-                        "Parsing failed. "
-                                + parser.getNumberOfSyntaxErrors()
-                                + " syntax errors."
-                                + " Last error was "
-                                + getErrorHistory().get(
-                                        getErrorHistory().size() - 1)));
+                throw (new RecognizerException("Parsing failed. "
+                        + parser.getNumberOfSyntaxErrors() + " syntax errors."
+                        + " Last error was "
+                        + getErrorHistory().get(getErrorHistory().size() - 1)));
             }
             return (CommonTree) parserResult.getTree();
         } catch (RecognitionException e) {
@@ -351,8 +337,8 @@ public class CobolStructureToXsd {
             throws RecognizerException {
         List < CobolDataItem > cobolDataItems = new ArrayList < CobolDataItem >();
         if (_log.isDebugEnabled()) {
-            debug("4. Emitting Model from AST: ", ((ast == null) ? "null" : ast
-                    .toStringTree()));
+            debug("4. Emitting Model from AST: ",
+                    ((ast == null) ? "null" : ast.toStringTree()));
         }
         if (ast == null) {
             return cobolDataItems;
@@ -369,18 +355,17 @@ public class CobolStructureToXsd {
     }
 
     /**
-     * Generate an XML Schema using a model of COBOL data items.
-     * The model is a list of root level items. From these, we only
-     * process group items (structures) with children.
+     * Generate an XML Schema using a model of COBOL data items. The model is a
+     * list of root level items. From these, we only process group items
+     * (structures) with children.
      * 
      * @param cobolDataItems a list of COBOL data items
      * @return the XML schema
      */
-    public XmlSchema emitXsd(
-            final List < CobolDataItem > cobolDataItems) {
+    public XmlSchema emitXsd(final List < CobolDataItem > cobolDataItems) {
         if (_log.isDebugEnabled()) {
-            debug("5. Emitting XML Schema from model: ", cobolDataItems
-                    .toString());
+            debug("5. Emitting XML Schema from model: ",
+                    cobolDataItems.toString());
         }
         XmlSchema xsd = createXmlSchema(getModel().getXsdEncoding());
         List < String > nonUniqueCobolNames = getNonUniqueCobolNames(cobolDataItems);
@@ -389,8 +374,7 @@ public class CobolStructureToXsd {
             if (cobolDataItem.getChildren().size() > 0) {
                 XsdDataItem xsdDataItem = new XsdDataItem(cobolDataItem,
                         getModel(), null, nonUniqueCobolNames, _errorHandler);
-                xsd.getItems().add(
-                        emitter.createXmlSchemaElement(xsdDataItem));
+                xsd.getItems().add(emitter.createXmlSchemaElement(xsdDataItem));
             }
         }
         return xsd;
@@ -435,8 +419,8 @@ public class CobolStructureToXsd {
                 Source xsltSource = new StreamSource(new File(xsltFileName));
                 transformer = tFactory.newTransformer(xsltSource);
             }
-            transformer.setOutputProperty(OutputKeys.ENCODING,
-                    getModel().getXsdEncoding());
+            transformer.setOutputProperty(OutputKeys.ENCODING, getModel()
+                    .getXsdEncoding());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer
                     .setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
@@ -459,9 +443,9 @@ public class CobolStructureToXsd {
     }
 
     /**
-     * Create a list of COBOL names which are not unique.
-     * This is useful when we build complex type names from the COBOL names.
-     * Complex type names need to be unique within a target namespace.
+     * Create a list of COBOL names which are not unique. This is useful when we
+     * build complex type names from the COBOL names. Complex type names need to
+     * be unique within a target namespace.
      * 
      * @param cobolDataItems a list of root data items
      * @return a list of COBOL names which are not unique
@@ -479,8 +463,7 @@ public class CobolStructureToXsd {
 
     /**
      * If data item COBOL name is already used, we add it to the non unique
-     * list.
-     * This recurse to the item children.
+     * list. This recurse to the item children.
      * <p/>
      * We don't add COBOL FILLERs as they are always considered non unique.
      * 
@@ -519,11 +502,10 @@ public class CobolStructureToXsd {
      * @return a new empty XML schema using the model
      */
     protected XmlSchema createXmlSchema(final String encoding) {
-        XmlSchema xsd = new XmlSchema(
-                getModel().getTargetNamespace(), new XmlSchemaCollection());
+        XmlSchema xsd = new XmlSchema(getModel().getTargetNamespace(),
+                new XmlSchemaCollection());
         if (getModel().getTargetNamespace() != null) {
-            xsd.setElementFormDefault(new XmlSchemaForm(
-                            XmlSchemaForm.QUALIFIED));
+            xsd.setElementFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
         }
         xsd.setAttributeFormDefault(null);
         xsd.setInputEncoding(encoding);
@@ -571,8 +553,7 @@ public class CobolStructureToXsd {
         } catch (IOException e) {
             _log.error(e);
         }
-        _log
-                .debug("----------------------------------------------------------------");
+        _log.debug("----------------------------------------------------------------");
     }
 
     /**
