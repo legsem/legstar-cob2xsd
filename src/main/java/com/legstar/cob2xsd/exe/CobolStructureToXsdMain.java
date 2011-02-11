@@ -47,7 +47,7 @@ import com.legstar.cob2xsd.XsdGenerationException;
 public class CobolStructureToXsdMain {
 
     /** The version properties file name. */
-    private static final String VERSION_FILE_NAME = "/version.properties";
+    private static final String VERSION_FILE_NAME = "/com/legstar/cob2xsd/version.properties";
 
     /** The default input. */
     private static final String DEFAULT_INPUT_FOLDER = "cobol";
@@ -126,9 +126,8 @@ public class CobolStructureToXsdMain {
      * @return true if arguments were valid
      * @throws Exception if something goes wrong while parsing arguments
      */
-    protected boolean collectOptions(
-            final Options options,
-            final String[] args) throws Exception {
+    protected boolean collectOptions(final Options options, final String[] args)
+            throws Exception {
         if (args != null && args.length > 0) {
             CommandLineParser parser = new PosixParser();
             CommandLine line = parser.parse(options, args);
@@ -155,8 +154,8 @@ public class CobolStructureToXsdMain {
     /**
      * A configuration file is expected. We load it into the generator model.
      * 
-     * @throws XsdGenerationException
-     *             if configuration file missing or file corrupt
+     * @throws XsdGenerationException if configuration file missing or file
+     *             corrupt
      */
     protected void loadModel() throws XsdGenerationException {
         try {
@@ -181,9 +180,10 @@ public class CobolStructureToXsdMain {
     protected void produceHelp(final Options options) throws Exception {
         HelpFormatter formatter = new HelpFormatter();
         String version = getVersion();
-        formatter.printHelp("java -jar legstar-cob2xsd-"
-                + version.substring(0, version.indexOf(' '))
-                + "-exe.jar followed by:", options);
+        formatter.printHelp(
+                "java -jar legstar-cob2xsd-"
+                        + version.substring(0, version.indexOf(' '))
+                        + "-exe.jar followed by:", options);
     }
 
     /**
@@ -209,9 +209,8 @@ public class CobolStructureToXsdMain {
                         + " Name is relative or absolute");
         options.addOption(input);
 
-        Option cobolSourceFileEncoding = new Option("e",
-                "sourceEncoding", true,
-                "Character set used for COBOL source files encoding");
+        Option cobolSourceFileEncoding = new Option("e", "sourceEncoding",
+                true, "Character set used for COBOL source files encoding");
         options.addOption(cobolSourceFileEncoding);
 
         Option output = new Option("o", "output", true,
@@ -229,9 +228,8 @@ public class CobolStructureToXsdMain {
      * @return false if processing needs to stop, true if its ok to continue
      * @throws Exception if line cannot be processed
      */
-    protected boolean processLine(
-            final CommandLine line,
-            final Options options) throws Exception {
+    protected boolean processLine(final CommandLine line, final Options options)
+            throws Exception {
         if (line.hasOption("version")) {
             System.out.println("version " + getVersion());
             return false;
@@ -247,8 +245,8 @@ public class CobolStructureToXsdMain {
             setInput(line.getOptionValue("input").trim());
         }
         if (line.hasOption("sourceEncoding")) {
-            setCobolSourceFileEncoding(line.getOptionValue(
-                    "sourceEncoding").trim());
+            setCobolSourceFileEncoding(line.getOptionValue("sourceEncoding")
+                    .trim());
         }
         if (line.hasOption("output")) {
             setOutput(line.getOptionValue("output").trim());
@@ -258,18 +256,17 @@ public class CobolStructureToXsdMain {
     }
 
     /**
-     * Translate a single file or all files from an input folder.
-     * Place results in the output folder.
+     * Translate a single file or all files from an input folder. Place results
+     * in the output folder.
      * 
      * @param input the input COBOL file or folder
      * @param cobolSourceFileEncoding the input file character set
      * @param target the output folder or file where XML schema file must go
      * @throws XsdGenerationException if XML schema cannot be generated
      */
-    protected void execute(
-            final File input,
-            final String cobolSourceFileEncoding,
-            final File target) throws XsdGenerationException {
+    protected void execute(final File input,
+            final String cobolSourceFileEncoding, final File target)
+            throws XsdGenerationException {
 
         try {
             _log.info("Started translation from COBOL to XML Schema");
@@ -306,10 +303,9 @@ public class CobolStructureToXsdMain {
      * @param target target file or folder
      * @throws XsdGenerationException if parser fails
      */
-    protected void translate(
-            final File cobolFile,
-            final String cobolSourceFileEncoding,
-            final File target) throws XsdGenerationException {
+    protected void translate(final File cobolFile,
+            final String cobolSourceFileEncoding, final File target)
+            throws XsdGenerationException {
         try {
             _log.info("Translation started for: " + cobolFile);
 
@@ -336,8 +332,8 @@ public class CobolStructureToXsdMain {
         InputStream stream = null;
         try {
             Properties version = new Properties();
-            stream = CobolStructureToXsdMain.class.getResourceAsStream(
-                            VERSION_FILE_NAME);
+            stream = CobolStructureToXsdMain.class
+                    .getResourceAsStream(VERSION_FILE_NAME);
             version.load(stream);
             return version.getProperty("version");
         } finally {
@@ -377,8 +373,7 @@ public class CobolStructureToXsdMain {
                 file = null;
             } else {
                 throw new IllegalArgumentException("Configuration file "
-                        + config
-                        + " not found");
+                        + config + " not found");
             }
         }
         setConfigFile(file);

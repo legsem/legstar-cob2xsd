@@ -1,16 +1,29 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>5</version>
+    </parent>
+
     <groupId>com.legsem.legstar</groupId>
     <artifactId>legstar-cob2xsd</artifactId>
-    <packaging>jar</packaging>
     <version>0.3.3-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
     <name>LegStar COBOL to XML schema translator</name>
-    <description>legstar-cob2xsd is a COBOL structure to XML Schema translator</description>
+    <description>Translates COBOL structure to XML Schema translator</description>
     <url>http://code.google.com/p/legstar-cob2xsd</url>
+
     <properties>
-        <legstarVersion>1.4.0</legstarVersion>
-        <antlrVersion>3.2</antlrVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <legstarVersion>1.5.1</legstarVersion>
+        <antlrVersion>3.2</antlrVersion>
+        <antInternalVersion>1.7.0</antInternalVersion> <!-- Used for legstar builds and tests -->
+        <antVersion>1.6.5</antVersion>  <!-- Expected to be provided at runtime -->
+        <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+        <buildDate>${maven.build.timestamp}</buildDate>
     </properties>
 
     <issueManagement>
@@ -24,6 +37,16 @@
         <url>http://legstar-cob2xsd.googlecode.com/svn/trunk/</url>
     </scm>
 
+    <distributionManagement>
+
+        <site>
+            <id>local.website</id>
+            <name>Local Website</name>
+            <url>file:///${legstar-dev-website-local-dir}/legstar-cob2xsd</url>
+        </site>
+
+    </distributionManagement>
+
     <mailingLists>
         <mailingList>
             <name>LegStar users mailing list</name>
@@ -31,6 +54,13 @@
             <unsubscribe>http://groups.google.com/group/legstar-user/subscribe</unsubscribe>
             <post>legstar-user@googlegroups.com</post>
             <archive>http://groups.google.com/group/legstar-user/topics</archive>
+        </mailingList>
+        <mailingList>
+            <name>LegStar dev mailing list</name>
+            <subscribe>http://groups.google.com/group/legstar-dev/subscribe</subscribe>
+            <unsubscribe>http://groups.google.com/group/legstar-dev/subscribe</unsubscribe>
+            <post>legstar-dev@googlegroups.com</post>
+            <archive>http://groups.google.com/group/legstar-dev/topics</archive>
         </mailingList>
     </mailingLists>
 
@@ -51,7 +81,7 @@
     <licenses>
         <license>
             <name>GNU Lesser General Public License</name>
-            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <url>http://www.gnu.org/licenses/lgpl-2.1.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -61,134 +91,24 @@
         <url>http://www.legsem.com/</url>
     </organization>
 
-    <distributionManagement>
-        <downloadUrl>http://www.legsem.com/legstar/mavenrepo</downloadUrl>
-        <site>
-            <id>local.website</id>
-            <name>Local Website</name>
-            <url>file:///${legstar-dev-website-local-dir}/legstar-cob2xsd</url>
-        </site>
-        <repository>
-            <id>ftp-release-repository</id>
-            <name>LEGSTAR Distributions Repository</name>
-            <url>ftp://ftp.legsem.com/public_html/legstar/maven/repo</url>
-        </repository>
-        <snapshotRepository>
-            <id>ftp-snapshots-repository</id>
-            <name>LEGSTAR Distributions Snapshot Repository</name>
-            <url>ftp://ftp.legsem.com/public_html/legstar/maven/snapshots</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <dependencies>
-
-        <!-- ANTLR -->    
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr</artifactId>
-            <version>${antlrVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr-runtime</artifactId>
-            <version>${antlrVersion}</version>
-        </dependency>
-
-        <!-- LegStar development & runtime API -->    
-        <dependency>
-            <groupId>com.legsem.legstar</groupId>
-            <artifactId>legstar-coxbapi</artifactId>
-            <version>${legstarVersion}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.legsem.legstar</groupId>
-            <artifactId>legstar-codegen</artifactId>
-            <version>${legstarVersion}</version>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- ANT -->    
-        <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.6.5</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant-launcher</artifactId>
-            <version>1.6.5</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Apache libraries -->    
-        <dependency>
-            <groupId>org.apache.ws.commons.schema</groupId>
-            <artifactId>XmlSchema</artifactId>
-            <version>1.4.5</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>logkit</groupId>
-                    <artifactId>logkit</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>avalon-framework</groupId>
-                    <artifactId>avalon-framework</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- Tests -->    
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId> 
-                    <artifactId>maven-assembly-plugin</artifactId> 
-                    <version>2.2-beta-5</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId> 
-                    <artifactId>maven-site-plugin</artifactId> 
-                    <version>2.0-beta-7</version> 
-                </plugin>
-            </plugins>
-        </pluginManagement>
+
+        <!-- Filter version properties file -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
 
          <extensions>
             <extension>
@@ -202,14 +122,53 @@
                 <version>1.0-beta-2</version>
             </extension>
         </extensions>
- 
+
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.0-beta-9</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>2.2</version>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+
+                <executions>
+
+                    <!-- Test the distribution files -->
+                    <execution>
+                        <id>test-distribution</id>
+                        <phase>verify</phase>
+                        <configuration>
+                            <tasks>
+                                <ant antfile="${basedir}/src/main/ant/test-distribution.xml" />
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+
+                </executions>
             </plugin>
 
             <plugin>
@@ -235,10 +194,9 @@
 
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
-                <inherited>true</inherited>
                 <executions>
                     <execution>
-                        <id>project-sources</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
@@ -246,82 +204,45 @@
                 </executions>
             </plugin>
 
+            <!-- Produce javadoc jar for each module -->
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-      
-                <executions>
-
-                    <!-- Generate a version properties file -->
-                    <execution>
-                        <id>generate-version</id>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <tasks>
-                                <ant antfile="${basedir}/src/main/ant/maven-to-version-properties.xml" />
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-
-                    <!-- Test the distribution files -->
-                    <execution>
-                        <id>test-distribution</id>
-                        <phase>verify</phase>
-                        <configuration>
-                            <tasks>
-                                <ant antfile="${basedir}/src/main/ant/test-distribution.xml" />
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-
-                </executions>
-            </plugin>
-
-            <!-- Let maven know about the location where we generate the version properties file
-                 so that it gets included in the target jar file  -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.4</version>
+                <artifactId>maven-javadoc-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>add-source</id>
-                        <phase>generate-resources</phase>
+                        <phase>package</phase>
                         <goals>
-                            <goal>add-resource</goal>
+                            <goal>jar</goal>
                         </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}/generated-sources/version</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId> 
-                <artifactId>maven-release-plugin</artifactId> 
-                <version>2.0-beta-9</version> 
                 <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <links>
+                        <link>http://download.oracle.com/javaee/1.5/api/</link>
+                        <link>http://download.oracle.com/javase/1.5.0/docs/api/</link>
+                    </links>
                 </configuration>
+            </plugin>
+
+            <!-- Sign all artifacts -->
+            <plugin>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
-		            <!-- 
-		                JAR with test classifier for use by other projects who need COBOL and XML SChema samples
-		              -->
+                <!--
+                    JAR with test classifier for use by other projects who need COBOL and XML SChema samples
+                  -->
                     <execution>
                         <id>bundle-test-jar</id>
                         <phase>package</phase>
@@ -338,8 +259,8 @@
                             </includes>
                         </configuration>
                     </execution>
- 
-                    <!-- 
+
+                    <!--
                         Executable jar
                       -->
                    <execution>
@@ -364,12 +285,34 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId> 
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <!-- 
+                       Dependencies are useful for ANT scripts classpath and distribution.
+                      -->
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <excludeGroupIds>org.codehaus.jackson</excludeGroupIds>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-5</version>
                 <executions>
 
-		            <!-- 
-		                Main ZIP distribution (includes executable jar)
-		              -->
+                <!--
+                    Main ZIP distribution (includes executable jar)
+                  -->
                     <execution>
                         <id>make-full-assembly</id>
                         <phase>package</phase>
@@ -386,7 +329,7 @@
                         </configuration>
                     </execution>
 
-                    <!-- 
+                    <!--
                         Full jar which contains dependencies
                       -->
                     <execution>
@@ -409,6 +352,107 @@
          </plugins>
    </build>
 
+    <dependencies>
+
+        <!-- ANTLR -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr</artifactId>
+            <version>${antlrVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr-runtime</artifactId>
+            <version>${antlrVersion}</version>
+        </dependency>
+
+        <!-- Apache ANT -->
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>${antVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Apache ANT launcher (Used to test generated ANT scripts) -->
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant-launcher</artifactId>
+            <version>${antVersion}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Apache Logging API -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>logkit</groupId>
+                    <artifactId>logkit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>avalon-framework</groupId>
+                    <artifactId>avalon-framework</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Apache commons IO -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <!-- Apache commons client -->
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.1</version>
+        </dependency>
+
+        <!-- Apache XML schema -->
+        <dependency>
+            <groupId>org.apache.ws.commons.schema</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+
+        <!-- LegStar COBOL binding API -->
+        <dependency>
+            <groupId>com.legsem.legstar</groupId>
+            <artifactId>legstar-coxbapi</artifactId>
+            <version>${legstarVersion}</version>
+        </dependency>
+
+        <!-- LegStar Code Generation API -->
+        <dependency>
+            <groupId>com.legsem.legstar</groupId>
+            <artifactId>legstar-codegen</artifactId>
+            <version>${legstarVersion}</version>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <reporting>
         <plugins>
 
@@ -430,6 +474,37 @@
                 </reportSets>
             </plugin>
 
+            <!-- Aggregate the sources cross references for all modules -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>jxr</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
+            <!-- Javadoc for all modules -->
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links>
+                        <link>http://download.oracle.com/javaee/1.5/api/</link>
+                        <link>http://download.oracle.com/javase/1.5.0/docs/api/</link>
+                    </links>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
@@ -441,6 +516,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.4</version> 
                 <configuration>
                     <instrumentation>
                         <!-- Instrumenting performance tests is useless for test coverage analysis -->
@@ -466,43 +542,12 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <links>
-                        <link>http://java.sun.com/j2ee/1.4/docs/api</link>
-                        <link>http://java.sun.com/j2se/1.4.2/docs/api</link>
-                        <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-                    </links>
-                    <excludePackageNames>com.legstar.coxb.cust.*</excludePackageNames>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>javadoc</report>
-                        <!-- <report>test-javadoc</report> -->
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jdepend-maven-plugin</artifactId>
-            </plugin>
-
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
             </plugin>
 
         </plugins>
-    
+
     </reporting>
 
 </project>
