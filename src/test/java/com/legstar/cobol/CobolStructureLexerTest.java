@@ -26,11 +26,11 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
         lexAndCheck("" + "       01 A" + LS + "      * a comment" + LS
                 + "       ." + LS, "[@0,7:8='01',<DATA_ITEM_LEVEL>,1:7]"
                 + "[@1,10:10='A',<DATA_NAME>,1:10]"
-                + "[@2,22:22='.',<PERIOD>,3:7]");
+                + "[@2,20:20='.',<PERIOD>,3:7]");
         lexAndCheck("" + "       01 A" + LS + "      / a comment" + LS
                 + "       ." + LS, "[@0,7:8='01',<DATA_ITEM_LEVEL>,1:7]"
                 + "[@1,10:10='A',<DATA_NAME>,1:10]"
-                + "[@2,22:22='.',<PERIOD>,3:7]");
+                + "[@2,20:20='.',<PERIOD>,3:7]");
     }
 
     /**
@@ -108,9 +108,8 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 "[@0,7:7='1',<DATA_ITEM_LEVEL>,1:7]"
                         + "[@1,9:9='A',<DATA_NAME>,1:9]"
                         + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
-                        + "[@3,39:208='\"AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEGGGGGGGGGGHHHHHHHHHH"
-                        + "IIIIIIIIIIJJJJJJJJJJKKKKKKKKKKLLLLLLLLLLMMMMMMMMMM\"',<ALPHANUM_LITERAL_STRING>,2:21]"
-                        + "[@4,209:209='.',<PERIOD>,4:43]");
+                        + "[@3,38:205='\"AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEGGGGGGGGGGHHHHHHHHHHIIIIIIIIIIJJJJJJJJJJKKKKKKKKKKLLLLLLLLLLMMMMMMMMMM\"',<ALPHANUM_LITERAL_STRING>,2:21]"
+                        + "[@4,206:206='.',<PERIOD>,4:43]");
     }
 
     /**
@@ -125,9 +124,8 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 "[@0,7:7='1',<DATA_ITEM_LEVEL>,1:7]"
                         + "[@1,9:9='A',<DATA_NAME>,1:9]"
                         + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
-                        + "[@3,39:134=''AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEELLLLLLLLLL"
-                        + "MMMMMMMMMM'',<ALPHANUM_LITERAL_STRING>,2:21]"
-                        + "[@4,135:135='.',<PERIOD>,3:43]");
+                        + "[@3,38:132=''AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEELLLLLLLLLLMMMMMMMMMM'',<ALPHANUM_LITERAL_STRING>,2:21]"
+                        + "[@4,133:133='.',<PERIOD>,3:43]");
     }
 
     /**
@@ -320,15 +318,15 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
      * More than one statement.
      */
     public void testMultipleStatements() {
-        lexAndCheck("       01 MYVAR1." + LS + "        02 MYVAR2 PIC X.",
+        lexAndCheck(
+                "       01 MYVAR1." + LS + "        02 MYVAR2 PIC X.",
                 "[@0,7:8='01',<DATA_ITEM_LEVEL>,1:7]"
                         + "[@1,10:15='MYVAR1',<DATA_NAME>,1:10]"
-                        + "[@2,16:16='.',<PERIOD>,1:16]"
-                        + "[@3,27:28='02',<DATA_ITEM_LEVEL>,2:8]"
-                        + "[@4,30:35='MYVAR2',<DATA_NAME>,2:11]"
-                        + "[@5,37:39='PIC',<PICTURE_KEYWORD>,2:18]"
-                        + "[@6,41:41='X',<PICTURE_PART>,2:22]"
-                        + "[@7,42:42='.',<PERIOD>,2:23]");
+                        + "[@2,16:16='.',<PERIOD>,1:16][@3,26:27='02',<DATA_ITEM_LEVEL>,2:8]"
+                        + "[@4,29:34='MYVAR2',<DATA_NAME>,2:11]"
+                        + "[@5,36:38='PIC',<PICTURE_KEYWORD>,2:18]"
+                        + "[@6,40:40='X',<PICTURE_PART>,2:22]"
+                        + "[@7,41:41='.',<PERIOD>,2:23]");
     }
 
     /**
@@ -340,13 +338,13 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 "[@0,7:8='01',<DATA_ITEM_LEVEL>,1:7]"
                         + "[@1,10:15='MYVAR1',<DATA_NAME>,1:10]"
                         + "[@2,16:16='.',<PERIOD>,1:16]"
-                        + "[@3,32:33='02',<DATA_ITEM_LEVEL>,3:11]"
-                        + "[@4,35:40='MYVAR2',<DATA_NAME>,3:14]"
-                        + "[@5,42:44='PIC',<PICTURE_KEYWORD>,3:21]"
-                        + "[@6,46:47='99',<PICTURE_PART>,3:25]"
-                        + "[@7,48:48='.',<DECIMAL_POINT>,3:27]"
-                        + "[@8,49:49='9',<PICTURE_PART>,3:28]"
-                        + "[@9,50:50='.',<PERIOD>,3:29]");
+                        + "[@3,30:31='02',<DATA_ITEM_LEVEL>,3:11]"
+                        + "[@4,33:38='MYVAR2',<DATA_NAME>,3:14]"
+                        + "[@5,40:42='PIC',<PICTURE_KEYWORD>,3:21]"
+                        + "[@6,44:45='99',<PICTURE_PART>,3:25]"
+                        + "[@7,46:46='.',<DECIMAL_POINT>,3:27]"
+                        + "[@8,47:47='9',<PICTURE_PART>,3:28]"
+                        + "[@9,48:48='.',<PERIOD>,3:29]");
     }
 
     /**
@@ -687,19 +685,18 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
      * Test lower case picture symbols.
      */
     public void testLowerCasePictureSymbols() {
-        lexAndCheck("       10 custom-name               pic x(4).\n"
-                + "      10 max-replies                 pic s9(4) comp. ",
+        lexAndCheck(
+                "       10 custom-name               pic x(4).\n"
+                        + "      10 max-replies                 pic s9(4) comp. ",
                 "[@0,7:8='10',<DATA_ITEM_LEVEL>,1:7]"
                         + "[@1,10:20='custom-name',<DATA_NAME>,1:10]"
                         + "[@2,36:38='pic',<PICTURE_KEYWORD>,1:36]"
                         + "[@3,40:43='x(4)',<PICTURE_PART>,1:40]"
-                        + "[@4,44:44='.',<PERIOD>,1:44]"
-                        + "[@5,53:54='10',<DATA_ITEM_LEVEL>,2:6]"
-                        + "[@6,56:66='max-replies',<DATA_NAME>,2:9]"
-                        + "[@7,84:86='pic',<PICTURE_KEYWORD>,2:37]"
-                        + "[@8,88:92='s9(4)',<PICTURE_PART>,2:41]"
-                        + "[@9,94:97='comp',<BINARY_KEYWORD>,2:47]"
-                        + "[@10,98:98='.',<PERIOD>,2:51]");
+                        + "[@4,44:44='.',<PERIOD>,1:44][@5,52:53='10',<DATA_ITEM_LEVEL>,2:6]"
+                        + "[@6,55:65='max-replies',<DATA_NAME>,2:9][@7,83:85='pic',<PICTURE_KEYWORD>,2:37]"
+                        + "[@8,87:91='s9(4)',<PICTURE_PART>,2:41]"
+                        + "[@9,93:96='comp',<BINARY_KEYWORD>,2:47]"
+                        + "[@10,97:97='.',<PERIOD>,2:51]");
     }
 
     /**
@@ -712,16 +709,16 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 "[@0,8:9='01',<DATA_ITEM_LEVEL>,1:8]"
                         + "[@1,12:22='5500-REC-01',<DATA_NAME>,1:12]"
                         + "[@2,23:23='.',<PERIOD>,1:23]"
-                        + "[@3,36:37='05',<DATA_ITEM_LEVEL>,2:10]"
-                        + "[@4,39:51='5500-REC-TYPE',<DATA_NAME>,2:13]"
-                        + "[@5,58:60='PIC',<PICTURE_KEYWORD>,2:32]"
-                        + "[@6,62:66='X(01)',<PICTURE_PART>,2:36]"
-                        + "[@7,67:67='.',<PERIOD>,2:41]"
-                        + "[@8,80:81='05',<DATA_ITEM_LEVEL>,3:10]"
-                        + "[@9,83:95='5500-PLAN-NUM',<DATA_NAME>,3:13]"
-                        + "[@10,102:104='PIC',<PICTURE_KEYWORD>,3:32]"
-                        + "[@11,106:110='X(06)',<PICTURE_PART>,3:36]"
-                        + "[@12,111:111='.',<PERIOD>,3:41]");
+                        + "[@3,35:36='05',<DATA_ITEM_LEVEL>,2:10]"
+                        + "[@4,38:50='5500-REC-TYPE',<DATA_NAME>,2:13]"
+                        + "[@5,57:59='PIC',<PICTURE_KEYWORD>,2:32]"
+                        + "[@6,61:65='X(01)',<PICTURE_PART>,2:36]"
+                        + "[@7,66:66='.',<PERIOD>,2:41]"
+                        + "[@8,78:79='05',<DATA_ITEM_LEVEL>,3:10]"
+                        + "[@9,81:93='5500-PLAN-NUM',<DATA_NAME>,3:13]"
+                        + "[@10,100:102='PIC',<PICTURE_KEYWORD>,3:32]"
+                        + "[@11,104:108='X(06)',<PICTURE_PART>,3:36]"
+                        + "[@12,109:109='.',<PERIOD>,3:41]");
     }
 
     /**

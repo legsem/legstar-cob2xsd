@@ -23,10 +23,9 @@ import com.legstar.antlr.CleanerException;
 
 /**
  * In order to reduce the lexer/parser grammar complexity, this class will
- * remove
- * all unnecessary characters from the original source.
- * This way, the ANTLR lexer will be presented with a purified source that only
- * contains data division entries.
+ * remove all unnecessary characters from the original source. This way, the
+ * ANTLR lexer will be presented with a purified source that only contains data
+ * division entries.
  * <p/>
  * This allows users to submit complete COBOL programs or fragments of COBOL
  * programs with non data description statements to the parser without the need
@@ -34,9 +33,6 @@ import com.legstar.antlr.CleanerException;
  * 
  */
 public abstract class AbstractCobolSourceCleaner {
-
-    /** Line separator (OS specific). */
-    public static final String LS = System.getProperty("line.separator");
 
     /** Cobol sentences are assumed to be terminated by this character. */
     public static final char COBOL_DELIMITER = '.';
@@ -47,21 +43,19 @@ public abstract class AbstractCobolSourceCleaner {
                     + COBOL_DELIMITER + "|$)");
 
     /** Pattern that recognizes the end of a data description entry. */
-    public static final Pattern DATA_DESCRIPTION_END = Pattern
-            .compile("(\\" + COBOL_DELIMITER + "$)|(\\" + COBOL_DELIMITER
-                    + "\\s)");
+    public static final Pattern DATA_DESCRIPTION_END = Pattern.compile("(\\"
+            + COBOL_DELIMITER + "$)|(\\" + COBOL_DELIMITER + "\\s)");
 
     /** Pattern that recognizes the start of a procedure division. */
-    public static final Pattern PROCEDURE_DIVISION =
-            Pattern.compile("^(\\s)*PROCEDURE DIVISION",
-                    Pattern.CASE_INSENSITIVE);
+    public static final Pattern PROCEDURE_DIVISION = Pattern.compile(
+            "^(\\s)*PROCEDURE DIVISION", Pattern.CASE_INSENSITIVE);
 
     /**
-     * List of compiler directives (they can be period delimited but
-     * are guaranteed to be alone on a line).
+     * List of compiler directives (they can be period delimited but are
+     * guaranteed to be alone on a line).
      */
-    public static final List < String > COMPILER_DIRECTIVES =
-            Arrays.asList("EJECT", "SKIP", "SKIP1", "SKIP2", "SKIP3");
+    public static final List < String > COMPILER_DIRECTIVES = Arrays.asList(
+            "EJECT", "SKIP", "SKIP1", "SKIP2", "SKIP3");
 
     /** Handles error messages. */
     private RecognizerErrorHandler _errorHandler;
@@ -71,16 +65,14 @@ public abstract class AbstractCobolSourceCleaner {
      * 
      * @param errorHandler handles error messages
      */
-    public AbstractCobolSourceCleaner(
-            final RecognizerErrorHandler errorHandler) {
+    public AbstractCobolSourceCleaner(final RecognizerErrorHandler errorHandler) {
         _errorHandler = errorHandler;
 
     }
 
     /**
-     * Takes in a raw COBOL source, potentially containing
-     * sequence numbers or non data description statements and produces a clean
-     * source code.
+     * Takes in a raw COBOL source, potentially containing sequence numbers or
+     * non data description statements and produces a clean source code.
      * <p/>
      * Statements which are not data descriptions become empty lines in order to
      * preserve original line numbering.
@@ -89,24 +81,22 @@ public abstract class AbstractCobolSourceCleaner {
      * @return the source cleaned up
      * @throws CleanerException if source cannot be read
      */
-    public String clean(
-            final String cobolSource) throws CleanerException {
+    public String clean(final String cobolSource) throws CleanerException {
         if (cobolSource != null) {
-            BufferedReader reader = new BufferedReader(
-                    new StringReader(cobolSource));
+            BufferedReader reader = new BufferedReader(new StringReader(
+                    cobolSource));
             String line;
             StringBuilder cleanedSource = new StringBuilder();
             CleaningContext context = new CleaningContext();
             try {
                 while ((line = reader.readLine()) != null) {
-                    if (isDataDivision(line, context)) {
-                        cleanedSource.append(
-                                removeExtraneousCharacters(
-                                        cleanLine(line), context));
+                    if (isLineOfCode(line) && isDataDivision(line, context)) {
+                        cleanedSource.append(removeExtraneousCharacters(
+                                cleanLine(line), context));
                     }
-                    cleanedSource.append(LS);
+                    cleanedSource.append("\n");
                 }
-                if (cleanedSource.length() <= LS.length()) {
+                if (cleanedSource.length() <= "\n".length()) {
                     throw new CleanerException(
                             "No data descriptions found. Are you sure this is COBOL source?");
                 }
@@ -120,30 +110,52 @@ public abstract class AbstractCobolSourceCleaner {
     }
 
     /**
+     * Make sure this is a line worth parsing. Ignore empty lines, comments and
+     * compiler directives.
+     * 
+     * @param line the line to parse
+     * @return true if this is not an empty or comment line
+     */
+    public boolean isLineOfCode(final String line) {
+        if (line.length() < getIndicatorAreaPos() + 1) {
+            return false;
+        }
+
+        /* Remove white space lines */
+        if (line.trim().length() == 0) {
+            return false;
+        }
+
+        /* Remove comments and special lines */
+        if (isComment(line)) {
+            return false;
+        }
+
+        /*
+         * If there is a single token on this line, make sure it is not a
+         * compiler directive.
+         */
+        String[] tokens = line.trim().split("[\\s\\.]+");
+        if (tokens.length == 1
+                && COMPILER_DIRECTIVES.contains(tokens[0].toUpperCase(Locale
+                        .getDefault()))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Remove characters that should not be passed to the lexer.
      * <p/>
      * Replace token separators such as ", " and "; " which complicate matters
      * uselessly. Replacement should not change column numbers though so we
      * simply replace the extra separators with a whitespace.
-     * <p/>
-     * Clear comment lines. We don't remove the line so that line numbers are
-     * preserved.
      * 
      * @param line before cleaning
      * @return a cleaner line of code
      */
     public String cleanLine(final String line) {
-        int length = line.length();
-        if (length < getIndicatorAreaPos() + 1) {
-            return "";
-        }
-
-        /* Remove comments and special lines */
-        char indicatorArea = line.charAt(getIndicatorAreaPos());
-        if (indicatorArea == '*' || indicatorArea == '/'
-                || indicatorArea == '$') {
-            return "";
-        }
 
         String cleanedLine = extendedCleanLine(line);
 
@@ -154,6 +166,14 @@ public abstract class AbstractCobolSourceCleaner {
         cleanedLine = ("a" + cleanedLine).trim().substring(1);
         return cleanedLine;
     }
+
+    /**
+     * Specialized cleaners determine if this line is a comment.
+     * 
+     * @param line the line to check
+     * @return true if this line is a comment
+     */
+    public abstract boolean isComment(final String line);
 
     /**
      * Derived classes can extend this method to further clean a line of code.
@@ -167,44 +187,19 @@ public abstract class AbstractCobolSourceCleaner {
 
     /**
      * Rough triage of statements which are not strictly part of the data
-     * division.
-     * <ul>
-     * <li>Removes comments</li>
-     * <li>Removes compiler directives</li>
-     * <li>Detects end of DATA DIVISION by looking for PROCEDURE DIVISION.</li>
-     * </ul>
+     * division. Detects end of DATA DIVISION by looking for PROCEDURE DIVISION.
      * 
      * @param line the line to set data description status from
      * @param context the data description detection context
      * @return true if we are within the data division
      */
-    public boolean isDataDivision(
-            final String line,
+    public boolean isDataDivision(final String line,
             final CleaningContext context) {
         if (context.isDataDivision()) {
             Matcher matcher = PROCEDURE_DIVISION.matcher(line);
             if (matcher.find()) {
                 context.setDataDivision(false);
                 emitErrorMessage("Procedure division found. The rest of the source code will be ignored.");
-            } else {
-                int commentPos = getIndicatorAreaPos();
-                if (line != null && line.length() > commentPos
-                        && (line.charAt(commentPos) == '*'
-                            || line.charAt(commentPos) == '/')) {
-                    return false;
-                }
-
-                /*
-                 * If there is a single token on this line, make sure it is
-                 * not a compiler directive.
-                 */
-                String[] tokens = line.trim().split("[\\s\\.]+");
-                if (tokens.length == 1) {
-                    if (COMPILER_DIRECTIVES.contains(tokens[0]
-                            .toUpperCase(Locale.getDefault()))) {
-                        return false;
-                    }
-                }
             }
         }
         return context.isDataDivision();
@@ -291,8 +286,8 @@ public abstract class AbstractCobolSourceCleaner {
                 }
 
                 /*
-                 * If we actually found a level, keep it and start looking
-                 * for a delimiter.
+                 * If we actually found a level, keep it and start looking for a
+                 * delimiter.
                  */
                 if (endClean == start) {
                     cleanedLine.append(fragment.substring(start,
@@ -323,10 +318,10 @@ public abstract class AbstractCobolSourceCleaner {
     }
 
     /**
-     * Describes the cleaning context.
-     * Because data description sentences can be multiline or because it
-     * does not make sense to look for data description entries once we
-     * past a PROCEDURE DIVISION section, we need to keep track of the context.
+     * Describes the cleaning context. Because data description sentences can be
+     * multiline or because it does not make sense to look for data description
+     * entries once we past a PROCEDURE DIVISION section, we need to keep track
+     * of the context.
      * 
      */
     public static class CleaningContext {
@@ -348,8 +343,8 @@ public abstract class AbstractCobolSourceCleaner {
         }
 
         /**
-         * @param isLookingForLevel set to true when we are looking for
-         *            a level (start of a data description entry)
+         * @param isLookingForLevel set to true when we are looking for a level
+         *            (start of a data description entry)
          */
         public void setLookingForLevel(final boolean isLookingForLevel) {
             _lookingForLevel = isLookingForLevel;
@@ -373,9 +368,9 @@ public abstract class AbstractCobolSourceCleaner {
     }
 
     /**
-     * Examine characters before an assumed level. If these characters
-     * are not terminated by a COBOL delimiter then the level is actually
-     * an argument to a previous keyword, not an actual level.
+     * Examine characters before an assumed level. If these characters are not
+     * terminated by a COBOL delimiter then the level is actually an argument to
+     * a previous keyword, not an actual level.
      * 
      * @param fragment a fragment of code preceding an assumed level
      * @return true if the assumed level is an argument

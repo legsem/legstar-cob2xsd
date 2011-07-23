@@ -10,20 +10,19 @@
  ******************************************************************************/
 package com.legstar.cobol;
 
-
 /**
  * Clean a free format COBOL source.
  * <p/>
- * Free format is the Microfocus and open COBOL format where column 1 is the indicator
- * area but code can start at column 1 as well. There are no area A and B anymore and
- * code has no fixed right margin.
- *
+ * Free format is the Microfocus and open COBOL format where column 1 is the
+ * indicator area but code can start at column 1 as well. There are no area A
+ * and B anymore and code has no fixed right margin.
+ * 
  */
 public class CobolFreeFormatSourceCleaner extends AbstractCobolSourceCleaner {
 
-    
     /**
      * Construct with a shared error handler.
+     * 
      * @param errorHandler handles error messages
      */
     public CobolFreeFormatSourceCleaner(
@@ -32,10 +31,21 @@ public class CobolFreeFormatSourceCleaner extends AbstractCobolSourceCleaner {
 
     }
 
-    /** {@inheritDoc}*/
+    /** {@inheritDoc} */
     @Override
     public int getIndicatorAreaPos() {
         return 0;
+    }
+
+    @Override
+    public boolean isComment(String line) {
+        // If first non white space character on the line is a comment indicator
+        char indicatorArea = line.trim().charAt(0);
+        if (indicatorArea == '*' || indicatorArea == '/'
+                || indicatorArea == '$') {
+            return true;
+        }
+        return false;
     }
 
 }

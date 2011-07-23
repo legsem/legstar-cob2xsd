@@ -50,8 +50,7 @@ public class CobolFixedFormatSourceCleaner extends AbstractCobolSourceCleaner {
      * @param endColumn column where code ends (right margin)
      */
     public CobolFixedFormatSourceCleaner(
-            final RecognizerErrorHandler errorHandler,
-            final int startColumn,
+            final RecognizerErrorHandler errorHandler, final int startColumn,
             final int endColumn) {
         super(errorHandler);
         _startColumn = startColumn;
@@ -71,8 +70,7 @@ public class CobolFixedFormatSourceCleaner extends AbstractCobolSourceCleaner {
     }
 
     /**
-     * Clear sequence numbers in column 1-6 and anything
-     * beyond column 72.
+     * Clear sequence numbers in column 1-6 and anything beyond column 72.
      * 
      * @param line the line of code
      * @return a line of code without sequence numbers
@@ -88,11 +86,23 @@ public class CobolFixedFormatSourceCleaner extends AbstractCobolSourceCleaner {
         }
 
         /* Trim anything beyond end column */
-        String areaA = line.substring(
-                _startColumn - 1, (length > _endColumn) ? _endColumn : length);
+        if (length > _startColumn - 1) {
+            String areaA = line.substring(_startColumn - 1,
+                    (length > _endColumn) ? _endColumn : length);
 
-        cleanedLine.append(areaA);
+            cleanedLine.append(areaA);
+        }
         return cleanedLine.toString();
+    }
+
+    @Override
+    public boolean isComment(String line) {
+        char indicatorArea = line.charAt(getIndicatorAreaPos());
+        if (indicatorArea == '*' || indicatorArea == '/'
+                || indicatorArea == '$') {
+            return true;
+        }
+        return false;
     }
 
 }

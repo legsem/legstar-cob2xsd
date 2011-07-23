@@ -31,7 +31,7 @@ public abstract class AbstractAntlrTester extends TestCase {
     private final Log _log = LogFactory.getLog(getClass());
 
     /** Line separator (OS specific). */
-    public static final String LS = System.getProperty("line.separator");
+    public static final String LS = "\n";
 
     /**
      * Cleanup source an compare to expected.
@@ -39,9 +39,7 @@ public abstract class AbstractAntlrTester extends TestCase {
      * @param source original source
      * @param expected expected result
      */
-    public void cleanAndCheck(
-            final String source,
-            final String expected) {
+    public void cleanAndCheck(final String source, final String expected) {
         try {
             assertEquals(expected, clean(source));
         } catch (RecognizerException e) {
@@ -52,8 +50,8 @@ public abstract class AbstractAntlrTester extends TestCase {
     }
 
     /**
-     * Apply a lexer to a source and check that the token stream produced
-     * is as expected.
+     * Apply a lexer to a source and check that the token stream produced is as
+     * expected.
      * 
      * @param source the source code
      * @param expected the expected token stream
@@ -98,8 +96,7 @@ public abstract class AbstractAntlrTester extends TestCase {
      * @param source the source fragment
      * @param expected the expected exception
      */
-    public void parseAndCheck(
-            final String source,
+    public void parseAndCheck(final String source,
             final RecognizerException expected) {
         try {
             parse(source);
