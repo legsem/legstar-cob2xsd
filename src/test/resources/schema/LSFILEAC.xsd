@@ -312,7 +312,7 @@
             <element name="ReplyMessage">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="REPLY-MESSAGE" levelNumber="5" picture="X(128)" srceLine="84" type="ALPHANUMERIC_ITEM" value=""/>
+                        <cb:cobolElement cobolName="REPLY-MESSAGE" levelNumber="5" picture="X(128)" srceLine="84" type="ALPHANUMERIC_ITEM" value=" "/>
                     </appinfo>
                 </annotation>
                 <simpleType>

@@ -41,7 +41,7 @@
             <element name="WsSpace">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-SPACE" levelNumber="5" picture="X(05)" srceLine="11" type="ALPHANUMERIC_ITEM" value=""/>
+                        <cb:cobolElement cobolName="WS-SPACE" levelNumber="5" picture="X(05)" srceLine="11" type="ALPHANUMERIC_ITEM" value=" "/>
                     </appinfo>
                 </annotation>
                 <simpleType>
@@ -53,7 +53,7 @@
             <element name="WsSpaces">
                 <annotation>
                     <appinfo>
-                        <cb:cobolElement cobolName="WS-SPACES" levelNumber="5" picture="X(05)" srceLine="12" type="ALPHANUMERIC_ITEM" value=""/>
+                        <cb:cobolElement cobolName="WS-SPACES" levelNumber="5" picture="X(05)" srceLine="12" type="ALPHANUMERIC_ITEM" value=" "/>
                     </appinfo>
                 </annotation>
                 <simpleType>

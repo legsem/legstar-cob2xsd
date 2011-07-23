@@ -26,6 +26,9 @@ public class CobolStructureToXsdTest extends AbstractXsdTester {
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
 
+    /** True when references should be created. */
+    private static final boolean CREATE_REFERENCES = false;
+
     /**
      * Go through all the samples and check with backward compatibility.
      * 
@@ -47,24 +50,27 @@ public class CobolStructureToXsdTest extends AbstractXsdTester {
                     model.setCustomXsltFileName(null);
                 }
                 model.setAddLegStarAnnotations(true);
-                model.setTargetNamespace("http://legstar.com/test/coxb/"
-                        + name);
+                model.setTargetNamespace("http://legstar.com/test/coxb/" + name);
 
                 /* Backward compatibility */
                 model.setElementNamesStartWithUppercase(true);
                 model.setQuoteIsQuote(false);
 
-                CobolStructureToXsd translator = new CobolStructureToXsd(
-                        model);
+                CobolStructureToXsd translator = new CobolStructureToXsd(model);
                 File xsdFile = translator.translate(cobolFile, xsdGenDir);
                 if (_log.isDebugEnabled()) {
                     _log.debug("Result:\n"
                             + FileUtils.readFileToString(xsdFile));
                 }
-                Document result = getXMLSchemaAsDoc(xsdFile);
-                Document expected = getXMLSchemaAsDoc(new File(XSD_SAMPLES_DIR,
-                        name.toLowerCase() + ".xsd"));
-                compare(xsdFile.getName(), expected, result);
+                File xsdRefFile = new File(XSD_SAMPLES_DIR, name.toLowerCase()
+                        + ".xsd");
+                if (CREATE_REFERENCES) {
+                    FileUtils.copyFile(xsdFile, xsdRefFile);
+                } else {
+                    Document result = getXMLSchemaAsDoc(xsdFile);
+                    Document expected = getXMLSchemaAsDoc(xsdRefFile);
+                    compare(xsdFile.getName(), expected, result);
+                }
             }
         }
     }

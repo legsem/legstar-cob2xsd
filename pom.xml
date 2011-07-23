@@ -18,7 +18,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <legstarVersion>1.5.1</legstarVersion>
+        <legstarCoreVersion>1.5.4</legstarCoreVersion>
         <antlrVersion>3.2</antlrVersion>
         <antInternalVersion>1.7.0</antInternalVersion> <!-- Used for legstar builds and tests -->
         <antVersion>1.6.5</antVersion>  <!-- Expected to be provided at runtime -->
@@ -145,6 +145,7 @@
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
 
@@ -223,19 +224,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Sign all artifacts -->
-            <plugin>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -247,11 +235,9 @@
                         <id>bundle-test-jar</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>test-jar</goal>
                         </goals>
                         <configuration>
-                            <classifier>test</classifier>
-                            <classesDirectory>${project.build.directory}/test-classes</classesDirectory>
                             <includes>
                                 <include>cobol/**</include>
                                 <include>schema/**</include>
@@ -428,14 +414,14 @@
         <dependency>
             <groupId>com.legsem.legstar</groupId>
             <artifactId>legstar-coxbapi</artifactId>
-            <version>${legstarVersion}</version>
+            <version>${legstarCoreVersion}</version>
         </dependency>
 
         <!-- LegStar Code Generation API -->
         <dependency>
             <groupId>com.legsem.legstar</groupId>
             <artifactId>legstar-codegen</artifactId>
-            <version>${legstarVersion}</version>
+            <version>${legstarCoreVersion}</version>
         </dependency>
 
         <!-- Tests -->

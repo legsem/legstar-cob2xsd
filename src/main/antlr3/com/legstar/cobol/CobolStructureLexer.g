@@ -163,7 +163,7 @@ import java.util.Map;
         put("FUNCTION-POINTER", FUNCTION_POINTER_KEYWORD);
         put("VALUES", VALUE_KEYWORD);
         put("VALUE", VALUE_KEYWORD);
-        put("DATE", Token.SKIP_TOKEN.getType());
+        put("DATE", DATE_KEYWORD);
         put("FORMAT", DATE_FORMAT_KEYWORD);
         put("ZEROES", ZERO_CONSTANT);
         put("ZEROS", ZERO_CONSTANT);
@@ -195,18 +195,22 @@ import java.util.Map;
         Integer type = KEYWORDS_MAP.get(text.toUpperCase());
         if (type == null) {
             return originalType;
-        } else {
-            if (type == Token.SKIP_TOKEN.getType()) {
-                skip();
-            } else {
-                /* Just found a PICTURE keyword, start collecting picture string parts */
-                if (type == PICTURE_KEYWORD) {
-                    pictureStarted = true;
-                }
-                lastKeyword = type;
-            }
-            return type;
         }
+        if (type == Token.SKIP_TOKEN.getType()) {
+            skip();
+        } else if(type == PICTURE_KEYWORD) {
+            /* Just found a PICTURE keyword, start collecting picture string parts */
+            pictureStarted = true;
+        } else if(type == DATE_KEYWORD) {
+            skip();
+        } else if(type == DATE_FORMAT_KEYWORD) {
+            /* Format is a date format only if preceded by date */
+            if (lastKeyword != DATE_KEYWORD) {
+                type = DATA_NAME;
+            }
+        }
+        lastKeyword = type;
+        return type;
     }
         
     /**
