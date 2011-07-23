@@ -198,6 +198,7 @@ import java.util.Map;
         }
         if (type == Token.SKIP_TOKEN.getType()) {
             skip();
+            return type;
         } else if(type == PICTURE_KEYWORD) {
             /* Just found a PICTURE keyword, start collecting picture string parts */
             pictureStarted = true;

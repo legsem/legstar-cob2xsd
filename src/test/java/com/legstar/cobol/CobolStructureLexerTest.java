@@ -252,6 +252,18 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
     }
 
     /**
+     * Date format case with IS.
+     */
+    public void testDateFormatWithIs() {
+        lexAndCheck("       1 YY  DATE FORMAT IS YY.",
+                "[@0,7:7='1',<DATA_ITEM_LEVEL>,1:7]"
+                        + "[@1,9:10='YY',<DATA_NAME>,1:9]"
+                        + "[@2,18:23='FORMAT',<DATE_FORMAT_KEYWORD>,1:18]"
+                        + "[@3,28:29='YY',<DATE_PATTERN>,1:28]"
+                        + "[@4,30:30='.',<PERIOD>,1:30]");
+    }
+
+    /**
      * A picture case.
      */
     public void testPicture() {
