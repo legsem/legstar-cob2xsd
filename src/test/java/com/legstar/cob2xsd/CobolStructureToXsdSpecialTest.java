@@ -703,4 +703,36 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
         }
     }
 
+    /**
+     * Test for Issue 49: Value strings containing delimiter are not parsed.
+     */
+    public void testValueStringWithDelimiter() {
+        try {
+            Cob2XsdModel model = new Cob2XsdModel();
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            String xmlSchema = cob2xsd
+                    .translate("*\n"
+                            + "       01 A. 02  B     PIC X(56) VALUE 'CONTO N. W '.\n");
+            compare("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+                    + "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                    + " elementFormDefault=\"unqualified\">"
+                    + "    <xsd:complexType name=\"A\">"
+                    + "        <xsd:sequence>"
+                    + "            <xsd:element name=\"b\">"
+                    + "                <xsd:simpleType>"
+                    + "                    <xsd:restriction base=\"xsd:string\">"
+                    + "                        <xsd:maxLength value=\"56\"/>"
+                    + "                    </xsd:restriction>"
+                    + "                </xsd:simpleType>"
+                    + "            </xsd:element>"
+                    + "        </xsd:sequence>"
+                    + "    </xsd:complexType>"
+                    + "    <xsd:element name=\"a\" type=\"A\"/>"
+                    + "</xsd:schema>", xmlSchema);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
 }

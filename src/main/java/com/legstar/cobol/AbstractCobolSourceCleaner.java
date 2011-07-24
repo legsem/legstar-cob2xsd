@@ -46,6 +46,10 @@ public abstract class AbstractCobolSourceCleaner {
     public static final Pattern DATA_DESCRIPTION_END = Pattern.compile("(\\"
             + COBOL_DELIMITER + "$)|(\\" + COBOL_DELIMITER + "\\s)");
 
+    /** Pattern that recognizes the start of an alphanumeric literal. */
+    public static final Pattern ALPHANUM_LITERAL_START = Pattern
+            .compile("(^|\\s)[\\\"\']");
+
     /** Pattern that recognizes the start of a procedure division. */
     public static final Pattern PROCEDURE_DIVISION = Pattern.compile(
             "^(\\s)*PROCEDURE DIVISION", Pattern.CASE_INSENSITIVE);
@@ -268,6 +272,7 @@ public abstract class AbstractCobolSourceCleaner {
             return fragment;
         }
         Matcher matcher;
+        Matcher alphanumLiteralMatcher;
         StringBuilder cleanedLine = new StringBuilder();
         if (context.isLookingForLevel()) {
             matcher = DATA_DESCRIPTION_START.matcher(fragment);
@@ -329,15 +334,66 @@ public abstract class AbstractCobolSourceCleaner {
                             + fragment);
                 }
             }
-        } else {
-            matcher = DATA_DESCRIPTION_END.matcher(fragment);
-            if (matcher.find()) {
-                cleanedLine.append(fragment.substring(0, matcher.end()));
-                context.setLookingForLevel(true);
+        } else if (context.isAlphanumStarted()) {
+            Pattern alphanumLiteralEnd = Pattern.compile("\\"
+                    + context.getAlphanumDelimiter() + "($|\\s|\\"
+                    + COBOL_DELIMITER + ")");
+            alphanumLiteralMatcher = alphanumLiteralEnd.matcher(fragment);
+            if (alphanumLiteralMatcher.find()) {
+                cleanedLine.append(fragment.substring(0,
+                        alphanumLiteralMatcher.end()));
+                if (fragment.substring(alphanumLiteralMatcher.end() - 1)
+                        .charAt(0) == COBOL_DELIMITER) {
+                    context.setLookingForLevel(true);
+                }
+                context.setAlphanumStarted(false);
                 cleanedLine.append(removeExtraneousCharacters(
-                        fragment.substring(matcher.end()), context));
+                        fragment.substring(alphanumLiteralMatcher.end()),
+                        context));
             } else {
                 cleanedLine.append(fragment);
+            }
+        } else {
+            alphanumLiteralMatcher = ALPHANUM_LITERAL_START.matcher(fragment);
+            matcher = DATA_DESCRIPTION_END.matcher(fragment);
+            if (alphanumLiteralMatcher.find()) {
+                if (matcher.find()) {
+                    if (matcher.end() < alphanumLiteralMatcher.end()) {
+                        cleanedLine
+                                .append(fragment.substring(0, matcher.end()));
+                        context.setLookingForLevel(true);
+                        cleanedLine.append(removeExtraneousCharacters(
+                                fragment.substring(matcher.end()), context));
+                    } else {
+                        cleanedLine.append(fragment.substring(0,
+                                alphanumLiteralMatcher.end()));
+                        context.setAlphanumDelimiter(fragment.substring(
+                                alphanumLiteralMatcher.end() - 1).charAt(0));
+                        context.setAlphanumStarted(true);
+                        cleanedLine.append(removeExtraneousCharacters(fragment
+                                .substring(alphanumLiteralMatcher.end()),
+                                context));
+                    }
+                } else {
+                    cleanedLine.append(fragment.substring(0,
+                            alphanumLiteralMatcher.end()));
+                    context.setAlphanumDelimiter(fragment.substring(
+                            alphanumLiteralMatcher.end() - 1).charAt(0));
+                    context.setAlphanumStarted(true);
+                    cleanedLine.append(removeExtraneousCharacters(
+                            fragment.substring(alphanumLiteralMatcher.end()),
+                            context));
+                }
+            } else {
+                if (matcher.find()) {
+                    cleanedLine.append(fragment.substring(0, matcher.end()));
+                    context.setLookingForLevel(true);
+                    cleanedLine.append(removeExtraneousCharacters(
+                            fragment.substring(matcher.end()), context));
+                } else {
+                    cleanedLine.append(fragment);
+                }
+
             }
         }
         return cleanedLine.toString();
@@ -360,6 +416,15 @@ public abstract class AbstractCobolSourceCleaner {
 
         /** True if we are likely to be in a COBOL DATA DIVISION section. */
         private boolean _inDataDivision = true;
+
+        /**
+         * Will be true when an alphanumeric delimiter is found and not yet
+         * closed.
+         */
+        private boolean _alphanumStarted;
+
+        /** When an alphanumeric is started this is the delimiter character. */
+        private char _alphanumDelimiter;
 
         /**
          * @return true when we are looking for a level
@@ -389,6 +454,38 @@ public abstract class AbstractCobolSourceCleaner {
          */
         public void setDataDivision(final boolean dataDivision) {
             _inDataDivision = dataDivision;
+        }
+
+        /**
+         * @return true when an alphanumeric delimiter is found and not yet
+         *         closed
+         */
+        public boolean isAlphanumStarted() {
+            return _alphanumStarted;
+        }
+
+        /**
+         * @param alphanumStarted true when an alphanumeric delimiter is found
+         *            and not yet closed
+         */
+        public void setAlphanumStarted(boolean alphanumStarted) {
+            this._alphanumStarted = alphanumStarted;
+        }
+
+        /**
+         * @return when an alphanumeric is started this is the delimiter
+         *         character
+         */
+        public char getAlphanumDelimiter() {
+            return _alphanumDelimiter;
+        }
+
+        /**
+         * @param alphanumDelimiter when an alphanumeric is started this is the
+         *            delimiter character
+         */
+        public void setAlphanumDelimiter(char alphanumDelimiter) {
+            this._alphanumDelimiter = alphanumDelimiter;
         }
 
     }

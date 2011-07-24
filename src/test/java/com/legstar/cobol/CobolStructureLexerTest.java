@@ -210,11 +210,11 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
      */
     public void testIso8859LiteralString() {
         lexAndCheck(
-                "       1 A value \"éàçù\"" + LS,
+                "       1 A value \"ï¿½ï¿½ï¿½ï¿½\"" + LS,
                 "[@0,7:7='1',<DATA_ITEM_LEVEL>,1:7]"
                         + "[@1,9:9='A',<DATA_NAME>,1:9]"
                         + "[@2,11:15='value',<VALUE_KEYWORD>,1:11]"
-                        + "[@3,17:22='\"éàçù\"',<ALPHANUM_LITERAL_STRING>,1:17]");
+                        + "[@3,17:22='\"ï¿½ï¿½ï¿½ï¿½\"',<ALPHANUM_LITERAL_STRING>,1:17]");
     }
 
     /**
@@ -729,5 +729,20 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
                 "[@0,8:9='01',<DATA_ITEM_LEVEL>,1:8]"
                         + "[@1,12:17='FORMAT',<DATA_NAME>,1:12]"
                         + "[@2,18:18='.',<PERIOD>,1:18]");
+    }
+
+    /**
+     * Test value containing delimiter.
+     */
+    public void testValueWithDelimiter() {
+        lexAndCheck(
+                "        10 FILLER  PIC X(56) VALUE 'CONTO N. W '.\n",
+                "[@0,8:9='10',<DATA_ITEM_LEVEL>,1:8]"
+                        + "[@1,11:16='FILLER',<DATA_NAME>,1:11]"
+                        + "[@2,19:21='PIC',<PICTURE_KEYWORD>,1:19]"
+                        + "[@3,23:27='X(56)',<PICTURE_PART>,1:23]"
+                        + "[@4,29:33='VALUE',<VALUE_KEYWORD>,1:29]"
+                        + "[@5,35:47=''CONTO N. W '',<ALPHANUM_LITERAL_STRING>,1:35]"
+                        + "[@6,48:48='.',<PERIOD>,1:48]");
     }
 }

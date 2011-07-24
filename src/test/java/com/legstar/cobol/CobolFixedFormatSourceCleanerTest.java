@@ -347,4 +347,52 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
                         + "          05 5500-PLAN-NUM      PIC X(06)." + LS);
 
     }
+
+    public void testShouldDetectDelimiterBeforeAlphanumLiteral() {
+        cleanAndCheck("       01 A. GARBAGE. 02 B VALUE 'Q'.",
+                "       01 A.          02 B VALUE 'Q'." + LS);
+    }
+
+    public void testShouldIgnoreDelimiterWithinLiteral() {
+        cleanAndCheck("       10 FILLER  PIC X(56) VALUE 'CONTO N. W '.",
+                "       10 FILLER  PIC X(56) VALUE 'CONTO N. W '." + LS);
+    }
+
+    public void testShouldDetectAlphanumLiteralNotFollowedByDelimiter() {
+        cleanAndCheck("       10 FILLER  VALUE 'CONTO N. W ' PIC X(56).",
+                "       10 FILLER  VALUE 'CONTO N. W ' PIC X(56)." + LS);
+    }
+
+    public void testShouldCleanExtraneousBetweenDataItems() {
+        cleanAndCheck(
+                "       01 WS-ODO."
+                        + LS
+                        + "          05 FILLER       PIC X(3) VALUE \"ODO\"."
+                        + LS
+                        + "          05 WS-ODO-A     PIC 9(2)."
+                        + LS
+                        + LS
+                        + "       LINKAGE SECTION."
+                        + LS
+                        + "       01 DFHCOMMAREA"
+                        + LS
+                        + "          05 TABLE-SIZE   PIC 9(2)."
+                        + LS
+                        + "          05 TABLE-ODO OCCURS 1 TO 100 DEPENDING ON TABLE-SIZE"
+                        + LS + "                          PIC X(5).",
+                "       01 WS-ODO."
+                        + LS
+                        + "          05 FILLER       PIC X(3) VALUE \"ODO\"."
+                        + LS
+                        + "          05 WS-ODO-A     PIC 9(2)."
+                        + LS
+                        + LS
+                        + LS
+                        + "       01 DFHCOMMAREA"
+                        + LS
+                        + "          05 TABLE-SIZE   PIC 9(2)."
+                        + LS
+                        + "          05 TABLE-ODO OCCURS 1 TO 100 DEPENDING ON TABLE-SIZE"
+                        + LS + "                          PIC X(5)." + LS);
+    }
 }
