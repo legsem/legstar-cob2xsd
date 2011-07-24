@@ -50,6 +50,14 @@ public abstract class AbstractCobolSourceCleaner {
     public static final Pattern PROCEDURE_DIVISION = Pattern.compile(
             "^(\\s)*PROCEDURE DIVISION", Pattern.CASE_INSENSITIVE);
 
+    /** Pattern that recognizes the start of an identification division. */
+    public static final Pattern IDENTIFICATION_DIVISION = Pattern.compile(
+            "^(\\s)*ID(ENTIFICATION)? DIVISION", Pattern.CASE_INSENSITIVE);
+
+    /** Pattern that recognizes the start of a data division. */
+    public static final Pattern DATA_DIVISION = Pattern.compile(
+            "^(\\s)*DATA DIVISION", Pattern.CASE_INSENSITIVE);
+
     /**
      * List of compiler directives (they can be period delimited but are
      * guaranteed to be alone on a line).
@@ -188,6 +196,10 @@ public abstract class AbstractCobolSourceCleaner {
     /**
      * Rough triage of statements which are not strictly part of the data
      * division. Detects end of DATA DIVISION by looking for PROCEDURE DIVISION.
+     * <p/>
+     * Since we are not guaranteed to have identification division, we initially
+     * consider we are in the data division. If we find an identification
+     * division, then we stop processing till we find a data division.
      * 
      * @param line the line to set data description status from
      * @param context the data description detection context
@@ -196,10 +208,24 @@ public abstract class AbstractCobolSourceCleaner {
     public boolean isDataDivision(final String line,
             final CleaningContext context) {
         if (context.isDataDivision()) {
-            Matcher matcher = PROCEDURE_DIVISION.matcher(line);
+            Matcher matcher = IDENTIFICATION_DIVISION.matcher(line);
             if (matcher.find()) {
                 context.setDataDivision(false);
-                emitErrorMessage("Procedure division found. The rest of the source code will be ignored.");
+                emitErrorMessage("Found identification division in ["
+                        + line.trim() + "]. Lines ignored till data division.");
+            }
+            matcher = PROCEDURE_DIVISION.matcher(line);
+            if (matcher.find()) {
+                context.setDataDivision(false);
+                emitErrorMessage("Found procedure division in [" + line.trim()
+                        + "]. Remaining lines ignored.");
+            }
+        } else {
+            Matcher matcher = DATA_DIVISION.matcher(line);
+            if (matcher.find()) {
+                context.setDataDivision(true);
+                emitErrorMessage("Found data division in [" + line.trim()
+                        + "]. Started looking for data items.");
             }
         }
         return context.isDataDivision();

@@ -34,12 +34,10 @@ import com.legstar.codegen.models.SourceToXsdCobolModel;
 public class Cob2XsdModel extends SourceToXsdCobolModel {
 
     /** This generator name. */
-    public static final String C2S_GENERATOR_NAME =
-            "LegStar COBOL to XML Schema generator";
+    public static final String C2S_GENERATOR_NAME = "LegStar COBOL to XML Schema generator";
 
     /** This velocity template. */
-    public static final String C2S_VELOCITY_MACRO_NAME =
-            "vlc/build-cob2xsd-xml.vm";
+    public static final String C2S_VELOCITY_MACRO_NAME = "vlc/build-cob2xsd-xml.vm";
 
     /**
      * Source can be in fixed format (sequence numbers, indicator area, area A,
@@ -88,6 +86,9 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
 
     /** For fixed format COBOL position of the right margin. */
     public static final String END_COLUMN = "endColumn";
+
+    /** Character set used to encode the source COBOL file. */
+    public static final String COBOL_SOURCE_FILE_ENCODING = "cobolSourceFileEncoding";
 
     /** Character set used to encode the output XML Schema. */
     public static final String XSD_ENCODING = "xsdEncoding";
@@ -146,6 +147,12 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
     /** For fixed format COBOL, position of the right margin. */
     private int _endColumn = DEFAULT_END_COLUMN;
 
+    /**
+     * Character set used to encode the input COBOL source files. Null means
+     * default character set.
+     */
+    private String _cobolSourceFileEncoding;
+
     /*
      * ----------------------------------------------------------------------
      * XML Schema related options
@@ -165,14 +172,13 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
 
     /**
      * True if parent complex type name should be prepended in case of name
-     * conflict
-     * (otherwise, the COBOL source line will be appended).
+     * conflict (otherwise, the COBOL source line will be appended).
      */
     private boolean _nameConflictPrependParentName = false;
 
     /**
-     * True if XSD element names should start with an uppercase
-     * (compatible with LegStar 1.2).
+     * True if XSD element names should start with an uppercase (compatible with
+     * LegStar 1.2).
      */
     private boolean _elementNamesStartWithUppercase = false;
 
@@ -239,6 +245,8 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
                 CodeFormat.FIXED_FORMAT.toString())));
         setStartColumn(getInt(props, START_COLUMN, DEFAULT_START_COLUMN));
         setEndColumn(getInt(props, END_COLUMN, DEFAULT_END_COLUMN));
+        setCobolSourceFileEncoding(getString(props, COBOL_SOURCE_FILE_ENCODING,
+                null));
         setXsdEncoding(getString(props, XSD_ENCODING, DEFAULT_XSD_ENCODING));
         setTargetNamespace(getString(props, TARGET_NAMESPACE, null));
         setMapConditionsToFacets(getBoolean(props, MAP_CONDITIONS_TO_FACETS,
@@ -264,8 +272,8 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
      * @param targetFile the script file that must be created
      * @throws CodeGenMakeException if generation fails
      */
-    public final void generateBuild(
-            final File targetFile) throws CodeGenMakeException {
+    public final void generateBuild(final File targetFile)
+            throws CodeGenMakeException {
         Writer w = null;
         try {
             if (!_velocityInitialized) {
@@ -275,10 +283,9 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
             VelocityContext context = CodeGenUtil
                     .getContext(C2S_GENERATOR_NAME);
             context.put("antModel", this);
-            w = new OutputStreamWriter(
-                    new FileOutputStream(targetFile), "UTF-8");
-            Velocity
-                    .mergeTemplate(C2S_VELOCITY_MACRO_NAME, "UTF-8", context, w);
+            w = new OutputStreamWriter(new FileOutputStream(targetFile),
+                    "UTF-8");
+            Velocity.mergeTemplate(C2S_VELOCITY_MACRO_NAME, "UTF-8", context, w);
         } catch (IOException e) {
             throw new CodeGenMakeException(e);
         } catch (Exception e) {
@@ -323,8 +330,8 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
     }
 
     /*
-     * -------------------------------------------------------------------
-     * COBOL source format related options
+     * ------------------------------------------------------------------- COBOL
+     * source format related options
      */
     /**
      * @return the Fixed or Free format COBOL source
@@ -369,9 +376,24 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
         _endColumn = endColumn;
     }
 
+    /**
+     * @return the character set used to encode the input COBOL source files
+     */
+    public String getCobolSourceFileEncoding() {
+        return _cobolSourceFileEncoding;
+    }
+
+    /**
+     * @param cobolSourceFileEncoding the character set used to encode the input
+     *            COBOL source files
+     */
+    public void setCobolSourceFileEncoding(final String cobolSourceFileEncoding) {
+        this._cobolSourceFileEncoding = cobolSourceFileEncoding;
+    }
+
     /*
-     * -------------------------------------------------------------------
-     * XML Schema related options
+     * ------------------------------------------------------------------- XML
+     * Schema related options
      */
 
     /**
@@ -417,8 +439,8 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
 
     /**
      * @param mapConditionsToFacets Whether COBOL conditions (level 88) should
-     *            be mapped to facets. Facets
-     *            restrict the content which might not be desirable
+     *            be mapped to facets. Facets restrict the content which might
+     *            not be desirable
      */
     public void setMapConditionsToFacets(final boolean mapConditionsToFacets) {
         _mapConditionsToFacets = mapConditionsToFacets;
@@ -443,12 +465,10 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
 
     /**
      * True if parent complex type name should be prepended in case of name
-     * conflict
-     * (otherwise, the COBOL source line will be appended).
+     * conflict (otherwise, the COBOL source line will be appended).
      * 
      * @return true if parent complex type name should be prepended in case of
-     *         name conflict
-     *         (otherwise, the COBOL source line will be appended)
+     *         name conflict (otherwise, the COBOL source line will be appended)
      */
     public boolean nameConflictPrependParentName() {
         return _nameConflictPrependParentName;
@@ -456,9 +476,8 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
 
     /**
      * @param nameConflictPrependParentName true if parent complex type name
-     *            should be prepended
-     *            in case of name conflict (otherwise, the COBOL source line
-     *            will be appended)
+     *            should be prepended in case of name conflict (otherwise, the
+     *            COBOL source line will be appended)
      */
     public void setNameConflictPrependParentName(
             final boolean nameConflictPrependParentName) {
@@ -466,8 +485,8 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
     }
 
     /**
-     * True if XSD element names should start with an uppercase
-     * (compatible with legstar-schemagen).
+     * True if XSD element names should start with an uppercase (compatible with
+     * legstar-schemagen).
      * 
      * @return true if XSD element names should start with an uppercase
      */
@@ -477,8 +496,7 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
 
     /**
      * @param elementNamesStartWithUppercase true if XSD element names should
-     *            start with an uppercase
-     *            (compatible with LegStar 1.2)
+     *            start with an uppercase (compatible with LegStar 1.2)
      */
     public void setElementNamesStartWithUppercase(
             final boolean elementNamesStartWithUppercase) {
@@ -508,8 +526,8 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
     }
 
     /*
-     * -------------------------------------------------------------------
-     * COBOL compiler related options
+     * ------------------------------------------------------------------- COBOL
+     * compiler related options
      */
 
     /**
@@ -619,6 +637,10 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
         }
         putInt(props, START_COLUMN, getStartColumn());
         putInt(props, END_COLUMN, getEndColumn());
+        if (getCobolSourceFileEncoding() != null) {
+            putString(props, COBOL_SOURCE_FILE_ENCODING,
+                    getCobolSourceFileEncoding());
+        }
         if (getXsdEncoding() != null) {
             putString(props, XSD_ENCODING, getXsdEncoding());
         }

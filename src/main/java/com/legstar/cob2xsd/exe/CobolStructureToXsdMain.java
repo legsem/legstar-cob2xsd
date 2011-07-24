@@ -67,9 +67,6 @@ public class CobolStructureToXsdMain {
      */
     private File _input;
 
-    /** Character set used to encode the input COBOL source files. */
-    private String _cobolSourceFileEncoding;
-
     /**
      * A folder containing translated XML Schema. Defaults to schema relative
      * folder.
@@ -107,7 +104,7 @@ public class CobolStructureToXsdMain {
             if (collectOptions(options, args)) {
                 setDefaults();
                 loadModel();
-                execute(getInput(), getCobolSourceFileEncoding(), getOutput());
+                execute(getInput(), getOutput());
             }
         } catch (Exception e) {
             _log.error("Transformers generator failure", e);
@@ -209,10 +206,6 @@ public class CobolStructureToXsdMain {
                         + " Name is relative or absolute");
         options.addOption(input);
 
-        Option cobolSourceFileEncoding = new Option("e", "sourceEncoding",
-                true, "Character set used for COBOL source files encoding");
-        options.addOption(cobolSourceFileEncoding);
-
         Option output = new Option("o", "output", true,
                 "folder or file receiving the translated XML schema");
         options.addOption(output);
@@ -244,10 +237,6 @@ public class CobolStructureToXsdMain {
         if (line.hasOption("input")) {
             setInput(line.getOptionValue("input").trim());
         }
-        if (line.hasOption("sourceEncoding")) {
-            setCobolSourceFileEncoding(line.getOptionValue("sourceEncoding")
-                    .trim());
-        }
         if (line.hasOption("output")) {
             setOutput(line.getOptionValue("output").trim());
         }
@@ -260,18 +249,15 @@ public class CobolStructureToXsdMain {
      * in the output folder.
      * 
      * @param input the input COBOL file or folder
-     * @param cobolSourceFileEncoding the input file character set
      * @param target the output folder or file where XML schema file must go
      * @throws XsdGenerationException if XML schema cannot be generated
      */
-    protected void execute(final File input,
-            final String cobolSourceFileEncoding, final File target)
+    protected void execute(final File input, final File target)
             throws XsdGenerationException {
 
         try {
             _log.info("Started translation from COBOL to XML Schema");
             _log.info("Taking COBOL from      : " + input);
-            _log.info("COBOL files encoding   : " + cobolSourceFileEncoding);
             _log.info("Output XML Schema to   : " + target);
             _log.info("Options in effect      : " + getModel().toString());
 
@@ -279,12 +265,12 @@ public class CobolStructureToXsdMain {
                 if (FilenameUtils.getExtension(target.getPath()).length() == 0) {
                     FileUtils.forceMkdir(target);
                 }
-                translate(input, cobolSourceFileEncoding, target);
+                translate(input, target);
             } else {
                 FileUtils.forceMkdir(target);
                 for (File cobolFile : input.listFiles()) {
                     if (cobolFile.isFile()) {
-                        translate(cobolFile, cobolSourceFileEncoding, target);
+                        translate(cobolFile, target);
                     }
                 }
             }
@@ -299,19 +285,16 @@ public class CobolStructureToXsdMain {
      * Translates a single COBOL source file.
      * 
      * @param cobolFile COBOL source file
-     * @param cobolSourceFileEncoding COBOL source file character encoding
      * @param target target file or folder
      * @throws XsdGenerationException if parser fails
      */
-    protected void translate(final File cobolFile,
-            final String cobolSourceFileEncoding, final File target)
+    protected void translate(final File cobolFile, final File target)
             throws XsdGenerationException {
         try {
             _log.info("Translation started for: " + cobolFile);
 
             CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getModel());
-            File xmlSchemaFile = cob2xsd.translate(cobolFile,
-                    cobolSourceFileEncoding, target);
+            File xmlSchemaFile = cob2xsd.translate(cobolFile, target);
             for (String errorMessage : cob2xsd.getErrorHistory()) {
                 _log.warn(errorMessage);
             }
@@ -410,14 +393,6 @@ public class CobolStructureToXsdMain {
     }
 
     /**
-     * @param cobolSourceFileEncoding the character set used to encode the input
-     *            COBOL source files
-     */
-    public void setCobolSourceFileEncoding(final String cobolSourceFileEncoding) {
-        _cobolSourceFileEncoding = cobolSourceFileEncoding;
-    }
-
-    /**
      * Check the output parameter and keep it only if it is valid.
      * 
      * @param output a file or folder name (relative or absolute)
@@ -444,13 +419,6 @@ public class CobolStructureToXsdMain {
      */
     public File getInput() {
         return _input;
-    }
-
-    /**
-     * @return the character set used to encode the input COBOL source files
-     */
-    public String getCobolSourceFileEncoding() {
-        return _cobolSourceFileEncoding;
     }
 
     /**

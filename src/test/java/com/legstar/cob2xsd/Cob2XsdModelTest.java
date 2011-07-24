@@ -13,14 +13,15 @@ import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
 public class Cob2XsdModelTest extends TestCase {
 
     /**
-     * Set all values to something different from the default,
-     * the serialize/deserialize and make sure everything is there.
+     * Set all values to something different from the default, the
+     * serialize/deserialize and make sure everything is there.
      */
     public void testSerialization() {
         Cob2XsdModel model = new Cob2XsdModel();
         model.setCodeFormat(CodeFormat.FREE_FORMAT);
         model.setStartColumn(9);
         model.setEndColumn(73);
+        model.setCobolSourceFileEncoding("UTF-8");
         model.setXsdEncoding("ISO-8859-1");
         model.setTargetNamespace("urn:somespace");
         model.setMapConditionsToFacets(true);
@@ -42,6 +43,7 @@ public class Cob2XsdModelTest extends TestCase {
                 .toString());
         assertEquals(9, model2.getStartColumn());
         assertEquals(73, model2.getEndColumn());
+        assertEquals("UTF-8", model2.getCobolSourceFileEncoding());
         assertEquals("ISO-8859-1", model2.getXsdEncoding());
         assertEquals("urn:somespace", model2.getTargetNamespace());
         assertEquals(true, model2.mapConditionsToFacets());

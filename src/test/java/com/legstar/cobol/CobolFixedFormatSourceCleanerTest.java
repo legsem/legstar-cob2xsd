@@ -60,32 +60,19 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
     public void testCleaningSequenceNumbers() {
         /* 0 1 2 3 4 5 6 7 */
         /* 123456789012345678901234567890123456789012345678901234567890123456789012 */
-        assertEquals(
-                "",
-                _cleaner.cleanLine(""));
+        assertEquals("", _cleaner.cleanLine(""));
 
-        assertEquals(
-                "",
-                _cleaner.cleanLine(
-                        "123456"));
+        assertEquals("", _cleaner.cleanLine("123456"));
 
         CobolFixedFormatSourceCleaner cleaner = new CobolFixedFormatSourceCleaner(
                 getErrorHandler(), 1, 66);
-        assertEquals(
-                "01 A.",
-                cleaner.cleanLine(
-                        "01 A."));
+        assertEquals("01 A.", cleaner.cleanLine("01 A."));
 
-        assertEquals(
-                "      -",
-                _cleaner.cleanLine(
-                        "123456-"));
+        assertEquals("      -", _cleaner.cleanLine("123456-"));
 
         assertEquals(
                 "      -                                                              ABC",
-                _cleaner
-                        .cleanLine(
-                        "123456-                                                              ABC123456"));
+                _cleaner.cleanLine("123456-                                                              ABC123456"));
     }
 
     /**
@@ -93,10 +80,8 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
      */
     public void testCleanLongSeparators() {
 
-        assertEquals(
-                "       01 A  PIC  X(5)  VALUE  5.",
-                _cleaner.cleanLine(
-                        "123456 01 A, PIC; X(5), VALUE, 5."));
+        assertEquals("       01 A  PIC  X(5)  VALUE  5.",
+                _cleaner.cleanLine("123456 01 A, PIC; X(5), VALUE, 5."));
     }
 
     /**
@@ -112,7 +97,7 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
         assertFalse(_cleaner.isDataDivision("       PROCEDURE DIVISION",
                 context));
         assertEquals(
-                "Procedure division found. The rest of the source code will be ignored.",
+                "Found procedure division in [PROCEDURE DIVISION]. Remaining lines ignored.",
                 getErrorHandler().getErrorMessages().get(0));
     }
 
@@ -206,14 +191,13 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
      * @param expected expected cleaneup result
      * @param context cleaning context
      */
-    private void removeExtraneousCharactersAndCheck(
-            final String line,
+    private void removeExtraneousCharactersAndCheck(final String line,
             final String expected,
             final CobolFixedFormatSourceCleaner.CleaningContext context) {
         CobolFixedFormatSourceCleaner cleaner = new CobolFixedFormatSourceCleaner(
                 getErrorHandler());
-        assertEquals(expected, cleaner
-                .removeExtraneousCharacters(line, context));
+        assertEquals(expected,
+                cleaner.removeExtraneousCharacters(line, context));
     }
 
     /**
@@ -224,12 +208,13 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
         /* 0 1 2 3 4 5 6 7 */
         /* 123456789012345678901234567890123456789012345678901234567890123456789012 */
         cleanAndCheck(
-                ""
-                        + "123456 PROCESS XOPTS(APOST)"
+                "" + "123456 PROCESS XOPTS(APOST)"
                         + LS
                         + "       IDENTIFICATION DIVISION."
                         + LS
                         + "       PROGRAM-ID. LSFILEAE."
+                        + LS
+                        + "       DATA DIVISION."
                         + LS
                         + "      * OVERVIEW                                                      *"
                         + LS
@@ -254,13 +239,11 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
                         + "                     \"AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE"
                         + LS
                         + "      -              \"GGGGGGGGGGHHHHHHHHHHIIIIIIIIIIJJJJJJJJJJKKKKKKKKKK"
+                        + LS + "      -              \"LLLLLLLLLLMMMMMMMMMM\"."
+                        + LS + "       PROCEDURE DIVISION." + LS
+                        + "          MOVE" + LS + "             05 TO B." + LS,
+                "" + ""
                         + LS
-                        + "      -              \"LLLLLLLLLLMMMMMMMMMM\"." + LS
-                        + "       PROCEDURE DIVISION." + LS
-                        + "          MOVE" + LS
-                        + "             05 TO B." + LS
-                ,
-                ""
                         + ""
                         + LS
                         + ""
@@ -290,23 +273,17 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
                         + "                     \"AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE"
                         + LS
                         + "      -              \"GGGGGGGGGGHHHHHHHHHHIIIIIIIIIIJJJJJJJJJJKKKKKKKKKK"
-                        + LS
-                        + "      -              \"LLLLLLLLLLMMMMMMMMMM\"." + LS
-                        + "" + LS
-                        + "" + LS
-                        + "" + LS);
+                        + LS + "      -              \"LLLLLLLLLLMMMMMMMMMM\"."
+                        + LS + "" + LS + "" + LS + "" + LS);
     }
 
     /**
      * Test effect of cleaning on source code starting at column1.
      */
     public void testCodeStartingColumnOne() {
-        cleanAndCheck(
-                "01   PO-RECORD1." + LS
-                        + "     05 RECORD-TYPE  PIC 9 VALUE 1."
-                ,
-                "" + LS
-                        + "      5 RECORD-TYPE  PIC 9 VALUE 1." + LS);
+        cleanAndCheck("01   PO-RECORD1." + LS
+                + "     05 RECORD-TYPE  PIC 9 VALUE 1.", "" + LS
+                + "      5 RECORD-TYPE  PIC 9 VALUE 1." + LS);
 
     }
 
@@ -314,15 +291,9 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
      * Test removal of comments even containing valid data descriptions.
      */
     public void testCommentWithValidDataDescription() {
-        cleanAndCheck(
-                ""
-                        + "        01   PO-RECORD1." + LS
-                        + "      * 01   PO-RECORD2." + LS
-                        + "      / 01   PO-RECORD3."
-                ,
-                "        01   PO-RECORD1." + LS
-                        + "" + LS
-                        + "" + LS);
+        cleanAndCheck("" + "        01   PO-RECORD1." + LS
+                + "      * 01   PO-RECORD2." + LS + "      / 01   PO-RECORD3.",
+                "        01   PO-RECORD1." + LS + "" + LS + "" + LS);
 
     }
 
@@ -330,12 +301,9 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
      * Test that identifiers starting with digits are correctly identified.
      */
     public void testIdentifierStartsWithDigit() {
-        cleanAndCheck(
-                ""
-                        + "        01  5500-REC-01." + LS
-                        + "          05 5500-REC-TYPE      PIC X(01)." + LS
-                        + "          05 5500-PLAN-NUM      PIC X(06)."
-                ,
+        cleanAndCheck("" + "        01  5500-REC-01." + LS
+                + "          05 5500-REC-TYPE      PIC X(01)." + LS
+                + "          05 5500-PLAN-NUM      PIC X(06).",
                 "        01  5500-REC-01." + LS
                         + "          05 5500-REC-TYPE      PIC X(01)." + LS
                         + "          05 5500-PLAN-NUM      PIC X(06)." + LS);
@@ -346,72 +314,36 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
      * Test that compiler directives are removed.
      */
     public void testCompilerDirectives() {
-        cleanAndCheck(
-                ""
-                        + "        01  5500-REC-01." + LS
-                        + "         EJECT." + LS
-                        + "          05 5500-PLAN-NUM      PIC X(06)."
-                ,
-                "        01  5500-REC-01." + LS
-                        + "" + LS
+        cleanAndCheck("" + "        01  5500-REC-01." + LS + "         EJECT."
+                + LS + "          05 5500-PLAN-NUM      PIC X(06).",
+                "        01  5500-REC-01." + LS + "" + LS
                         + "          05 5500-PLAN-NUM      PIC X(06)." + LS);
 
-        cleanAndCheck(
-                ""
-                        + "        01  5500-REC-01." + LS
-                        + "         EJECT" + LS
-                        + "          05 5500-PLAN-NUM      PIC X(06)."
-                ,
-                "        01  5500-REC-01." + LS
-                        + "" + LS
+        cleanAndCheck("" + "        01  5500-REC-01." + LS + "         EJECT"
+                + LS + "          05 5500-PLAN-NUM      PIC X(06).",
+                "        01  5500-REC-01." + LS + "" + LS
                         + "          05 5500-PLAN-NUM      PIC X(06)." + LS);
-        cleanAndCheck(
-                ""
-                        + "        01  5500-REC-01" + LS
-                        + "         EJECT." + LS
-                        + "         PIC X(06)."
-                ,
-                "        01  5500-REC-01" + LS
-                        + "" + LS
-                        + "         PIC X(06)." + LS);
-        cleanAndCheck(
-                ""
-                        + "        01  5500-REC-01." + LS
-                        + "         SKIP." + LS
-                        + "          05 5500-PLAN-NUM      PIC X(06)."
-                ,
-                "        01  5500-REC-01." + LS
-                        + "" + LS
+        cleanAndCheck("" + "        01  5500-REC-01" + LS + "         EJECT."
+                + LS + "         PIC X(06).", "        01  5500-REC-01" + LS
+                + "" + LS + "         PIC X(06)." + LS);
+        cleanAndCheck("" + "        01  5500-REC-01." + LS + "         SKIP."
+                + LS + "          05 5500-PLAN-NUM      PIC X(06).",
+                "        01  5500-REC-01." + LS + "" + LS
                         + "          05 5500-PLAN-NUM      PIC X(06)." + LS);
 
-        cleanAndCheck(
-                ""
-                        + "        01  5500-REC-01." + LS
-                        + "         SKIP1." + LS
-                        + "          05 5500-PLAN-NUM      PIC X(06)."
-                ,
-                "        01  5500-REC-01." + LS
-                        + "" + LS
+        cleanAndCheck("" + "        01  5500-REC-01." + LS + "         SKIP1."
+                + LS + "          05 5500-PLAN-NUM      PIC X(06).",
+                "        01  5500-REC-01." + LS + "" + LS
                         + "          05 5500-PLAN-NUM      PIC X(06)." + LS);
 
-        cleanAndCheck(
-                ""
-                        + "        01  5500-REC-01." + LS
-                        + "         SKIP2." + LS
-                        + "          05 5500-PLAN-NUM      PIC X(06)."
-                ,
-                "        01  5500-REC-01." + LS
-                        + "" + LS
+        cleanAndCheck("" + "        01  5500-REC-01." + LS + "         SKIP2."
+                + LS + "          05 5500-PLAN-NUM      PIC X(06).",
+                "        01  5500-REC-01." + LS + "" + LS
                         + "          05 5500-PLAN-NUM      PIC X(06)." + LS);
 
-        cleanAndCheck(
-                ""
-                        + "        01  5500-REC-01." + LS
-                        + "         SKIP3." + LS
-                        + "          05 5500-PLAN-NUM      PIC X(06)."
-                ,
-                "        01  5500-REC-01." + LS
-                        + "" + LS
+        cleanAndCheck("" + "        01  5500-REC-01." + LS + "         SKIP3."
+                + LS + "          05 5500-PLAN-NUM      PIC X(06).",
+                "        01  5500-REC-01." + LS + "" + LS
                         + "          05 5500-PLAN-NUM      PIC X(06)." + LS);
 
     }

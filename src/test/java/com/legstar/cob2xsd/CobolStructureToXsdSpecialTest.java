@@ -210,6 +210,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
         try {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setTargetNamespace("http://www.mycompany.com/test");
+            model.setCobolSourceFileEncoding("UTF-8");
             model.setXsdEncoding("UTF-8");
             model.setAddLegStarAnnotations(true);
             CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
@@ -220,8 +221,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             out.write("       01 A.\n           02 B PIC G(4) VALUE '牛年快乐'.");
             out.flush();
             out.close();
-            File xmlSchema = cob2xsd.translate(tempCobolFile, "UTF-8",
-                    GEN_XSD_DIR);
+            File xmlSchema = cob2xsd.translate(tempCobolFile, GEN_XSD_DIR);
             in = new BufferedReader(new InputStreamReader(new FileInputStream(
                     xmlSchema), "UTF8"));
             String line;
@@ -667,4 +667,40 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             fail();
         }
     }
+
+    /**
+     * Test for issue 48: Dates in DATE-WRITTEN directive are misinterpreted..
+     */
+    public void testDateWrittenIssue() {
+        try {
+            Cob2XsdModel model = new Cob2XsdModel();
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            String xmlSchema = cob2xsd.translate("*\n"
+                    + "       ID DIVISION.\n"
+                    + "       DATE-WRITTEN.              04 GENNAIO 2005.\n"
+                    + "       DATA DIVISION.\n"
+                    + "       01 A. 02  B     PIC S9(13)V99.\n");
+            compare("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+                    + "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                    + " elementFormDefault=\"unqualified\">"
+                    + "    <xsd:complexType name=\"A\">"
+                    + "        <xsd:sequence>"
+                    + "            <xsd:element name=\"b\">"
+                    + "                <xsd:simpleType>"
+                    + "                    <xsd:restriction base=\"xsd:decimal\">"
+                    + "                        <xsd:totalDigits value=\"15\"/>"
+                    + "                        <xsd:fractionDigits value=\"2\"/>"
+                    + "                    </xsd:restriction>"
+                    + "                </xsd:simpleType>"
+                    + "            </xsd:element>"
+                    + "        </xsd:sequence>"
+                    + "    </xsd:complexType>"
+                    + "    <xsd:element name=\"a\" type=\"A\"/>"
+                    + "</xsd:schema>", xmlSchema);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
 }

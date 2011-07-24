@@ -24,9 +24,9 @@ import org.apache.tools.ant.types.FileSet;
 
 import com.legstar.antlr.RecognizerException;
 import com.legstar.cob2xsd.Cob2XsdModel;
+import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
 import com.legstar.cob2xsd.CobolStructureToXsd;
 import com.legstar.cob2xsd.XsdGenerationException;
-import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
 
 /**
  * COBOL Structure to XSD ANT Task. <code>
@@ -57,27 +57,21 @@ public class CobolStructureToXsdTask extends Task {
 
     /**
      * The target can either be a folder where XML schema result is to be
-     * written
-     * or a file in which case the XML schema is written there.
+     * written or a file in which case the XML schema is written there.
      */
     private File _target;
 
     /** Set of translation options to use. */
     private Cob2XsdModel _model = new Cob2XsdModel();
 
-    /** Character set used to encode the input COBOL source files. */
-    private String _cobolSourceFileEncoding;
-
     /**
-     * The ant execution method.
-     * Check parameters and produce XSD files.
+     * The ant execution method. Check parameters and produce XSD files.
      */
     public final void execute() {
         _log.info("Started translation from COBOL to XML Schema");
 
         checkParameters();
         _log.info("Taking COBOL from    : " + _fileSets);
-        _log.info("COBOL files encoding : " + getCobolSourceFileEncoding());
         _log.info("Output XML Schema to : " + getTarget());
         _log.info(getModel().toString());
 
@@ -93,8 +87,7 @@ public class CobolStructureToXsdTask extends Task {
                 for (int i = 0; i < files.length; i++) {
                     File cobolFile = new File(fileset.getDir(getProject()),
                             files[i]);
-                    translate(cobolFile, getCobolSourceFileEncoding(),
-                            getTarget());
+                    translate(cobolFile, getTarget());
                 }
             }
         } catch (IllegalStateException e) {
@@ -111,20 +104,15 @@ public class CobolStructureToXsdTask extends Task {
      * Translates a single COBOL source file.
      * 
      * @param cobolFile COBOL source file
-     * @param cobolSourceFileEncoding COBOL source file character encoding
      * @param target target file or folder
      * @throws RecognizerException if parser fails
      * @throws XsdGenerationException if COBOL model interpretation fails
      */
-    protected void translate(
-            final File cobolFile,
-            final String cobolSourceFileEncoding,
-            final File target) throws RecognizerException,
-            XsdGenerationException {
+    protected void translate(final File cobolFile, final File target)
+            throws RecognizerException, XsdGenerationException {
         CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getModel());
         _log.info("Translation started for: " + cobolFile);
-        File xmlSchemaFile = cob2xsd.translate(cobolFile,
-                cobolSourceFileEncoding, target);
+        File xmlSchemaFile = cob2xsd.translate(cobolFile, target);
         for (String errorMessage : cob2xsd.getErrorHistory()) {
             _log.warn(errorMessage);
         }
@@ -132,8 +120,8 @@ public class CobolStructureToXsdTask extends Task {
     }
 
     /**
-     * Check that we have enough parameters to get started.
-     * Check that we have a valid target directory or file.
+     * Check that we have enough parameters to get started. Check that we have a
+     * valid target directory or file.
      */
     private void checkParameters() {
         if (_fileSets.isEmpty()) {
@@ -159,8 +147,8 @@ public class CobolStructureToXsdTask extends Task {
     }
 
     /*
-     * -------------------------------------------------------------------
-     * COBOL source format related options
+     * ------------------------------------------------------------------- COBOL
+     * source format related options
      */
     /**
      * @return the Fixed or Free format COBOL source
@@ -212,9 +200,24 @@ public class CobolStructureToXsdTask extends Task {
         getModel().setEndColumn(endColumn);
     }
 
+    /**
+     * @return the character set used to encode the input COBOL source files
+     */
+    public String getCobolSourceFileEncoding() {
+        return getModel().getCobolSourceFileEncoding();
+    }
+
+    /**
+     * @param cobolSourceFileEncoding the character set used to encode the input
+     *            COBOL source files
+     */
+    public void setCobolSourceFileEncoding(final String cobolSourceFileEncoding) {
+        getModel().setCobolSourceFileEncoding(cobolSourceFileEncoding);
+    }
+
     /*
-     * -------------------------------------------------------------------
-     * XML Schema related options
+     * ------------------------------------------------------------------- XML
+     * Schema related options
      */
 
     /**
@@ -248,8 +251,7 @@ public class CobolStructureToXsdTask extends Task {
 
     /**
      * @return whether COBOL conditions (level 88) should be mapped to facets.
-     *         Facets
-     *         restrict the content which might not be desirable
+     *         Facets restrict the content which might not be desirable
      */
     public boolean mapConditionsToFacets() {
         return getModel().mapConditionsToFacets();
@@ -257,8 +259,8 @@ public class CobolStructureToXsdTask extends Task {
 
     /**
      * @param mapConditionsToFacets Whether COBOL conditions (level 88) should
-     *            be mapped to facets. Facets
-     *            restrict the content which might not be desirable
+     *            be mapped to facets. Facets restrict the content which might
+     *            not be desirable
      */
     public void setMapConditionsToFacets(final boolean mapConditionsToFacets) {
         getModel().setMapConditionsToFacets(mapConditionsToFacets);
@@ -281,8 +283,7 @@ public class CobolStructureToXsdTask extends Task {
 
     /**
      * @return true if parent complex type name should be prepended in case of
-     *         name conflict
-     *         (otherwise, the COBOL source line will be appended)
+     *         name conflict (otherwise, the COBOL source line will be appended)
      */
     public boolean nameConflictPrependParentName() {
         return getModel().nameConflictPrependParentName();
@@ -290,9 +291,8 @@ public class CobolStructureToXsdTask extends Task {
 
     /**
      * @param nameConflictPrependParentName true if parent complex type name
-     *            should be prepended
-     *            in case of name conflict (otherwise, the COBOL source line
-     *            will be appended)
+     *            should be prepended in case of name conflict (otherwise, the
+     *            COBOL source line will be appended)
      */
     public void setNameConflictPrependParentName(
             final boolean nameConflictPrependParentName) {
@@ -310,8 +310,7 @@ public class CobolStructureToXsdTask extends Task {
 
     /**
      * @param elementNamesStartWithUppercase true if XSD element names should
-     *            start with an uppercase
-     *            (compatible with LegStar 1.2)
+     *            start with an uppercase (compatible with LegStar 1.2)
      */
     public void setElementNamesStartWithUppercase(
             final boolean elementNamesStartWithUppercase) {
@@ -340,8 +339,8 @@ public class CobolStructureToXsdTask extends Task {
     }
 
     /*
-     * -------------------------------------------------------------------
-     * COBOL compiler related options
+     * ------------------------------------------------------------------- COBOL
+     * compiler related options
      */
 
     /**
@@ -446,21 +445,6 @@ public class CobolStructureToXsdTask extends Task {
      */
     public void setTarget(final File target) {
         _target = target;
-    }
-
-    /**
-     * @return the character set used to encode the input COBOL source files
-     */
-    public String getCobolSourceFileEncoding() {
-        return _cobolSourceFileEncoding;
-    }
-
-    /**
-     * @param cobolSourceFileEncoding the character set used to encode the input
-     *            COBOL source files
-     */
-    public void setCobolSourceFileEncoding(final String cobolSourceFileEncoding) {
-        this._cobolSourceFileEncoding = cobolSourceFileEncoding;
     }
 
 }

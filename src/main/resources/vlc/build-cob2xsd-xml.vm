@@ -39,6 +39,9 @@
             startColumn="${antModel.startColumn}"
             endColumn="${antModel.endColumn}"
 #end
+#if(${antModel.cobolSourceFileEncoding})
+            cobolSourceFileEncoding="${antModel.cobolSourceFileEncoding}"
+#end
 
 ## -------------------------------------------------------------------
 ## XML Schema related options

@@ -80,32 +80,15 @@ public class CobolStructureToXsdMainTest extends TestCase {
     }
 
     /**
-     * Test with cobolSourceFileEncoding argument.
-     */
-    public void testCobolSourceFileEncodingArgument() {
-        try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
-            Options options = main.createOptions();
-            assertEquals(null, main.getCobolSourceFileEncoding());
-            assertTrue(main.collectOptions(options,
-                    new String[] { "-e ISO-8859-1" }));
-            assertEquals("ISO-8859-1", main.getCobolSourceFileEncoding());
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
      * Test with configuration argument.
      */
     public void testConfigurationArgument() {
         CobolStructureToXsdMain main = new CobolStructureToXsdMain();
         try {
-            main.execute(new String[] {
-                    "-p", "src/main/resources/conf/cob2xsd.properties",
-                    "-i", "src/test/resources/cobol/LSFILEAE",
-                    "-o", "target/gen/myfile.xsd"
-                    });
+            main.execute(new String[] { "-p",
+                    "src/main/resources/conf/cob2xsd.properties", "-i",
+                    "src/test/resources/cobol/LSFILEAE", "-o",
+                    "target/gen/myfile.xsd" });
             assertTrue(new File("target/gen/myfile.xsd").exists());
         } catch (Exception e) {
             fail(e.getMessage());

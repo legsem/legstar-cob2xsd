@@ -136,7 +136,8 @@ public class CobolStructureToXsd {
     /**
      * Execute the translation from COBOL to XML Schema.
      * 
-     * @param cobolSourceFile the COBOL source code
+     * @param cobolSourceFile the COBOL source code (platform encoding by
+     *            default)
      * @param target can either be a folder where XML schema result is to be
      *            written or a file in which case the XML schema is written
      *            there
@@ -146,26 +147,6 @@ public class CobolStructureToXsd {
      */
     public File translate(final File cobolSourceFile, final File target)
             throws RecognizerException, XsdGenerationException {
-        return translate(cobolSourceFile, null, target);
-    }
-
-    /**
-     * Execute the translation from COBOL to XML Schema.
-     * 
-     * @param cobolSourceFile the COBOL source code (platform encoding by
-     *            default)
-     * @param cobolSourceFileEncoding the character set used to encode the COBOL
-     *            source file
-     * @param target can either be a folder where XML schema result is to be
-     *            written or a file in which case the XML schema is written
-     *            there
-     * @return the XML Schema
-     * @throws RecognizerException if COBOL recognition fails
-     * @throws XsdGenerationException if XML schema generation process fails
-     */
-    public File translate(final File cobolSourceFile,
-            final String cobolSourceFileEncoding, final File target)
-            throws RecognizerException, XsdGenerationException {
         try {
             if (_log.isDebugEnabled()) {
                 _log.debug("Translating COBOL file: " + cobolSourceFile);
@@ -174,7 +155,7 @@ public class CobolStructureToXsd {
             checkTarget(target);
 
             String xsdString = translate(FileUtils.readFileToString(
-                    cobolSourceFile, cobolSourceFileEncoding));
+                    cobolSourceFile, getModel().getCobolSourceFileEncoding()));
             File xsdFile = null;
             if (target.isDirectory()) {
                 String xsdFileName = cobolSourceFile.getName() + ".xsd";
