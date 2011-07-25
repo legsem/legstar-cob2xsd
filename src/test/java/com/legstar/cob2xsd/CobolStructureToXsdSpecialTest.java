@@ -735,4 +735,41 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
         }
     }
 
+    /**
+     * Test for Issue 50: Must disambiguate siblings with same name
+     */
+    public void testMustDisambiguateSiblingsWithSameName() {
+        try {
+            Cob2XsdModel model = new Cob2XsdModel();
+            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            String xmlSchema = cob2xsd.translate("*\n"
+                    + "       01 FILLER. 02  F PIC X. 02  F PIC X.\n");
+            compare("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+                    + "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+                    + " elementFormDefault=\"unqualified\">"
+                    + "    <xsd:complexType name=\"Filler2\">"
+                    + "        <xsd:sequence>"
+                    + "            <xsd:element name=\"f0\">"
+                    + "                <xsd:simpleType>"
+                    + "                    <xsd:restriction base=\"xsd:string\">"
+                    + "                        <xsd:maxLength value=\"1\"/>"
+                    + "                    </xsd:restriction>"
+                    + "                </xsd:simpleType>"
+                    + "            </xsd:element>"
+                    + "            <xsd:element name=\"f1\">"
+                    + "                <xsd:simpleType>"
+                    + "                    <xsd:restriction base=\"xsd:string\">"
+                    + "                        <xsd:maxLength value=\"1\"/>"
+                    + "                    </xsd:restriction>"
+                    + "                </xsd:simpleType>"
+                    + "            </xsd:element>"
+                    + "        </xsd:sequence>"
+                    + "    </xsd:complexType>"
+                    + "    <xsd:element name=\"filler2\" type=\"Filler2\"/>"
+                    + "</xsd:schema>", xmlSchema);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 }

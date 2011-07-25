@@ -47,8 +47,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setUsage(Usage.DOUBLEFLOAT);
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " type=\"DOUBLE_FLOAT_ITEM\""
+                        + " levelNumber=\"1\"" + " type=\"DOUBLE_FLOAT_ITEM\""
                         + " usage=\"COMP-2\"/>");
     }
 
@@ -61,10 +60,8 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setUsage(Usage.NATIONAL);
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"NNNN/NN\""
-                        + " type=\"NATIONAL_ITEM\""
-                        + " usage=\"NATIONAL\"/>");
+                        + " levelNumber=\"1\"" + " picture=\"NNNN/NN\""
+                        + " type=\"NATIONAL_ITEM\"" + " usage=\"NATIONAL\"/>");
     }
 
     /**
@@ -76,8 +73,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setJustifiedRight(true);
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"X\""
+                        + " levelNumber=\"1\"" + " picture=\"X\""
                         + " type=\"ALPHANUMERIC_ITEM\""
                         + " justifiedRight=\"true\"/>");
     }
@@ -91,13 +87,10 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setUsage(Usage.PACKEDDECIMAL);
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"99\""
+                        + " levelNumber=\"1\"" + " picture=\"99\""
                         + " type=\"PACKED_DECIMAL_ITEM\""
-                        + " usage=\"PACKED-DECIMAL\""
-                        + " totalDigits=\"2\""
-                        + " signed=\"false\""
-                        + "/>");
+                        + " usage=\"PACKED-DECIMAL\"" + " totalDigits=\"2\""
+                        + " signed=\"false\"" + "/>");
     }
 
     /**
@@ -108,13 +101,9 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setPicture("S99V9");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"S99V9\""
-                        + " type=\"ZONED_DECIMAL_ITEM\""
-                        + " totalDigits=\"3\""
-                        + " fractionDigits=\"1\""
-                        + " signed=\"true\""
-                        + "/>");
+                        + " levelNumber=\"1\"" + " picture=\"S99V9\""
+                        + " type=\"ZONED_DECIMAL_ITEM\"" + " totalDigits=\"3\""
+                        + " fractionDigits=\"1\"" + " signed=\"true\"" + "/>");
     }
 
     /**
@@ -126,14 +115,10 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setSignLeading(true);
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"S99V9\""
-                        + " type=\"ZONED_DECIMAL_ITEM\""
-                        + " totalDigits=\"3\""
-                        + " fractionDigits=\"1\""
-                        + " signed=\"true\""
-                        + " signLeading=\"true\""
-                        + "/>");
+                        + " levelNumber=\"1\"" + " picture=\"S99V9\""
+                        + " type=\"ZONED_DECIMAL_ITEM\"" + " totalDigits=\"3\""
+                        + " fractionDigits=\"1\"" + " signed=\"true\""
+                        + " signLeading=\"true\"" + "/>");
     }
 
     /**
@@ -146,14 +131,10 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setSignSeparate(true);
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"S99V9\""
-                        + " type=\"ZONED_DECIMAL_ITEM\""
-                        + " totalDigits=\"3\""
-                        + " fractionDigits=\"1\""
-                        + " signed=\"true\""
-                        + " signLeading=\"true\""
-                        + " signSeparate=\"true\""
+                        + " levelNumber=\"1\"" + " picture=\"S99V9\""
+                        + " type=\"ZONED_DECIMAL_ITEM\"" + " totalDigits=\"3\""
+                        + " fractionDigits=\"1\"" + " signed=\"true\""
+                        + " signLeading=\"true\"" + " signSeparate=\"true\""
                         + "/>");
     }
 
@@ -165,11 +146,8 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setMaxOccurs(3);
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " maxOccurs=\"3\""
-                        + " minOccurs=\"3\""
-                        + " type=\"GROUP_ITEM\""
-                        + "/>");
+                        + " levelNumber=\"1\"" + " maxOccurs=\"3\""
+                        + " minOccurs=\"3\"" + " type=\"GROUP_ITEM\"" + "/>");
     }
 
     /**
@@ -182,12 +160,9 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setDependingOn("COBOL-LEN");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " dependingOn=\"COBOL-LEN\""
-                        + " maxOccurs=\"1\""
-                        + " minOccurs=\"0\""
-                        + " type=\"GROUP_ITEM\""
-                        + "/>");
+                        + " levelNumber=\"1\"" + " dependingOn=\"COBOL-LEN\""
+                        + " maxOccurs=\"1\"" + " minOccurs=\"0\""
+                        + " type=\"GROUP_ITEM\"" + "/>");
     }
 
     /**
@@ -200,8 +175,7 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
                 "<cb:cobolElement cobolName=\"COBOL-REDEFINING\""
                         + " levelNumber=\"1\""
                         + " redefines=\"COBOL-REDEFINED\""
-                        + " type=\"GROUP_ITEM\""
-                        + "/>");
+                        + " type=\"GROUP_ITEM\"" + "/>");
     }
 
     /**
@@ -212,10 +186,8 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("ZEROS");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " value=\"0\""
-                        + " type=\"GROUP_ITEM\""
-                        + "/>");
+                        + " levelNumber=\"1\"" + " value=\"0\""
+                        + " type=\"GROUP_ITEM\"" + "/>");
     }
 
     /**
@@ -226,10 +198,8 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("SPACE");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " value=\" \""
-                        + " type=\"GROUP_ITEM\""
-                        + "/>");
+                        + " levelNumber=\"1\"" + " value=\" \""
+                        + " type=\"GROUP_ITEM\"" + "/>");
     }
 
     /**
@@ -241,10 +211,8 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("HIGH-VALUES");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"X(3)\""
-                        + " value=\"0xFFFFFF\""
-                        + " type=\"ALPHANUMERIC_ITEM\""
+                        + " levelNumber=\"1\"" + " picture=\"X(3)\""
+                        + " value=\"0xFFFFFF\"" + " type=\"ALPHANUMERIC_ITEM\""
                         + "/>");
     }
 
@@ -257,10 +225,8 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("LOW-VALUES");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"X(3)\""
-                        + " value=\"0x000000\""
-                        + " type=\"ALPHANUMERIC_ITEM\""
+                        + " levelNumber=\"1\"" + " picture=\"X(3)\""
+                        + " value=\"0x000000\"" + " type=\"ALPHANUMERIC_ITEM\""
                         + "/>");
     }
 
@@ -273,10 +239,8 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("NULLS");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"X(3)\""
-                        + " value=\"0x000000\""
-                        + " type=\"ALPHANUMERIC_ITEM\""
+                        + " levelNumber=\"1\"" + " picture=\"X(3)\""
+                        + " value=\"0x000000\"" + " type=\"ALPHANUMERIC_ITEM\""
                         + "/>");
     }
 
@@ -289,10 +253,8 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("QUOTES");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"X(3)\""
-                        + " value=\"&quot;\""
-                        + " type=\"ALPHANUMERIC_ITEM\""
+                        + " levelNumber=\"1\"" + " picture=\"X(3)\""
+                        + " value=\"&quot;\"" + " type=\"ALPHANUMERIC_ITEM\""
                         + "/>");
     }
 
@@ -305,10 +267,8 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("apost");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"X(3)\""
-                        + " value=\"&apos;\""
-                        + " type=\"ALPHANUMERIC_ITEM\""
+                        + " levelNumber=\"1\"" + " picture=\"X(3)\""
+                        + " value=\"&apos;\"" + " type=\"ALPHANUMERIC_ITEM\""
                         + "/>");
     }
 
@@ -321,10 +281,8 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("ALL A");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"X(3)\""
-                        + " value=\"AAA\""
-                        + " type=\"ALPHANUMERIC_ITEM\""
+                        + " levelNumber=\"1\"" + " picture=\"X(3)\""
+                        + " value=\"AAA\"" + " type=\"ALPHANUMERIC_ITEM\""
                         + "/>");
     }
 
@@ -337,11 +295,9 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("ALL QUOTE");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"X(3)\""
+                        + " levelNumber=\"1\"" + " picture=\"X(3)\""
                         + " value=\"&quot;&quot;&quot;\""
-                        + " type=\"ALPHANUMERIC_ITEM\""
-                        + "/>");
+                        + " type=\"ALPHANUMERIC_ITEM\"" + "/>");
     }
 
     /**
@@ -353,11 +309,9 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("-125.63");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " usage=\"PACKED-DECIMAL\""
+                        + " levelNumber=\"1\"" + " usage=\"PACKED-DECIMAL\""
                         + " value=\"-125.63\""
-                        + " type=\"PACKED_DECIMAL_ITEM\""
-                        + "/>");
+                        + " type=\"PACKED_DECIMAL_ITEM\"" + "/>");
     }
 
     /**
@@ -369,11 +323,9 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("<A>");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"X(3)\""
+                        + " levelNumber=\"1\"" + " picture=\"X(3)\""
                         + " value=\"&lt;A&gt;\""
-                        + " type=\"ALPHANUMERIC_ITEM\""
-                        + "/>");
+                        + " type=\"ALPHANUMERIC_ITEM\"" + "/>");
     }
 
     /**
@@ -385,17 +337,15 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         dataItem.setValue("\"ABD\"");
         emitAnnotationAndCheck(dataItem,
                 "<cb:cobolElement cobolName=\"COBOL-NAME\""
-                        + " levelNumber=\"1\""
-                        + " picture=\"X(3)\""
-                        + " value=\"ABD\""
-                        + " type=\"ALPHANUMERIC_ITEM\""
+                        + " levelNumber=\"1\"" + " picture=\"X(3)\""
+                        + " value=\"ABD\"" + " type=\"ALPHANUMERIC_ITEM\""
                         + "/>");
     }
 
     /**
-     * Helper to check item level annotation emission.
-     * Get item level annotations. We hook them directly in the schema because
-     * that simplifies testing.
+     * Helper to check item level annotation emission. Get item level
+     * annotations. We hook them directly in the schema because that simplifies
+     * testing.
      * 
      * @param dataItem a COBOL data item
      * @param expected expected annotations as a string
@@ -406,19 +356,13 @@ public class XsdAnnotationEmitterTest extends AbstractXsdEmitterTester {
         model.setAddLegStarAnnotations(true);
         XmlSchema xsd = getXmlSchema();
         XsdAnnotationEmitter emitter = new XsdAnnotationEmitter(xsd, model);
-        XsdDataItem xsdDataItem = new XsdDataItem(
-                dataItem, model, null, new ArrayList < String >(),
-                _errorHandler);
+        XsdDataItem xsdDataItem = new XsdDataItem(dataItem, model, null, 0,
+                new ArrayList < String >(), _errorHandler);
         XmlSchemaAnnotation annotation = emitter
                 .createLegStarAnnotation(xsdDataItem);
         xsd.setAnnotation(annotation);
-        check(
-                "<annotation>"
-                        + "<appinfo>"
-                        + expected
-                        + "</appinfo>"
-                        + "</annotation>"
-                , xsd, true);
+        check("<annotation>" + "<appinfo>" + expected + "</appinfo>"
+                + "</annotation>", xsd, true);
     }
 
 }

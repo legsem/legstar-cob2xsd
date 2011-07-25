@@ -354,7 +354,7 @@ public class CobolStructureToXsd {
         for (CobolDataItem cobolDataItem : cobolDataItems) {
             if (cobolDataItem.getChildren().size() > 0) {
                 XsdDataItem xsdDataItem = new XsdDataItem(cobolDataItem,
-                        getModel(), null, nonUniqueCobolNames, _errorHandler);
+                        getModel(), null, 0, nonUniqueCobolNames, _errorHandler);
                 xsd.getItems().add(emitter.createXmlSchemaElement(xsdDataItem));
             }
         }

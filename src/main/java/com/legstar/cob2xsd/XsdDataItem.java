@@ -125,21 +125,23 @@ public class XsdDataItem {
      * @param cobolDataItem the COBOL elementary data item
      * @param model the translator options in effect
      * @param parent the parent data item or null if root
+     * @param order order within parent to disambiguate siblings
      * @param nonUniqueCobolNames a list of non unique COBOL names used to
      *            detect name collisions
      * @param errorHandler collects translation errors
      */
     public XsdDataItem(final CobolDataItem cobolDataItem,
             final Cob2XsdModel model, final XsdDataItem parent,
-            final List < String > nonUniqueCobolNames,
+            final int order, final List < String > nonUniqueCobolNames,
             final RecognizerErrorHandler errorHandler) {
 
         _errorHandler = errorHandler;
         _cobolDataItem = cobolDataItem;
         _parent = parent;
-        _xsdElementName = formatElementName(cobolDataItem, model);
+        _xsdElementName = formatElementName(cobolDataItem, nonUniqueCobolNames,
+                model, parent, order);
         _xsdTypeName = formatTypeName(_xsdElementName, cobolDataItem,
-                nonUniqueCobolNames, model, parent);
+                nonUniqueCobolNames, model, parent, order);
 
         switch (cobolDataItem.getDataEntryType()) {
         case DATA_DESCRIPTION:
@@ -229,10 +231,12 @@ public class XsdDataItem {
         }
 
         /* Create the list of children by decorating the COBOL item children. */
+        int order = 0;
         for (CobolDataItem child : cobolDataItem.getChildren()) {
-            XsdDataItem xsdChild = new XsdDataItem(child, model, this,
+            XsdDataItem xsdChild = new XsdDataItem(child, model, this, order,
                     nonUniqueCobolNames, _errorHandler);
             _children.add(xsdChild);
+            order++;
         }
 
         /*
@@ -680,48 +684,6 @@ public class XsdDataItem {
     }
 
     /**
-     * Turn a COBOL name to a unique XSD type name.
-     * <p/>
-     * Complex type names customarily start with an uppercase character.
-     * <p/>
-     * The proposed name might be conflicting with another so we disambiguate
-     * xsd type names with one of 2 options:
-     * <ul>
-     * <li>Appending the COBOL source line number (compatible with
-     * legstar-schemagen)</li>
-     * <li>Appending the parent XSD type name</li>
-     * </ul>
-     * 
-     * @param cobolDataItem the COBOL data item
-     * @param elementName the element name built from the COBOL name
-     * @param nonUniqueCobolNames a list of non unique COBOL names
-     * @param model the translator options
-     * @param parent used to resolve potential name conflict
-     * @return a nice XML type name
-     */
-    public static String formatTypeName(final String elementName,
-            final CobolDataItem cobolDataItem,
-            final List < String > nonUniqueCobolNames,
-            final Cob2XsdModel model, final XsdDataItem parent) {
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(Character.toUpperCase(elementName.charAt(0)));
-        sb.append(elementName.substring(1));
-
-        if (nonUniqueCobolNames.contains(cobolDataItem.getCobolName())) {
-            if (model.nameConflictPrependParentName()) {
-                if (parent != null) {
-                    sb.insert(0, parent.getXsdTypeName());
-                }
-            } else {
-                sb.append(cobolDataItem.getSrceLine());
-            }
-        }
-
-        return sb.toString();
-    }
-
-    /**
      * Turn a COBOL name to an XSD element name.
      * <p/>
      * COBOL names look ugly in XML schema. They are often uppercased and use
@@ -743,13 +705,21 @@ public class XsdDataItem {
      * Since Enterprise COBOL V4R1, underscores can be used (apart from first
      * character). We treat them as hyphens here, they are not propagated to the
      * XSD name but are used as word breakers.
+     * <p/>
+     * Once an element name is identified, we make sure it is unique among
+     * siblings within the same parent.
      * 
      * @param cobolDataItem the original COBOL data item
+     * @param nonUniqueCobolNames a list of non unique COBOL names used to
+     *            detect name collisions
      * @param model the translator options
+     * @param parent used to resolve potential name conflict
+     * @param order order within parent to disambiguate siblings
      * @return an XML schema element name
      */
     public static String formatElementName(final CobolDataItem cobolDataItem,
-            final Cob2XsdModel model) {
+            final List < String > nonUniqueCobolNames,
+            final Cob2XsdModel model, final XsdDataItem parent, final int order) {
 
         String cobolName = getXmlCompatibleCobolName(cobolDataItem
                 .getCobolName());
@@ -780,6 +750,62 @@ public class XsdDataItem {
                 wordBreaker = true;
             }
         }
+
+        String elementName = sb.toString();
+        if (parent != null) {
+            int siblingsWithSameName = 0;
+            for (CobolDataItem child : parent.getCobolChildren()) {
+                if (child.getCobolName().equals(cobolDataItem.getCobolName())) {
+                    siblingsWithSameName++;
+                }
+            }
+            if (siblingsWithSameName > 1) {
+                elementName += order;
+            }
+        }
+
+        return elementName;
+    }
+
+    /**
+     * Turn a COBOL name to a unique XSD type name.
+     * <p/>
+     * Complex type names customarily start with an uppercase character.
+     * <p/>
+     * The proposed name might be conflicting with another so we disambiguate
+     * xsd type names with one of 2 options:
+     * <ul>
+     * <li>Appending the COBOL source line number (compatible with
+     * legstar-schemagen)</li>
+     * <li>Appending the parent XSD type name</li>
+     * </ul>
+     * 
+     * @param cobolDataItem the COBOL data item
+     * @param elementName the element name built from the COBOL name
+     * @param nonUniqueCobolNames a list of non unique COBOL names
+     * @param model the translator options
+     * @param parent used to resolve potential name conflict
+     * @param order order within parent to disambiguate siblings
+     * @return a nice XML type name
+     */
+    public static String formatTypeName(final String elementName,
+            final CobolDataItem cobolDataItem,
+            final List < String > nonUniqueCobolNames,
+            final Cob2XsdModel model, final XsdDataItem parent, final int order) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(Character.toUpperCase(elementName.charAt(0)));
+        sb.append(elementName.substring(1));
+        if (nonUniqueCobolNames.contains(cobolDataItem.getCobolName())) {
+            if (model.nameConflictPrependParentName()) {
+                if (parent != null) {
+                    sb.insert(0, parent.getXsdTypeName());
+                }
+            } else {
+                sb.append(cobolDataItem.getSrceLine());
+            }
+        }
+
         return sb.toString();
     }
 
@@ -1118,6 +1144,13 @@ public class XsdDataItem {
         default:
             return false;
         }
+    }
+
+    /**
+     * @return the ordered list of direct COBOL children
+     */
+    public List < CobolDataItem > getCobolChildren() {
+        return _cobolDataItem.getChildren();
     }
 
     /**

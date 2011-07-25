@@ -58,9 +58,7 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
      *            simplicity)
      * @param dataItem the COBOL data item
      */
-    public void emitAndCheck(
-            final String expected,
-            final CobolDataItem dataItem) {
+    public void emitAndCheck(final String expected, final CobolDataItem dataItem) {
         emitAndCheck(expected, dataItem, false, false);
     }
 
@@ -72,10 +70,8 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
      * @param dataItem the COBOL data item
      * @param withLegStarAnnotations true if LegStar annotations are to be added
      */
-    public void emitAndCheck(
-            final String expected,
-            final CobolDataItem dataItem,
-            final boolean withLegStarAnnotations) {
+    public void emitAndCheck(final String expected,
+            final CobolDataItem dataItem, final boolean withLegStarAnnotations) {
         emitAndCheck(expected, dataItem, withLegStarAnnotations, false);
     }
 
@@ -89,10 +85,8 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
      * @param mapConditionsToFacets true if facets must be generated for
      *            conditions
      */
-    public void emitAndCheck(
-            final String expected,
-            final CobolDataItem dataItem,
-            final boolean withLegStarAnnotations,
+    public void emitAndCheck(final String expected,
+            final CobolDataItem dataItem, final boolean withLegStarAnnotations,
             final boolean mapConditionsToFacets) {
         Cob2XsdModel model = new Cob2XsdModel();
         if (withLegStarAnnotations) {
@@ -101,7 +95,7 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
         model.setMapConditionsToFacets(mapConditionsToFacets);
         XmlSchema xsd = getXmlSchema();
         XsdEmitter emitter = new XsdEmitter(xsd, model);
-        XsdDataItem xsdDataItem = new XsdDataItem(dataItem, model, null,
+        XsdDataItem xsdDataItem = new XsdDataItem(dataItem, model, null, 0,
                 new ArrayList < String >(), _errorHandler);
         emitter.createXmlSchemaType(xsdDataItem);
         check(expected, xsd, withLegStarAnnotations);
@@ -125,9 +119,7 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
      * @param xsd the XML schema result
      * @param withLegStarAnnotations true if LegStar annotations are to be added
      */
-    public void check(
-            final String expected,
-            final XmlSchema xsd,
+    public void check(final String expected, final XmlSchema xsd,
             final boolean withLegStarAnnotations) {
         if (_log.isDebugEnabled()) {
             StringWriter writer = new StringWriter();
@@ -152,8 +144,7 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
      * @return a DOM document
      * @throws Exception if something goes wrong
      */
-    public Document getExpectedXMLSchema(
-            final String expected,
+    public Document getExpectedXMLSchema(final String expected,
             final boolean withLegStarAnnotations) throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append("<schema xmlns=\"http://www.w3.org/2001/XMLSchema\""
@@ -162,15 +153,13 @@ public class AbstractXsdEmitterTester extends XMLTestCase {
                 + " elementFormDefault=\"qualified\""
                 + " targetNamespace=\"http://legstar.com/test\"");
         if (withLegStarAnnotations) {
-            sb
-                    .append(" xmlns:cb=\"http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd\"");
+            sb.append(" xmlns:cb=\"http://www.legsem.com/legstar/xml/cobol-binding-1.0.1.xsd\"");
         }
         sb.append(">");
         sb.append(expected);
         sb.append("</schema>");
         InputSource is = new InputSource();
-        is.setCharacterStream(
-                new StringReader(sb.toString()));
+        is.setCharacterStream(new StringReader(sb.toString()));
         return _docBuilder.parse(is);
     }
 
