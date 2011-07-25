@@ -23,9 +23,9 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 
 import com.legstar.antlr.RecognizerException;
+import com.legstar.cob2xsd.Cob2XsdIO;
 import com.legstar.cob2xsd.Cob2XsdModel;
 import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
-import com.legstar.cob2xsd.CobolStructureToXsd;
 import com.legstar.cob2xsd.XsdGenerationException;
 
 /**
@@ -61,6 +61,12 @@ public class CobolStructureToXsdTask extends Task {
      */
     private File _target;
 
+    /**
+     * With this option turned on, the target namespace from the model will be
+     * appended the input file base file name.
+     */
+    private boolean _appendBaseFileNameToNamespace;
+
     /** Set of translation options to use. */
     private Cob2XsdModel _model = new Cob2XsdModel();
 
@@ -71,8 +77,9 @@ public class CobolStructureToXsdTask extends Task {
         _log.info("Started translation from COBOL to XML Schema");
 
         checkParameters();
-        _log.info("Taking COBOL from    : " + _fileSets);
-        _log.info("Output XML Schema to : " + getTarget());
+        _log.info("Taking COBOL from     : " + _fileSets);
+        _log.info("Output XML Schema to  : " + getTarget());
+        _log.info("Append base file name : " + _appendBaseFileNameToNamespace);
         _log.info(getModel().toString());
 
         try {
@@ -102,6 +109,8 @@ public class CobolStructureToXsdTask extends Task {
 
     /**
      * Translates a single COBOL source file.
+     * <p/>
+     * When requested the file base name is appended to the target namespace.
      * 
      * @param cobolFile COBOL source file
      * @param target target file or folder
@@ -110,13 +119,10 @@ public class CobolStructureToXsdTask extends Task {
      */
     protected void translate(final File cobolFile, final File target)
             throws RecognizerException, XsdGenerationException {
-        CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getModel());
-        _log.info("Translation started for: " + cobolFile);
-        File xmlSchemaFile = cob2xsd.translate(cobolFile, target);
-        for (String errorMessage : cob2xsd.getErrorHistory()) {
-            _log.warn(errorMessage);
-        }
-        _log.info("Result XML Schema is   : " + xmlSchemaFile);
+
+        Cob2XsdIO cob2XsdIO = new Cob2XsdIO(getModel());
+        cob2XsdIO.translate(cobolFile, target,
+                isAppendBaseFileNameToNamespace());
     }
 
     /**
@@ -445,6 +451,23 @@ public class CobolStructureToXsdTask extends Task {
      */
     public void setTarget(final File target) {
         _target = target;
+    }
+
+    /**
+     * @return whether the target namespace from the model should be appended
+     *         the input file base file name
+     */
+    public boolean isAppendBaseFileNameToNamespace() {
+        return _appendBaseFileNameToNamespace;
+    }
+
+    /**
+     * @param whether the target namespace from the model should be appended the
+     *            input file base file name
+     */
+    public void setAppendBaseFileNameToNamespace(
+            boolean _appendBaseFileNameToNamespace) {
+        this._appendBaseFileNameToNamespace = _appendBaseFileNameToNamespace;
     }
 
 }

@@ -29,15 +29,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.legstar.antlr.RecognizerException;
+import com.legstar.cob2xsd.Cob2XsdIO;
 import com.legstar.cob2xsd.Cob2XsdModel;
-import com.legstar.cob2xsd.CobolStructureToXsd;
+import com.legstar.cob2xsd.Cob2Xsd;
 import com.legstar.cob2xsd.XsdGenerationException;
 
 /**
  * COBOL structure to XML schema executable.
  * <p/>
  * This is the main class for the executable jar. It takes options from the
- * command line and calls the {@link CobolStructureToXsd} API.
+ * command line and calls the {@link Cob2Xsd} API.
  * <p/>
  * Usage: <code>
  * java -jar legstar-cob2xsd-x.y.z-exe.jar -i&lt;input file or folder&gt; -o&lt;output folder&gt;
@@ -72,6 +73,12 @@ public class CobolStructureToXsdMain {
      * folder.
      */
     private File _output;
+
+    /**
+     * With this option turned on, the target namespace from the model will be
+     * appended the input file base file name.
+     */
+    private boolean _appendBaseFileNameToNamespace;
 
     /** Set of translation options to use. */
     private Cob2XsdModel _model;
@@ -210,6 +217,11 @@ public class CobolStructureToXsdMain {
                 "folder or file receiving the translated XML schema");
         options.addOption(output);
 
+        Option appendBaseFileNameToNamespace = new Option("a",
+                "appendBaseFileNameToNamespace", false,
+                "add input base file name to namespace");
+        options.addOption(appendBaseFileNameToNamespace);
+
         return options;
     }
 
@@ -241,6 +253,10 @@ public class CobolStructureToXsdMain {
             setOutput(line.getOptionValue("output").trim());
         }
 
+        if (line.hasOption("appendBaseFileNameToNamespace")) {
+            _appendBaseFileNameToNamespace = true;
+        }
+
         return true;
     }
 
@@ -260,6 +276,8 @@ public class CobolStructureToXsdMain {
             _log.info("Taking COBOL from      : " + input);
             _log.info("Output XML Schema to   : " + target);
             _log.info("Options in effect      : " + getModel().toString());
+            _log.info("Append base file name  : "
+                    + _appendBaseFileNameToNamespace);
 
             if (input.isFile()) {
                 if (FilenameUtils.getExtension(target.getPath()).length() == 0) {
@@ -291,15 +309,9 @@ public class CobolStructureToXsdMain {
     protected void translate(final File cobolFile, final File target)
             throws XsdGenerationException {
         try {
-            _log.info("Translation started for: " + cobolFile);
-
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(getModel());
-            File xmlSchemaFile = cob2xsd.translate(cobolFile, target);
-            for (String errorMessage : cob2xsd.getErrorHistory()) {
-                _log.warn(errorMessage);
-            }
-
-            _log.info("Result XML Schema is   : " + xmlSchemaFile);
+            Cob2XsdIO cob2XsdIO = new Cob2XsdIO(getModel());
+            cob2XsdIO.translate(cobolFile, target,
+                    _appendBaseFileNameToNamespace);
         } catch (RecognizerException e) {
             throw new XsdGenerationException(e);
         }

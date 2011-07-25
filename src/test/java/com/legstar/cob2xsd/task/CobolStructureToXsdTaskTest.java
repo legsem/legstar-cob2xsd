@@ -22,6 +22,7 @@ import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.BuildLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
+import org.apache.tools.ant.types.FileSet;
 import org.w3c.dom.Document;
 
 import com.legstar.cob2xsd.AbstractXsdTester;
@@ -80,6 +81,40 @@ public class CobolStructureToXsdTaskTest extends AbstractXsdTester {
         Document expected = getXMLSchemaAsDoc(new File(XSD_SAMPLES_DIR, _model
                 .getTargetXsdFileName().toLowerCase()));
         compare(xsdFile.getName(), expected, result);
+    }
+
+    /**
+     * Generate an ant script with append base file name option and run it to
+     * produce an XML Schema.
+     * 
+     * @throws Exception if ant cannot be generated
+     */
+    public void testBuildCob2XsdWithAppendBaseFileNameOption() throws Exception {
+
+        final Project project = new Project();
+        project.addBuildListener(new TestLogger());
+        project.setCoreLoader(this.getClass().getClassLoader());
+        project.init();
+        CobolStructureToXsdTask task = new CobolStructureToXsdTask();
+        task.setProject(project);
+        FileSet fileset = task.createFileset();
+        fileset.setProject(project);
+        fileset.setFile(new File(COBOL_SAMPLES_DIR + "/LSFILEAE"));
+        File targetXsdFile = new File(GEN_XSD_DIR, "lsfileae.xsd");
+        task.setTarget(targetXsdFile);
+        task.setTargetNamespace("http://legstar.com/test/coxb");
+        task.setAppendBaseFileNameToNamespace(true);
+        task.setAddLegStarAnnotations(true);
+        /* Backward compatibility */
+        task.setElementNamesStartWithUppercase(true);
+        task.setQuoteIsQuote(false);
+
+        task.execute();
+
+        Document result = getXMLSchemaAsDoc(targetXsdFile);
+        Document expected = getXMLSchemaAsDoc(new File(XSD_SAMPLES_DIR,
+                targetXsdFile.getName()));
+        compare(targetXsdFile.getName(), expected, result);
     }
 
     /**

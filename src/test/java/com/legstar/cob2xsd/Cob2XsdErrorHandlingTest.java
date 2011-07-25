@@ -18,7 +18,7 @@ import com.legstar.antlr.RecognizerException;
  * Check how various types of errors are handled at the API level.
  * 
  */
-public class CobolStructureToXsdErrorHandlingTest extends TestCase {
+public class Cob2XsdErrorHandlingTest extends TestCase {
 
     /**
      * Cleaning might get errors.
@@ -26,8 +26,8 @@ public class CobolStructureToXsdErrorHandlingTest extends TestCase {
     public void testCleanerErrors() {
         try {
             Cob2XsdModel model = new Cob2XsdModel();
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
-            cob2xsd.translate("^ù@");
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
+            cob2xsd.translate("^ï¿½@");
         } catch (XsdGenerationException e) {
             fail();
         } catch (RecognizerException e) {
@@ -43,8 +43,8 @@ public class CobolStructureToXsdErrorHandlingTest extends TestCase {
     public void testLexerErrors() {
         try {
             Cob2XsdModel model = new Cob2XsdModel();
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
-            cob2xsd.translate("       1 ^ù@.");
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
+            cob2xsd.translate("       1 ^ï¿½@.");
             assertEquals("line 1:12 Syntax error in last COBOL clause", cob2xsd
                     .getErrorHistory().get(0));
         } catch (XsdGenerationException e) {
@@ -60,7 +60,7 @@ public class CobolStructureToXsdErrorHandlingTest extends TestCase {
     public void testParserUnwantedTokenException() {
         try {
             Cob2XsdModel model = new Cob2XsdModel();
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             cob2xsd.translate("       01 01.");
         } catch (XsdGenerationException e) {
             fail();
@@ -78,7 +78,7 @@ public class CobolStructureToXsdErrorHandlingTest extends TestCase {
     public void testParserMismatchedTokenException() {
         try {
             Cob2XsdModel model = new Cob2XsdModel();
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             cob2xsd.translate("       88 A PIC X.");
         } catch (XsdGenerationException e) {
             fail();
@@ -96,7 +96,7 @@ public class CobolStructureToXsdErrorHandlingTest extends TestCase {
     public void testParserMismatchedTokenExceptionEOF() {
         try {
             Cob2XsdModel model = new Cob2XsdModel();
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             cob2xsd.translate("       01 A PIC X");
         } catch (XsdGenerationException e) {
             fail();
@@ -114,7 +114,7 @@ public class CobolStructureToXsdErrorHandlingTest extends TestCase {
     public void testParserEarlyExitException() {
         try {
             Cob2XsdModel model = new Cob2XsdModel();
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             cob2xsd.translate("       01 A PIC.");
         } catch (XsdGenerationException e) {
             fail();

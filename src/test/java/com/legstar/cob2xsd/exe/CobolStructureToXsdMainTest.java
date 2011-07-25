@@ -15,6 +15,7 @@ import java.io.File;
 import junit.framework.TestCase;
 
 import org.apache.commons.cli.Options;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Test the executable jar.
@@ -85,11 +86,30 @@ public class CobolStructureToXsdMainTest extends TestCase {
     public void testConfigurationArgument() {
         CobolStructureToXsdMain main = new CobolStructureToXsdMain();
         try {
-            main.execute(new String[] { "-p",
+            main.execute(new String[] { "-c",
                     "src/main/resources/conf/cob2xsd.properties", "-i",
                     "src/test/resources/cobol/LSFILEAE", "-o",
                     "target/gen/myfile.xsd" });
             assertTrue(new File("target/gen/myfile.xsd").exists());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Test with append base file name option.
+     */
+    public void testAppendBaseFileNameToNamespace() {
+        CobolStructureToXsdMain main = new CobolStructureToXsdMain();
+        try {
+            main.execute(new String[] { "-c",
+                    "src/main/resources/conf/cob2xsd.properties", "-i",
+                    "src/test/resources/cobol/LSFILEAE", "-o",
+                    "target/gen/myfile.xsd", "-a" });
+            File result = new File("target/gen/myfile.xsd");
+            assertTrue(result.exists());
+            assertTrue(FileUtils.readFileToString(result).contains(
+                    "xmlns:tns=\"http://legstar.com/test/coxb/lsfileae\""));
         } catch (Exception e) {
             fail(e.getMessage());
         }

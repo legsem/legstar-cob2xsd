@@ -17,7 +17,7 @@ import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
  * These tests check that the XML Schemas that we generate are validating.
  * 
  */
-public class CobolStructureToXsdValidationTest extends AbstractXsdTester {
+public class Cob2XsdValidationTest extends AbstractXsdTester {
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
@@ -76,7 +76,7 @@ public class CobolStructureToXsdValidationTest extends AbstractXsdTester {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setCodeFormat(CodeFormat.FREE_FORMAT);
             model.setTargetNamespace(targetNamespace);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd.translate(COBOL_SOURCE);
 
             // First make sure the XML Schema itself is valid XML

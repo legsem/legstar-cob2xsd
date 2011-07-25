@@ -10,30 +10,23 @@
  ******************************************************************************/
 package com.legstar.cob2xsd;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 
 import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
 
 /**
  * Additional tests for CobolStructureToXsd. These are kept outside
- * {@link CobolStructureToXsdTest} to keep things simple.
+ * {@link Cob2XsdIOTest} to keep things simple.
  * 
  */
-public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
+public class Cob2XsdSpecialTest extends AbstractXsdTester {
 
     /**
      * Check input file validation.
      */
     public void testInputFileValidation() {
         try {
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd();
+            Cob2Xsd cob2xsd = new Cob2Xsd();
             cob2xsd.checkCobolSourceFile(null);
             fail();
         } catch (Exception e) {
@@ -42,7 +35,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
                     e.toString());
         }
         try {
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd();
+            Cob2Xsd cob2xsd = new Cob2Xsd();
             cob2xsd.checkCobolSourceFile(new File("toto"));
             fail();
         } catch (Exception e) {
@@ -57,7 +50,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
      */
     public void testOutputFileValidation() {
         try {
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd();
+            Cob2Xsd cob2xsd = new Cob2Xsd();
             cob2xsd.checkTarget(null);
             fail();
         } catch (Exception e) {
@@ -66,7 +59,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
                     e.toString());
         }
         try {
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd();
+            Cob2Xsd cob2xsd = new Cob2Xsd();
             cob2xsd.checkTarget(new File("toto"));
             fail();
         } catch (Exception e) {
@@ -74,7 +67,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
                     e.toString());
         }
         try {
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd();
+            Cob2Xsd cob2xsd = new Cob2Xsd();
             cob2xsd.checkTarget(new File("toto.xsd"));
         } catch (Exception e) {
             fail(e.toString());
@@ -88,7 +81,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
         try {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setTargetNamespace("http://www.mycompany.com/test");
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd
                     .translate("       01 A.\n           02 B PIC X.");
             compare("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
@@ -123,7 +116,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setTargetNamespace("http://www.mycompany.com/test");
             model.setXsdEncoding("ISO-8859-1");
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd
                     .translate("       01 A.\n           02 B PIC X.");
             compare("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>"
@@ -160,7 +153,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             model.setXsdEncoding("ISO-8859-1");
             model.setAddLegStarAnnotations(true);
             model.setCustomXsltFileName("src/test/resources/xslt/alltypes.xsl");
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd
                     .translate("       01 A.\n           02 S-BINARY PIC X.");
             compare("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>"
@@ -202,52 +195,6 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
     }
 
     /**
-     * Check that the XML Schema produced has the correct encoding from a file
-     * standpoint. Not using commons-io on purpose.
-     */
-    public void testFileOutputEncoding() {
-        BufferedReader in = null;
-        try {
-            Cob2XsdModel model = new Cob2XsdModel();
-            model.setTargetNamespace("http://www.mycompany.com/test");
-            model.setCobolSourceFileEncoding("UTF-8");
-            model.setXsdEncoding("UTF-8");
-            model.setAddLegStarAnnotations(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
-            File tempCobolFile = File.createTempFile("test", ".cob");
-            tempCobolFile.deleteOnExit();
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(tempCobolFile), "UTF8"));
-            out.write("       01 A.\n           02 B PIC G(4) VALUE '牛年快乐'.");
-            out.flush();
-            out.close();
-            File xmlSchema = cob2xsd.translate(tempCobolFile, GEN_XSD_DIR);
-            in = new BufferedReader(new InputStreamReader(new FileInputStream(
-                    xmlSchema), "UTF8"));
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (line.contains("cobolName=\"B\"")) {
-                    assertTrue(line.contains("value=\"牛年快乐\""));
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    fail();
-                }
-            }
-        }
-
-    }
-
-    /**
      * Test combinations of conditions and figurative constants.
      */
     public void testConditionsWithFigurativeConstants() {
@@ -255,7 +202,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setTargetNamespace("http://www.mycompany.com/test");
             model.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd
                     .translate("       01 DFHCOMMAREA.\n"
                             + "          05 E-FIELD-1        PIC X(5).\n"
@@ -304,7 +251,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setTargetNamespace("http://www.mycompany.com/test");
             model.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd.translate("        01  5500-REC-01.\n"
                     + "          05 5500-REC-TYPE      PIC X(01).\n"
                     + "          05 5500-PLAN-NUM      PIC X(06).");
@@ -348,7 +295,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setTargetNamespace("http://www.mycompany.com/test");
             model.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd.translate("        01  REC-01.\n"
                     + "            05 REC-TYPE      PIC X(01).\n"
                     + "        01  REC-02.\n"
@@ -400,7 +347,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setTargetNamespace("http://www.mycompany.com/test");
             model.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd.translate("        01  REC-01.\n"
                     + "            05 REC-TYPE.\n"
                     + "                10 FIELD1      PIC X(01).\n"
@@ -464,7 +411,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setTargetNamespace("http://www.mycompany.com/test");
             model.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd.translate("        01  REC-01.\n"
                     + "            05 REC-TYPE      PIC X(01).\n"
                     + "                10 FIELD1      PIC X(01).\n");
@@ -503,7 +450,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             model.setCodeFormat(CodeFormat.FREE_FORMAT);
             model.setTargetNamespace("http://www.mycompany.com/test");
             model.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd
                     .translate("*\n"
                             + "01  WS71-HEADER.\n"
@@ -556,7 +503,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setCodeFormat(CodeFormat.FREE_FORMAT);
             model.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd
                     .translate("*\n"
                             + "01  WS71-HEADER.\n"
@@ -605,7 +552,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setCodeFormat(CodeFormat.FREE_FORMAT);
             model.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd.translate("*\n" + "FD OUTPUT-FILE\n"
                     + "RECORDING MODE IS V\n" + "BLOCK CONTAINS 2 RECORDS\n"
                     + "RECORD CONTAINS 58 TO 183 CHARACTERS.\n"
@@ -641,7 +588,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
             Cob2XsdModel model = new Cob2XsdModel();
             model.setCodeFormat(CodeFormat.FREE_FORMAT);
             model.setMapConditionsToFacets(true);
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd.translate("*\n"
                     + "01  A                         COMP-3.\n"
                     + "    05  B     PIC S9(13)V99.\n");
@@ -674,7 +621,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
     public void testDateWrittenIssue() {
         try {
             Cob2XsdModel model = new Cob2XsdModel();
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd.translate("*\n"
                     + "       ID DIVISION.\n"
                     + "       DATE-WRITTEN.              04 GENNAIO 2005.\n"
@@ -709,7 +656,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
     public void testValueStringWithDelimiter() {
         try {
             Cob2XsdModel model = new Cob2XsdModel();
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd
                     .translate("*\n"
                             + "       01 A. 02  B     PIC X(56) VALUE 'CONTO N. W '.\n");
@@ -741,7 +688,7 @@ public class CobolStructureToXsdSpecialTest extends AbstractXsdTester {
     public void testMustDisambiguateSiblingsWithSameName() {
         try {
             Cob2XsdModel model = new Cob2XsdModel();
-            CobolStructureToXsd cob2xsd = new CobolStructureToXsd(model);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
             String xmlSchema = cob2xsd.translate("*\n"
                     + "       01 FILLER. 02  F PIC X. 02  F PIC X.\n");
             compare("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"

@@ -37,7 +37,6 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -92,7 +91,7 @@ import com.legstar.cobol.model.CobolDataItem;
  * {@link #getErrorHistory()}.
  * 
  */
-public class CobolStructureToXsd {
+public class Cob2Xsd {
 
     /** Execution parameters for the COBOL to XSD utility. */
     private Cob2XsdModel _model;
@@ -106,14 +105,14 @@ public class CobolStructureToXsd {
     /**
      * Default constructor.
      */
-    public CobolStructureToXsd() {
+    public Cob2Xsd() {
         this(new Cob2XsdModel());
     }
 
     /**
      * @param model execution parameters for the COBOL to XML Schema utility
      */
-    public CobolStructureToXsd(final Cob2XsdModel model) {
+    public Cob2Xsd(final Cob2XsdModel model) {
         _model = model;
     }
 
@@ -131,47 +130,6 @@ public class CobolStructureToXsd {
             debug("Translating with options:", getModel().toString());
         }
         return xsdToString(emitXsd(toModel(cobolSource)));
-    }
-
-    /**
-     * Execute the translation from COBOL to XML Schema.
-     * 
-     * @param cobolSourceFile the COBOL source code (platform encoding by
-     *            default)
-     * @param target can either be a folder where XML schema result is to be
-     *            written or a file in which case the XML schema is written
-     *            there
-     * @return the XML Schema
-     * @throws RecognizerException if COBOL recognition fails
-     * @throws XsdGenerationException if XML schema generation process fails
-     */
-    public File translate(final File cobolSourceFile, final File target)
-            throws RecognizerException, XsdGenerationException {
-        try {
-            if (_log.isDebugEnabled()) {
-                _log.debug("Translating COBOL file: " + cobolSourceFile);
-            }
-            checkCobolSourceFile(cobolSourceFile);
-            checkTarget(target);
-
-            String xsdString = translate(FileUtils.readFileToString(
-                    cobolSourceFile, getModel().getCobolSourceFileEncoding()));
-            File xsdFile = null;
-            if (target.isDirectory()) {
-                String xsdFileName = cobolSourceFile.getName() + ".xsd";
-                xsdFile = new File(target, xsdFileName);
-            } else {
-                xsdFile = target;
-            }
-            FileUtils.writeStringToFile(xsdFile, xsdString, getModel()
-                    .getXsdEncoding());
-            if (_log.isDebugEnabled()) {
-                _log.debug("Created XML schema file: " + xsdFile);
-            }
-            return xsdFile;
-        } catch (IOException e) {
-            throw (new XsdGenerationException(e));
-        }
     }
 
     /**

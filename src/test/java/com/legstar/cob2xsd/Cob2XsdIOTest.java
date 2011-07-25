@@ -10,7 +10,14 @@
  ******************************************************************************/
 package com.legstar.cob2xsd;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
@@ -21,7 +28,7 @@ import org.w3c.dom.Document;
  * Test the COBOL to XSD API.
  * 
  */
-public class CobolStructureToXsdTest extends AbstractXsdTester {
+public class Cob2XsdIOTest extends AbstractXsdTester {
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
@@ -56,8 +63,9 @@ public class CobolStructureToXsdTest extends AbstractXsdTester {
                 model.setElementNamesStartWithUppercase(true);
                 model.setQuoteIsQuote(false);
 
-                CobolStructureToXsd translator = new CobolStructureToXsd(model);
-                File xsdFile = translator.translate(cobolFile, xsdGenDir);
+                Cob2XsdIO translator = new Cob2XsdIO(model);
+                File xsdFile = translator
+                        .translate(cobolFile, xsdGenDir, false);
                 if (_log.isDebugEnabled()) {
                     _log.debug("Result:\n"
                             + FileUtils.readFileToString(xsdFile));
@@ -73,6 +81,53 @@ public class CobolStructureToXsdTest extends AbstractXsdTester {
                 }
             }
         }
+    }
+
+    /**
+     * Check that the XML Schema produced has the correct encoding from a file
+     * standpoint. Not using commons-io on purpose.
+     */
+    public void testFileOutputEncoding() {
+        BufferedReader in = null;
+        try {
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setTargetNamespace("http://www.mycompany.com/test");
+            model.setCobolSourceFileEncoding("UTF-8");
+            model.setXsdEncoding("UTF-8");
+            model.setAddLegStarAnnotations(true);
+            Cob2XsdIO cob2xsd = new Cob2XsdIO(model);
+            File tempCobolFile = File.createTempFile("test", ".cob");
+            tempCobolFile.deleteOnExit();
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(tempCobolFile), "UTF8"));
+            out.write("       01 A.\n           02 B PIC G(4) VALUE '牛年快乐'.");
+            out.flush();
+            out.close();
+            File xmlSchema = cob2xsd.translate(tempCobolFile, GEN_XSD_DIR,
+                    false);
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(
+                    xmlSchema), "UTF8"));
+            String line;
+            while ((line = in.readLine()) != null) {
+                if (line.contains("cobolName=\"B\"")) {
+                    assertTrue(line.contains("value=\"牛年快乐\""));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    fail();
+                }
+            }
+        }
+
     }
 
 }
