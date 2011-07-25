@@ -261,7 +261,7 @@
                                 <manifest>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
-                                    <mainClass>com.legstar.cob2xsd.exe.CobolStructureToXsdMain</mainClass>
+                                    <mainClass>com.legstar.cob2xsd.Cob2XsdMain</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>

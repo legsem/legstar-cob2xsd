@@ -8,7 +8,7 @@
  * Contributors:
  *     LegSem - initial API and implementation
  ******************************************************************************/
-package com.legstar.cob2xsd.task;
+package com.legstar.cob2xsd;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -25,8 +25,8 @@ import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.types.FileSet;
 import org.w3c.dom.Document;
 
-import com.legstar.cob2xsd.AbstractXsdTester;
 import com.legstar.cob2xsd.Cob2XsdModel;
+import com.legstar.cob2xsd.Cob2XsdTask;
 import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
 import com.legstar.codegen.CodeGenUtil;
 
@@ -34,7 +34,7 @@ import com.legstar.codegen.CodeGenUtil;
  * Test the generation model.
  * 
  */
-public class CobolStructureToXsdTaskTest extends AbstractXsdTester {
+public class Cob2XsdTaskTest extends AbstractXsdTester {
 
     /** The parameters set. */
     private Cob2XsdModel _model;
@@ -95,7 +95,7 @@ public class CobolStructureToXsdTaskTest extends AbstractXsdTester {
         project.addBuildListener(new TestLogger());
         project.setCoreLoader(this.getClass().getClassLoader());
         project.init();
-        CobolStructureToXsdTask task = new CobolStructureToXsdTask();
+        Cob2XsdTask task = new Cob2XsdTask();
         task.setProject(project);
         FileSet fileset = task.createFileset();
         fileset.setProject(project);

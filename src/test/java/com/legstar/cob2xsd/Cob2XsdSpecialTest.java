@@ -15,8 +15,8 @@ import java.io.File;
 import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
 
 /**
- * Additional tests for CobolStructureToXsd. These are kept outside
- * {@link Cob2XsdIOTest} to keep things simple.
+ * Additional tests for Cob2Xsd. These are kept outside {@link Cob2XsdIOTest} to
+ * keep things simple.
  * 
  */
 public class Cob2XsdSpecialTest extends AbstractXsdTester {

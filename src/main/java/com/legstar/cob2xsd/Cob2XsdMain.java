@@ -8,7 +8,7 @@
  * Contributors:
  *     LegSem - initial API and implementation
  ******************************************************************************/
-package com.legstar.cob2xsd.exe;
+package com.legstar.cob2xsd;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,10 +29,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.legstar.antlr.RecognizerException;
-import com.legstar.cob2xsd.Cob2XsdIO;
-import com.legstar.cob2xsd.Cob2XsdModel;
-import com.legstar.cob2xsd.Cob2Xsd;
-import com.legstar.cob2xsd.XsdGenerationException;
 
 /**
  * COBOL structure to XML schema executable.
@@ -45,7 +41,7 @@ import com.legstar.cob2xsd.XsdGenerationException;
  * </code>
  * 
  */
-public class CobolStructureToXsdMain {
+public class Cob2XsdMain {
 
     /** The version properties file name. */
     private static final String VERSION_FILE_NAME = "/com/legstar/cob2xsd/version.properties";
@@ -93,7 +89,7 @@ public class CobolStructureToXsdMain {
      * @param args translator options. Provides help if no arguments passed.
      */
     public static void main(final String[] args) {
-        CobolStructureToXsdMain main = new CobolStructureToXsdMain();
+        Cob2XsdMain main = new Cob2XsdMain();
         main.execute(args);
     }
 
@@ -327,7 +323,7 @@ public class CobolStructureToXsdMain {
         InputStream stream = null;
         try {
             Properties version = new Properties();
-            stream = CobolStructureToXsdMain.class
+            stream = Cob2XsdMain.class
                     .getResourceAsStream(VERSION_FILE_NAME);
             version.load(stream);
             return version.getProperty("version");

@@ -8,7 +8,7 @@
  * Contributors:
  *     LegSem - initial API and implementation
  ******************************************************************************/
-package com.legstar.cob2xsd.exe;
+package com.legstar.cob2xsd;
 
 import java.io.File;
 
@@ -17,18 +17,20 @@ import junit.framework.TestCase;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 
+import com.legstar.cob2xsd.Cob2XsdMain;
+
 /**
  * Test the executable jar.
  * 
  */
-public class CobolStructureToXsdMainTest extends TestCase {
+public class Cob2XsdMainTest extends TestCase {
 
     /**
      * Test without arguments.
      */
     public void testNoArgument() {
         try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
+            Cob2XsdMain main = new Cob2XsdMain();
             Options options = main.createOptions();
             assertTrue(main.collectOptions(options, null));
         } catch (Exception e) {
@@ -41,7 +43,7 @@ public class CobolStructureToXsdMainTest extends TestCase {
      */
     public void testHelpArgument() {
         try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
+            Cob2XsdMain main = new Cob2XsdMain();
             Options options = main.createOptions();
             assertFalse(main.collectOptions(options, new String[] { "-h" }));
         } catch (Exception e) {
@@ -54,7 +56,7 @@ public class CobolStructureToXsdMainTest extends TestCase {
      */
     public void testWrongInputArgument() {
         try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
+            Cob2XsdMain main = new Cob2XsdMain();
             Options options = main.createOptions();
             main.collectOptions(options, new String[] { "-i nope" });
             fail();
@@ -70,7 +72,7 @@ public class CobolStructureToXsdMainTest extends TestCase {
      */
     public void testUnsupportedArgument() {
         try {
-            CobolStructureToXsdMain main = new CobolStructureToXsdMain();
+            Cob2XsdMain main = new Cob2XsdMain();
             Options options = main.createOptions();
             main.collectOptions(options, new String[] { "- #" });
         } catch (Exception e) {
@@ -84,7 +86,7 @@ public class CobolStructureToXsdMainTest extends TestCase {
      * Test with configuration argument.
      */
     public void testConfigurationArgument() {
-        CobolStructureToXsdMain main = new CobolStructureToXsdMain();
+        Cob2XsdMain main = new Cob2XsdMain();
         try {
             main.execute(new String[] { "-c",
                     "src/main/resources/conf/cob2xsd.properties", "-i",
@@ -100,7 +102,7 @@ public class CobolStructureToXsdMainTest extends TestCase {
      * Test with append base file name option.
      */
     public void testAppendBaseFileNameToNamespace() {
-        CobolStructureToXsdMain main = new CobolStructureToXsdMain();
+        Cob2XsdMain main = new Cob2XsdMain();
         try {
             main.execute(new String[] { "-c",
                     "src/main/resources/conf/cob2xsd.properties", "-i",

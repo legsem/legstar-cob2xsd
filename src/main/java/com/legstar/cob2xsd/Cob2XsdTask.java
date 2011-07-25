@@ -8,7 +8,7 @@
  * Contributors:
  *     LegSem - initial API and implementation
  ******************************************************************************/
-package com.legstar.cob2xsd.task;
+package com.legstar.cob2xsd;
 
 import java.io.File;
 import java.util.Iterator;
@@ -23,17 +23,14 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 
 import com.legstar.antlr.RecognizerException;
-import com.legstar.cob2xsd.Cob2XsdIO;
-import com.legstar.cob2xsd.Cob2XsdModel;
 import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
-import com.legstar.cob2xsd.XsdGenerationException;
 
 /**
  * COBOL Structure to XSD ANT Task. <code>
  * Usage:<br>
  * 
  * &lt;project ...&gt;<br>
- *   &lt;taskdef name="cob2xsd" classname="com.legstar.cob2xsd.task.CobolStructureToXsdTask" /&gt;<br>
+ *   &lt;taskdef name="cob2xsd" classname="com.legstar.cob2xsd.Cob2XsdTask" /&gt;<br>
  *   &lt;property name="cobol.dir" value="../cobol"/&gt;<br>
  *   &lt;property name="xsd.dir" value="../xsd"/&gt;<br>
  *   &lt;target name="generate"&gt;<br>
@@ -47,7 +44,7 @@ import com.legstar.cob2xsd.XsdGenerationException;
  * </code>
  * 
  */
-public class CobolStructureToXsdTask extends Task {
+public class Cob2XsdTask extends Task {
 
     /** Logger. */
     private final Log _log = LogFactory.getLog(getClass());
