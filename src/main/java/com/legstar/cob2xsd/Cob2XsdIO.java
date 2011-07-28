@@ -50,10 +50,9 @@ public class Cob2XsdIO extends Cob2Xsd {
             if (appendBaseFileNameToNamespace) {
                 String baseName = FilenameUtils.getBaseName(
                         cobolFile.getAbsolutePath()).toLowerCase();
-                if (getModel().getTargetNamespace() != null) {
-                    getModel().setTargetNamespace(
-                            getModel().getTargetNamespace() + "/" + baseName);
-                }
+                getModel().setTargetNamespace(
+                        getUniqueTargetNamespace(baseName, getModel()
+                                .getTargetNamespace()));
 
             }
 
@@ -75,6 +74,29 @@ public class Cob2XsdIO extends Cob2Xsd {
         } catch (IOException e) {
             throw (new XsdGenerationException(e));
         }
+    }
+
+    /**
+     * TargetNamespace, if it is not null, is completed with the baseName.
+     * 
+     * @param baseName A name, derived from the COBOL file name, that can be
+     *            used to identify generated artifacts
+     * @param targetNamespacePrefix the namespace prefix
+     * @return the previous value of the model targetNamespace field
+     */
+    protected static String getUniqueTargetNamespace(final String baseName,
+            final String targetNamespacePrefix) {
+
+        if (targetNamespacePrefix != null && targetNamespacePrefix.length() > 0
+                && !targetNamespacePrefix.endsWith(baseName)) {
+            if (targetNamespacePrefix
+                    .charAt(targetNamespacePrefix.length() - 1) == '/') {
+                return targetNamespacePrefix + baseName;
+            } else {
+                return targetNamespacePrefix + '/' + baseName;
+            }
+        }
+        return targetNamespacePrefix;
     }
 
 }
