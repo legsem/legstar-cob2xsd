@@ -18,8 +18,7 @@ import junit.framework.TestCase;
 import com.legstar.cob2xsd.XsdDataItem.XsdType;
 import com.legstar.cobol.RecognizerErrorHandler;
 import com.legstar.cobol.model.CobolDataItem;
-import com.legstar.cobol.model.CobolDataItem.DataEntryType;
-import com.legstar.cobol.model.CobolDataItem.Usage;
+import com.legstar.coxb.CobolUsage.Usage;
 
 /**
  * Test the XSD mapping of elementary COBOL data items.
@@ -443,7 +442,7 @@ public class XsdDataItemTest extends TestCase {
      */
     public void testRenames() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-RENAME");
-        dataItem.setDataEntryType(DataEntryType.RENAMES);
+        dataItem.setLevelNumber(66);
 
         XsdDataItem xsdDataItem = new XsdDataItem(dataItem, _model, null, 0,
                 new ArrayList < String >(), _errorHandler);
@@ -456,7 +455,7 @@ public class XsdDataItemTest extends TestCase {
      */
     public void testCondition() {
         CobolDataItem dataItem = new CobolDataItem("COBOL-CONDITION");
-        dataItem.setDataEntryType(DataEntryType.CONDITION);
+        dataItem.setLevelNumber(88);
 
         XsdDataItem xsdDataItem = new XsdDataItem(dataItem, _model, null, 0,
                 new ArrayList < String >(), _errorHandler);

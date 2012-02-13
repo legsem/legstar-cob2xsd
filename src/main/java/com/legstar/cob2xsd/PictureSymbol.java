@@ -8,7 +8,7 @@
  * Contributors:
  *     LegSem - initial API and implementation
  ******************************************************************************/
-package com.legstar.cobol.model;
+package com.legstar.cob2xsd;
 
 /**
  * A picture symbol occurs a number of times in a picture string.

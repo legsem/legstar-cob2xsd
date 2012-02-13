@@ -17,7 +17,7 @@ import org.apache.ws.commons.schema.XmlSchemaAnnotation;
 
 import com.legstar.cobol.RecognizerErrorHandler;
 import com.legstar.cobol.model.CobolDataItem;
-import com.legstar.cobol.model.CobolDataItem.Usage;
+import com.legstar.coxb.CobolUsage.Usage;
 
 /**
  * Test the XSD annotations produced.

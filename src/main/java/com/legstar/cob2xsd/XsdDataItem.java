@@ -21,9 +21,9 @@ import com.legstar.cobol.RecognizerErrorHandler;
 import com.legstar.cobol.model.CobolDataItem;
 import com.legstar.cobol.model.CobolDataItem.DataEntryType;
 import com.legstar.cobol.model.CobolDataItem.Range;
-import com.legstar.cobol.model.CobolDataItem.Usage;
 import com.legstar.cobol.utils.PictureUtil;
 import com.legstar.coxb.CobolType;
+import com.legstar.coxb.CobolUsage.Usage;
 
 /**
  * XML Schema attributes derived from a COBOL data item.

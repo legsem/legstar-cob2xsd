@@ -23,9 +23,8 @@ options {
 @header {
 package com.legstar.cobol;
 import com.legstar.cobol.model.CobolDataItem;
-import com.legstar.cobol.model.CobolDataItem.DataEntryType;
 import com.legstar.cobol.model.CobolDataItem.Range;
-import com.legstar.cobol.model.CobolDataItem.Usage;
+import com.legstar.coxb.CobolUsage.Usage;
 }
 
 /*------------------------------------------------------------------
@@ -56,7 +55,6 @@ scope {
  *------------------------------------------------------------------*/
 data_description_entry
     :   ^(DATA_ITEM data_item_level data_item_name? clauses* (data_entry[$data_entry::dataEntry.getChildren()])*)
-        {$data_entry::dataEntry.setDataEntryType(DataEntryType.DATA_DESCRIPTION);}
     ;
     
 data_item_level
@@ -74,7 +72,6 @@ data_item_name
  *------------------------------------------------------------------*/
 rename_description_entry
     :   ^(RENAME rename_level data_item_name (rename_subject_literal | rename_subject_range))
-        {$data_entry::dataEntry.setDataEntryType(DataEntryType.RENAMES);}
     ; 
     
 rename_level
@@ -97,7 +94,6 @@ rename_subject_range
  *------------------------------------------------------------------*/
 condition_description_entry
     :   ^(CONDITION condition_level data_item_name (condition_subject_literal | condition_subject_range)+)
-        {$data_entry::dataEntry.setDataEntryType(DataEntryType.CONDITION);}
     ; 
 
 condition_level

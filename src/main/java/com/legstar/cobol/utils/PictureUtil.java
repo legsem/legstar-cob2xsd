@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.legstar.cobol.model.PictureSymbol;
+import com.legstar.cob2xsd.PictureSymbol;
 
 /**
  * Utility class provides methods to introspect COBOL picture clauses.
@@ -34,7 +34,7 @@ public final class PictureUtil {
      * Determines how many times a given character occurs in a picture string.
      * A character can appear standalone or as a factored sequence like X(nn).
      * Unlike all other picture symbols, currency symbols are case sensitive.
-     * For example, ’D’ and ’d’ specify different currency symbols.
+     * For example, ï¿½Dï¿½ and ï¿½dï¿½ specify different currency symbols.
      * @param picture the picture string
      * @param currencySymbol the currency symbol
      * @return a map of all characters to search for

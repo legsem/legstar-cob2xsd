@@ -18,7 +18,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <legstarCoreVersion>1.5.4</legstarCoreVersion>
+        <legstarCoreVersion>1.5.7-SNAPSHOT</legstarCoreVersion>
         <antlrVersion>3.2</antlrVersion>
         <antInternalVersion>1.7.0</antInternalVersion> <!-- Used for legstar builds and tests -->
         <antVersion>1.6.5</antVersion>  <!-- Expected to be provided at runtime -->
@@ -415,6 +415,24 @@
             <groupId>com.legsem.legstar</groupId>
             <artifactId>legstar-coxbapi</artifactId>
             <version>${legstarCoreVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jackson-core-asl</artifactId>
+                    <groupId>org.codehaus.jackson</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-xc</artifactId>
+                    <groupId>org.codehaus.jackson</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-mapper-asl</artifactId>
+                    <groupId>org.codehaus.jackson</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jaxb-api</artifactId>
+                    <groupId>javax.xml.bind</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- LegStar Code Generation API -->

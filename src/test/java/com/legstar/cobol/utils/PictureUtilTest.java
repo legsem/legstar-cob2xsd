@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.legstar.cobol.model.PictureSymbol;
+import com.legstar.cob2xsd.PictureSymbol;
 
 import junit.framework.TestCase;
 
