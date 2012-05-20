@@ -58,6 +58,7 @@
 #end
             nameConflictPrependParentName="${antModel.nameConflictPrependParentName()}"
             elementNamesStartWithUppercase="${antModel.elementNamesStartWithUppercase()}"
+            ignoreOrphanPrimitiveElements="${antModel.ignoreOrphanPrimitiveElements()}"
 
 ## -------------------------------------------------------------------
 ## LegStar annotations related options

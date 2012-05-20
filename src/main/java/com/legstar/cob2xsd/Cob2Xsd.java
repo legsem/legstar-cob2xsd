@@ -310,11 +310,13 @@ public class Cob2Xsd {
         List < String > nonUniqueCobolNames = getNonUniqueCobolNames(cobolDataItems);
         XsdEmitter emitter = new XsdEmitter(xsd, getModel());
         for (CobolDataItem cobolDataItem : cobolDataItems) {
-            if (cobolDataItem.getChildren().size() > 0) {
-                XsdDataItem xsdDataItem = new XsdDataItem(cobolDataItem,
-                        getModel(), null, 0, nonUniqueCobolNames, _errorHandler);
-                xsd.getItems().add(emitter.createXmlSchemaElement(xsdDataItem));
+            if (getModel().ignoreOrphanPrimitiveElements()
+                    && cobolDataItem.getChildren().size() == 0) {
+                continue;
             }
+            XsdDataItem xsdDataItem = new XsdDataItem(cobolDataItem,
+                    getModel(), null, 0, nonUniqueCobolNames, _errorHandler);
+            xsd.getItems().add(emitter.createXmlSchemaElement(xsdDataItem));
         }
         return xsd;
     }

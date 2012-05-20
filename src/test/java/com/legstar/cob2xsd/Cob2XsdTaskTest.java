@@ -25,8 +25,6 @@ import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.types.FileSet;
 import org.w3c.dom.Document;
 
-import com.legstar.cob2xsd.Cob2XsdModel;
-import com.legstar.cob2xsd.Cob2XsdTask;
 import com.legstar.cob2xsd.Cob2XsdModel.CodeFormat;
 import com.legstar.codegen.CodeGenUtil;
 
@@ -160,12 +158,14 @@ public class Cob2XsdTaskTest extends AbstractXsdTester {
         _model.setMapConditionsToFacets(true);
         _model.setNameConflictPrependParentName(true);
         _model.setElementNamesStartWithUppercase(true);
+        _model.setIgnoreOrphanPrimitiveElements(false);
         result = genAntScriptAsString();
         assertTrue(result.contains("xsdEncoding=\"ISO-8859-1\""));
         assertTrue(result.contains("targetNamespace=\"test/targetNamespace\""));
         assertTrue(result.contains("mapConditionsToFacets=\"true\""));
         assertTrue(result.contains("nameConflictPrependParentName=\"true\""));
         assertTrue(result.contains("elementNamesStartWithUppercase=\"true\""));
+        assertTrue(result.contains("ignoreOrphanPrimitiveElements=\"false\""));
 
         _model.setCustomXsltFileName("src/test/resources/xslt/alltypes.xsl");
         result = genAntScriptAsString();

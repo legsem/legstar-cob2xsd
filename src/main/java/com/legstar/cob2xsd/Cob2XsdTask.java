@@ -321,6 +321,27 @@ public class Cob2XsdTask extends Task {
                 elementNamesStartWithUppercase);
     }
 
+    /**
+     * Ignore primitive data items which are not attached to a parent group.
+     * 
+     * @return true if primitive data items without a parent group are ignored
+     */
+    public boolean ignoreOrphanPrimitiveElements() {
+        return getModel().ignoreOrphanPrimitiveElements();
+    }
+
+    /**
+     * Ignore primitive data items which are not attached to a parent group.
+     * 
+     * @param ignoreOrphanPrimitiveElements set to true to ignore primitive data
+     *            items without a parent group item
+     */
+    public void setIgnoreOrphanPrimitiveElements(
+            boolean ignoreOrphanPrimitiveElements) {
+        getModel().setIgnoreOrphanPrimitiveElements(
+                ignoreOrphanPrimitiveElements);
+    }
+
     /*
      * -------------------------------------------------------------------
      * LegStar annotations related options

@@ -108,6 +108,9 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
     /** True if XSD element names should start with an uppercase. */
     public static final String ELEMENT_NAMES_START_WITH_UPPERCASE = "elementNamesStartWithUppercase";
 
+    /** True if we should ignore primitive data items without a parent group. */
+    public static final String IGNORE_ORPHAN_PRIMITIVE_ELEMENTS = "ignoreOrphanPrimitiveElements";
+
     /** An optional XSLT transform for XML schema customization. */
     public static final String CUSTOM_XSLT_FILENAME = "customXsltFileName";
 
@@ -185,6 +188,11 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
     /** An optional XSLT transform for XML schema customization. */
     private String _customXsltFileName;
 
+    /**
+     * Ignore primitive data items which are not attached to a parent group.
+     */
+    private boolean _ignoreOrphanPrimitiveElements = true;
+
     /*
      * ----------------------------------------------------------------------
      * LegStar annotations related options
@@ -255,6 +263,8 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
                 NAME_CONFLICT_PREPEND_PARENT_NAME, false));
         setElementNamesStartWithUppercase(getBoolean(props,
                 ELEMENT_NAMES_START_WITH_UPPERCASE, false));
+        setIgnoreOrphanPrimitiveElements(getBoolean(props,
+                IGNORE_ORPHAN_PRIMITIVE_ELEMENTS, true));
         setCustomXsltFileName(getString(props, CUSTOM_XSLT_FILENAME, null));
         setAddLegStarAnnotations(getBoolean(props, ADD_LEGSTAR_ANNOTATIONS,
                 false));
@@ -503,6 +513,26 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
         _elementNamesStartWithUppercase = elementNamesStartWithUppercase;
     }
 
+    /**
+     * Ignore primitive data items which are not attached to a parent group.
+     * 
+     * @return true if primitive data items without a parent group are ignored
+     */
+    public boolean ignoreOrphanPrimitiveElements() {
+        return _ignoreOrphanPrimitiveElements;
+    }
+
+    /**
+     * Ignore primitive data items which are not attached to a parent group.
+     * 
+     * @param ignoreOrphanPrimitiveElements set to true to ignore primitive data
+     *            items without a parent group item
+     */
+    public void setIgnoreOrphanPrimitiveElements(
+            boolean ignoreOrphanPrimitiveElements) {
+        _ignoreOrphanPrimitiveElements = ignoreOrphanPrimitiveElements;
+    }
+
     /*
      * -------------------------------------------------------------------
      * LegStar annotations related options
@@ -652,6 +682,8 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
                 nameConflictPrependParentName());
         putBoolean(props, ELEMENT_NAMES_START_WITH_UPPERCASE,
                 elementNamesStartWithUppercase());
+        putBoolean(props, IGNORE_ORPHAN_PRIMITIVE_ELEMENTS,
+                ignoreOrphanPrimitiveElements());
         if (getCustomXsltFileName() != null) {
             putString(props, CUSTOM_XSLT_FILENAME, getCustomXsltFileName());
         }
@@ -667,4 +699,5 @@ public class Cob2XsdModel extends SourceToXsdCobolModel {
         putBoolean(props, QUOTE_IS_QUOTE, quoteIsQuote());
         return props;
     }
+
 }

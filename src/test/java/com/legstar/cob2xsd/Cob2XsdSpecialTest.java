@@ -719,4 +719,38 @@ public class Cob2XsdSpecialTest extends AbstractXsdTester {
             fail();
         }
     }
+
+    /**
+     * Test for Issue 58: Must accept orphan items without root parent
+     */
+    public void testMustAcceptOrphans() {
+        try {
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setIgnoreOrphanPrimitiveElements(false);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
+            String xmlSchema = cob2xsd
+                    .translate("        10  A PIC S9(4) COMP.\n"
+                            + "        10  B PIC S9(04) COMP.\n");
+            compare("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+                    + "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"unqualified\">"
+                    + "    <xsd:element name=\"a\">"
+                    + "        <xsd:simpleType>"
+                    + "            <xsd:restriction base=\"xsd:short\">"
+                    + "                <xsd:totalDigits value=\"4\"/>"
+                    + "            </xsd:restriction>"
+                    + "        </xsd:simpleType>"
+                    + "    </xsd:element>"
+                    + "    <xsd:element name=\"b\">"
+                    + "        <xsd:simpleType>"
+                    + "            <xsd:restriction base=\"xsd:short\">"
+                    + "                <xsd:totalDigits value=\"4\"/>"
+                    + "            </xsd:restriction>"
+                    + "        </xsd:simpleType>"
+                    + "    </xsd:element>"
+                    + "</xsd:schema>", xmlSchema);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 }
