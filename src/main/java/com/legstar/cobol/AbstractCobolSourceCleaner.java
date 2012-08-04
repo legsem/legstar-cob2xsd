@@ -159,10 +159,6 @@ public abstract class AbstractCobolSourceCleaner {
 
     /**
      * Remove characters that should not be passed to the lexer.
-     * <p/>
-     * Replace token separators such as ", " and "; " which complicate matters
-     * uselessly. Replacement should not change column numbers though so we
-     * simply replace the extra separators with a whitespace.
      * 
      * @param line before cleaning
      * @return a cleaner line of code
@@ -170,9 +166,6 @@ public abstract class AbstractCobolSourceCleaner {
     public String cleanLine(final String line) {
 
         String cleanedLine = extendedCleanLine(line);
-
-        /* Replace long separator forms */
-        cleanedLine = cleanedLine.replace(", ", "  ").replace("; ", "  ");
 
         /* Right trim, no need to over burden the lexer with spaces */
         cleanedLine = ("a" + cleanedLine).trim().substring(1);
@@ -195,6 +188,19 @@ public abstract class AbstractCobolSourceCleaner {
      */
     public String extendedCleanLine(final String line) {
         return line;
+    }
+
+    /**
+     * Replace token separators such as ", " and "; " which complicate matters
+     * uselessly. Replacement should not change column numbers though so we
+     * simply replace the extra separators with a whitespace.
+     * 
+     * @param str a string containing long separators
+     * @return the same string where long sperators have been replaced with
+     *         white spaces
+     */
+    protected String replaceLongSeparators(String str) {
+        return str.replace(", ", "  ").replace("; ", "  ");
     }
 
     /**
@@ -261,6 +267,9 @@ public abstract class AbstractCobolSourceCleaner {
      * Unsupported data description instructions such as COPY might appear on
      * the same line as data instructions. They also can span multiple lines.
      * This code blanks out such "non data description" statements.
+     * <p/>
+     * Code that is outside alphanumeric literals is also cleaned from long
+     * separators.
      * 
      * @param fragment a fragment of a line which might hold a data description
      * @param context the data description detection context
@@ -336,19 +345,15 @@ public abstract class AbstractCobolSourceCleaner {
             }
         } else if (context.isAlphanumStarted()) {
             Pattern alphanumLiteralEnd = Pattern.compile("\\"
-                    + context.getAlphanumDelimiter() + "($|\\s|\\"
+                    + context.getAlphanumDelimiter() + "($|\\s|,|;|\\"
                     + COBOL_DELIMITER + ")");
             alphanumLiteralMatcher = alphanumLiteralEnd.matcher(fragment);
             if (alphanumLiteralMatcher.find()) {
                 cleanedLine.append(fragment.substring(0,
-                        alphanumLiteralMatcher.end()));
-                if (fragment.substring(alphanumLiteralMatcher.end() - 1)
-                        .charAt(0) == COBOL_DELIMITER) {
-                    context.setLookingForLevel(true);
-                }
+                        alphanumLiteralMatcher.end() - 1));
                 context.setAlphanumStarted(false);
                 cleanedLine.append(removeExtraneousCharacters(
-                        fragment.substring(alphanumLiteralMatcher.end()),
+                        fragment.substring(alphanumLiteralMatcher.end() - 1),
                         context));
             } else {
                 cleanedLine.append(fragment);
@@ -359,14 +364,14 @@ public abstract class AbstractCobolSourceCleaner {
             if (alphanumLiteralMatcher.find()) {
                 if (matcher.find()) {
                     if (matcher.end() < alphanumLiteralMatcher.end()) {
-                        cleanedLine
-                                .append(fragment.substring(0, matcher.end()));
+                        cleanedLine.append(replaceLongSeparators(fragment
+                                .substring(0, matcher.end())));
                         context.setLookingForLevel(true);
                         cleanedLine.append(removeExtraneousCharacters(
                                 fragment.substring(matcher.end()), context));
                     } else {
-                        cleanedLine.append(fragment.substring(0,
-                                alphanumLiteralMatcher.end()));
+                        cleanedLine.append(replaceLongSeparators(fragment
+                                .substring(0, alphanumLiteralMatcher.end())));
                         context.setAlphanumDelimiter(fragment.substring(
                                 alphanumLiteralMatcher.end() - 1).charAt(0));
                         context.setAlphanumStarted(true);
@@ -375,8 +380,8 @@ public abstract class AbstractCobolSourceCleaner {
                                 context));
                     }
                 } else {
-                    cleanedLine.append(fragment.substring(0,
-                            alphanumLiteralMatcher.end()));
+                    cleanedLine.append(replaceLongSeparators(fragment
+                            .substring(0, alphanumLiteralMatcher.end())));
                     context.setAlphanumDelimiter(fragment.substring(
                             alphanumLiteralMatcher.end() - 1).charAt(0));
                     context.setAlphanumStarted(true);
@@ -386,7 +391,8 @@ public abstract class AbstractCobolSourceCleaner {
                 }
             } else {
                 if (matcher.find()) {
-                    cleanedLine.append(fragment.substring(0, matcher.end()));
+                    cleanedLine.append(replaceLongSeparators(fragment
+                            .substring(0, matcher.end())));
                     context.setLookingForLevel(true);
                     cleanedLine.append(removeExtraneousCharacters(
                             fragment.substring(matcher.end()), context));

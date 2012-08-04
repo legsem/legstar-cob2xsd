@@ -10,6 +10,7 @@
  ******************************************************************************/
 package com.legstar.cobol;
 
+import com.legstar.antlr.CleanerException;
 import com.legstar.antlr.RecognizerException;
 
 /**
@@ -77,11 +78,25 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
 
     /**
      * Check that long separators are trimmed.
+     * 
+     * @throws CleanerException
      */
-    public void testCleanLongSeparators() {
+    public void testCleanLongSeparators() throws CleanerException {
 
-        assertEquals("       01 A  PIC  X(5)  VALUE  5.",
-                _cleaner.cleanLine("123456 01 A, PIC; X(5), VALUE, 5."));
+        assertEquals("       01 A  PIC  X(5)  VALUE  5." + LS,
+                _cleaner.clean("123456 01 A, PIC; X(5), VALUE, 5."));
+    }
+
+    /**
+     * Check that long separators are trimmed but not if within literal.
+     * 
+     * @throws CleanerException
+     */
+    public void testCleanLongSeparatorsInAlphanumericLiteral()
+            throws CleanerException {
+
+        assertEquals("       01 A  PIC  X(5)  VALUE  'AB, C'." + LS,
+                _cleaner.clean("123456 01 A, PIC; X(5), VALUE, 'AB, C'."));
     }
 
     /**

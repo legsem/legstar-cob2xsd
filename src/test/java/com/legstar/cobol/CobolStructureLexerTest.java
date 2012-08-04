@@ -591,6 +591,50 @@ public class CobolStructureLexerTest extends AbstractCobolTester {
     }
 
     /**
+     * A condition with comma separated values.
+     */
+    public void testConditionWithCommaSeparatedValues() {
+        lexAndCheck("      88 CONDITION VALUE 1, 2, 3.",
+                "[@0,6:7='88',<CONDITION_LEVEL>,1:6]"
+                        + "[@1,9:17='CONDITION',<DATA_NAME>,1:9]"
+                        + "[@2,19:23='VALUE',<VALUE_KEYWORD>,1:19]"
+                        + "[@3,25:25='1',<INT>,1:25]"
+                        + "[@4,28:28='2',<INT>,1:28]"
+                        + "[@5,31:31='3',<INT>,1:31]"
+                        + "[@6,32:32='.',<PERIOD>,1:32]");
+        lexAndCheck("      88 CONDITION VALUE 'A', 'B', 'C'.",
+                "[@0,6:7='88',<CONDITION_LEVEL>,1:6]"
+                        + "[@1,9:17='CONDITION',<DATA_NAME>,1:9]"
+                        + "[@2,19:23='VALUE',<VALUE_KEYWORD>,1:19]"
+                        + "[@3,25:27=''A'',<ALPHANUM_LITERAL_STRING>,1:25]"
+                        + "[@4,30:32=''B'',<ALPHANUM_LITERAL_STRING>,1:30]"
+                        + "[@5,35:37=''C'',<ALPHANUM_LITERAL_STRING>,1:35]"
+                        + "[@6,38:38='.',<PERIOD>,1:38]");
+    }
+
+    /**
+     * A condition with comma separated values.
+     */
+    public void testConditionWithWhitespaceSeparatedValues() {
+        lexAndCheck("      88 CONDITION VALUE 1 2 3.",
+                "[@0,6:7='88',<CONDITION_LEVEL>,1:6]"
+                        + "[@1,9:17='CONDITION',<DATA_NAME>,1:9]"
+                        + "[@2,19:23='VALUE',<VALUE_KEYWORD>,1:19]"
+                        + "[@3,25:25='1',<INT>,1:25]"
+                        + "[@4,27:27='2',<INT>,1:27]"
+                        + "[@5,29:29='3',<INT>,1:29]"
+                        + "[@6,30:30='.',<PERIOD>,1:30]");
+        lexAndCheck("      88 CONDITION VALUE 'A' 'B' 'C'.",
+                "[@0,6:7='88',<CONDITION_LEVEL>,1:6]"
+                        + "[@1,9:17='CONDITION',<DATA_NAME>,1:9]"
+                        + "[@2,19:23='VALUE',<VALUE_KEYWORD>,1:19]"
+                        + "[@3,25:27=''A'',<ALPHANUM_LITERAL_STRING>,1:25]"
+                        + "[@4,29:31=''B'',<ALPHANUM_LITERAL_STRING>,1:29]"
+                        + "[@5,33:35=''C'',<ALPHANUM_LITERAL_STRING>,1:33]"
+                        + "[@6,36:36='.',<PERIOD>,1:36]");
+    }
+
+    /**
      * A value clause followed by a keyword.
      */
     public void testValueThenKeyword() {
