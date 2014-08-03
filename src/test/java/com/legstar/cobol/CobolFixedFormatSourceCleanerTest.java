@@ -410,4 +410,17 @@ public class CobolFixedFormatSourceCleanerTest extends AbstractCobolTester {
                         + "          05 TABLE-ODO OCCURS 1 TO 100 DEPENDING ON TABLE-SIZE"
                         + LS + "                          PIC X(5)." + LS);
     }
+
+    /**
+     * Issue 60: Long separators are mistakenly replaced in alphanumeric
+     * literals.
+     */
+    public void testLongSeparatorsWithinValue() {
+
+        CobolFixedFormatSourceCleaner.CleaningContext context = new CobolFixedFormatSourceCleaner.CleaningContext();
+
+        removeExtraneousCharactersAndCheck("01 A PIC  X(5) VALUE  'AB, C'.",
+                "01 A PIC  X(5) VALUE  'AB, C'.", context);
+    }
+
 }

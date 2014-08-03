@@ -110,7 +110,7 @@ public class Cob2XsdMain {
                 execute(getInput(), getOutput());
             }
         } catch (Exception e) {
-            _log.error("Transformers generator failure", e);
+            _log.error("COBOL to Xsd translation failure", e);
             throw new RuntimeException(e);
         }
     }
@@ -323,8 +323,7 @@ public class Cob2XsdMain {
         InputStream stream = null;
         try {
             Properties version = new Properties();
-            stream = Cob2XsdMain.class
-                    .getResourceAsStream(VERSION_FILE_NAME);
+            stream = Cob2XsdMain.class.getResourceAsStream(VERSION_FILE_NAME);
             version.load(stream);
             return version.getProperty("version");
         } finally {
