@@ -346,7 +346,7 @@ public class Cob2Xsd {
             try {
                 tFactory.setAttribute("indent-number", "4");
             } catch (IllegalArgumentException e) {
-                _log.warn("Unable to set indent-number on transfomer factory",
+                _log.debug("Unable to set indent-number on transfomer factory",
                         e);
             }
             StringWriter writer = new StringWriter();
