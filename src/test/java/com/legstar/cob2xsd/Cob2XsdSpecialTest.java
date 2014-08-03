@@ -753,4 +753,41 @@ public class Cob2XsdSpecialTest extends AbstractXsdTester {
             fail();
         }
     }
+
+    /**
+     * Test for Issue 61: Level 88 translations containing VALUE THRU
+     */
+    public void testLevel88WithValueThru() {
+        try {
+            Cob2XsdModel model = new Cob2XsdModel();
+            model.setMapConditionsToFacets(true);
+            Cob2Xsd cob2xsd = new Cob2Xsd(model);
+            String xmlSchema = cob2xsd
+                    .translate("        01  COMMAREA."
+                            + "        05  PIB-SECURITY-CODE PIC 9(3) COMP-4.\n"
+                            + "        88  PIB-TECH-USER               VALUE  1.\n"
+                            + "        88  PIB-MASTER-USER             VALUE  1 THRU   9.\n"
+                            + "        88  PIB-SYSTEM-USER             VALUE 10 THRU  19.\n");
+            compare("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"unqualified\">"
+                    + "    <xsd:complexType name=\"Commarea\">"
+                    + "        <xsd:sequence>"
+                    + "            <xsd:element name=\"pibSecurityCode\">"
+                    + "                <xsd:simpleType>"
+                    + "                    <xsd:restriction base=\"xsd:unsignedShort\">"
+                    + "                        <xsd:totalDigits value=\"3\"/>"
+                    + "                        <xsd:enumeration value=\"1\"/>"
+                    + "                        <xsd:minInclusive value=\"1\"/>"
+                    + "                        <xsd:maxInclusive value=\"9\"/>"
+                    + "                    </xsd:restriction>"
+                    + "                </xsd:simpleType>"
+                    + "            </xsd:element>"
+                    + "        </xsd:sequence>"
+                    + "    </xsd:complexType>"
+                    + "    <xsd:element name=\"commarea\" type=\"Commarea\"/>"
+                    + "</xsd:schema>", xmlSchema);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 }

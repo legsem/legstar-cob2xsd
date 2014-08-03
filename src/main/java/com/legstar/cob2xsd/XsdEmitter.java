@@ -13,6 +13,8 @@ package com.legstar.cob2xsd;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaChoice;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
@@ -57,6 +59,9 @@ public class XsdEmitter {
     /** Specialized LegStar/JAXB annotations emitter. */
     private XsdAnnotationEmitter _annotationEmitter;
 
+    /** Logger. */
+    private final Log _log = LogFactory.getLog(getClass());
+
     /** TODO make XSD name formatting optional */
 
     /**
@@ -65,9 +70,7 @@ public class XsdEmitter {
      * @param xsd the XML Schema to be populated.
      * @param model the translator options
      */
-    public XsdEmitter(
-            final XmlSchema xsd,
-            final Cob2XsdModel model) {
+    public XsdEmitter(final XmlSchema xsd, final Cob2XsdModel model) {
         _xsd = xsd;
         _cob2xsdModel = model;
         if (_cob2xsdModel.addLegStarAnnotations()) {
@@ -123,16 +126,13 @@ public class XsdEmitter {
     }
 
     /**
-     * Create an XML schema complex type.
-     * We want to use Named complex types so we add them to the XSD directly.
-     * We add complex types before their children because its nicer for the XSD
-     * layout to list roots before leafs.
+     * Create an XML schema complex type. We want to use Named complex types so
+     * we add them to the XSD directly. We add complex types before their
+     * children because its nicer for the XSD layout to list roots before leafs.
      * Redefined and redefining elements are grouped into an XML Schema choice.
      * A choice is created when an element marked as isRedefined is encountered
-     * and
-     * it groups all subsequent elements marked as redefines until a non
-     * redefining
-     * element is found.
+     * and it groups all subsequent elements marked as redefines until a non
+     * redefining element is found.
      * 
      * @param xsdDataItem COBOL data item decorated with XSD attributes
      * @return a new complex type
@@ -196,9 +196,9 @@ public class XsdEmitter {
         }
 
         /*
-         * Create this element schema type, then if its a simple type
-         * set it as an anonymous type. Otherwise, it is a named complex type,
-         * so reference it by name.
+         * Create this element schema type, then if its a simple type set it as
+         * an anonymous type. Otherwise, it is a named complex type, so
+         * reference it by name.
          */
         XmlSchemaType xmlSchemaType = createXmlSchemaType(xsdDataItem);
         if (xmlSchemaType == null) {
@@ -210,8 +210,8 @@ public class XsdEmitter {
             element.setSchemaTypeName(xmlSchemaType.getQName());
         }
         if (getModel().addLegStarAnnotations()) {
-            element.setAnnotation(
-                    _annotationEmitter.createLegStarAnnotation(xsdDataItem));
+            element.setAnnotation(_annotationEmitter
+                    .createLegStarAnnotation(xsdDataItem));
         }
         return element;
     }
@@ -270,8 +270,7 @@ public class XsdEmitter {
 
             /*
              * Due to a bug in JAXB (see JAXB issue 715), unsignedLong may end
-             * up
-             * being mapped to BigInteger instead of Long when totalDigits is
+             * up being mapped to BigInteger instead of Long when totalDigits is
              * used instead of maxInclusive. So for now, we keep maxInclusive.
              */
             if (xsdDataItem.getXsdType() == XsdType.ULONG) {
@@ -294,12 +293,11 @@ public class XsdEmitter {
         }
 
         /*
-         * For xsd:decimal and xsd:integer, we further constrain if the
-         * numeric needs to be positive (unsigned).
+         * For xsd:decimal and xsd:integer, we further constrain if the numeric
+         * needs to be positive (unsigned).
          */
-        if ((xsdDataItem.getXsdType() == XsdType.INTEGER
-                || xsdDataItem.getXsdType() == XsdType.DECIMAL)
-                && !xsdDataItem.isSigned()) {
+        if ((xsdDataItem.getXsdType() == XsdType.INTEGER || xsdDataItem
+                .getXsdType() == XsdType.DECIMAL) && !xsdDataItem.isSigned()) {
             restriction.getFacets().add(createMinInclusiveFacet("0"));
         }
         addEnumerationFacets(xsdDataItem, restriction);
@@ -312,40 +310,44 @@ public class XsdEmitter {
      * @param xsdDataItem COBOL data item decorated with XSD attributes
      * @param restriction the current set of constraints
      */
-    protected void addEnumerationFacets(
-            final XsdDataItem xsdDataItem,
+    protected void addEnumerationFacets(final XsdDataItem xsdDataItem,
             final XmlSchemaSimpleTypeRestriction restriction) {
         if (getModel().mapConditionsToFacets()) {
+            boolean hasValueThru = false;
             for (XsdDataItem child : xsdDataItem.getChildren()) {
                 if (child.getDataEntryType() == DataEntryType.CONDITION) {
                     for (String conditionValue : child.getConditionLiterals()) {
                         restriction.getFacets().add(
-                                createEnumerationFacet(
-                                        ValueUtil.resolveFigurative(
-                                                conditionValue,
+                                createEnumerationFacet(ValueUtil
+                                        .resolveFigurative(conditionValue,
                                                 xsdDataItem
                                                         .getMaxStorageLength(),
-                                                getModel().quoteIsQuote())
-                                ));
+                                                getModel().quoteIsQuote())));
                     }
                     for (Range conditionRange : child.getConditionRanges()) {
+                        if (hasValueThru) {
+                            _log.warn(xsdDataItem.getCobolName()
+                                    + " has several VALUE THRU statements."
+                                    + " Cannot translate to XSD."
+                                    + " Only the first one will be converted."
+                                    + " Ignoring: " + conditionRange.toString());
+                            break;
+                        }
                         restriction.getFacets().add(
-                                createMinInclusiveFacet(
-                                        ValueUtil.resolveFigurative(
-                                                conditionRange.getFrom(),
-                                                xsdDataItem
-                                                        .getMaxStorageLength(),
-                                                getModel().quoteIsQuote())
-                                ));
+                                createMinInclusiveFacet(ValueUtil
+                                        .resolveFigurative(conditionRange
+                                                .getFrom(), xsdDataItem
+                                                .getMaxStorageLength(),
+                                                getModel().quoteIsQuote())));
                         restriction.getFacets().add(
-                                createMaxInclusiveFacet(
-                                        ValueUtil.resolveFigurative(
-                                                conditionRange.getTo(),
-                                                xsdDataItem
-                                                        .getMaxStorageLength(),
-                                                getModel().quoteIsQuote())
-                                ));
+                                createMaxInclusiveFacet(ValueUtil
+                                        .resolveFigurative(conditionRange
+                                                .getTo(), xsdDataItem
+                                                .getMaxStorageLength(),
+                                                getModel().quoteIsQuote())));
+                        hasValueThru = true;
                     }
+
                 }
             }
         }
