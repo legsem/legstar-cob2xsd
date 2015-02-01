@@ -222,7 +222,13 @@ public class XsdDataItem {
 
         /* Inform object upstream that someone depends on him. */
         if (getDependingOn() != null && getParent() != null) {
-            getParent().updateDependency(getDependingOn());
+            boolean odoObjectMarked = markODOObjectInAncestor(getDependingOn());
+            if (!odoObjectMarked) {
+                addMessageToHistory(
+                        "Unable to locate ODO object named " + getDependingOn()
+                                + " for item " + cobolDataItem.toString(),
+                        "warn");
+            }
         }
 
         /* Inform object upstream that someone redefines him. */
@@ -282,15 +288,19 @@ public class XsdDataItem {
 
         /*
          * Set XSD minOccurs/maxOccurs from COBOL. If no minOccurs set in COBOL,
-         * this is a fixed size array.
+         * this is a fixed size array (unless a depending on clause exists).
          */
         if (cobolDataItem.getMaxOccurs() > 0) {
             _maxOccurs = cobolDataItem.getMaxOccurs();
             _maxStorageLength = _maxStorageLength * _maxOccurs;
-            if (cobolDataItem.getMinOccurs() > -1) {
-                _minOccurs = cobolDataItem.getMinOccurs();
+            if (cobolDataItem.getDependingOn() == null) {
+                if (cobolDataItem.getMinOccurs() > -1) {
+                    _minOccurs = cobolDataItem.getMinOccurs();
+                } else {
+                    _minOccurs = cobolDataItem.getMaxOccurs();
+                }
             } else {
-                _minOccurs = cobolDataItem.getMaxOccurs();
+                _minOccurs = 0;
             }
             _minStorageLength = _minStorageLength * _minOccurs;
         }
@@ -328,25 +338,60 @@ public class XsdDataItem {
     }
 
     /**
-     * Called when some child (or child of a child) has a DEPENDING ON clause.
-     * We look up our children for an item matching the COBOL name of the
-     * depending on object. If found, we update its isODOObject member,
-     * otherwise we propagate the request to our own parent.
+     * Lookup our ancestors for the ODO object of an array.
+     * <p/>
+     * First we ask our direct parent to lookup in his children (stopping when
+     * he reaches us).
+     * <p/>
+     * If we can't find in the immediate parent, then we move up to the grand
+     * parent.
      * 
-     * @param cobolName the depending on object.
+     * @param odoObjectCobolName the depending on object name.
+     * @return true when the ODO object was found and marked
      */
-    public void updateDependency(final String cobolName) {
+    public boolean markODOObjectInAncestor(final String odoObjectCobolName) {
+        boolean found = false;
+        if (getParent() == null) {
+            return found;
+        }
+        found = getParent().markODOObjectInChildren(odoObjectCobolName,
+                getCobolName());
+        if (found) {
+            return found;
+        }
+        return getParent().markODOObjectInAncestor(odoObjectCobolName);
+    }
+
+    /**
+     * Lookup an ODO object in this item's children.
+     * <p/>
+     * Recurses through the grand children until found or no more children to
+     * lookup.
+     * 
+     * @param odoObjectCobolName the ODO Object we are looking for
+     * @param stopChildCobolName a child name past which it is not useful to
+     *            continue the lookup
+     * @return
+     */
+    public boolean markODOObjectInChildren(final String odoObjectCobolName,
+            final String stopChildCobolName) {
         boolean found = false;
         for (XsdDataItem child : getChildren()) {
-            if (child.getCobolName().equals(cobolName)) {
+            if (child.getCobolName().equals(stopChildCobolName)) {
+                break;
+            }
+            if (child.getCobolName().equals(odoObjectCobolName)) {
                 child.setIsODOObject(true);
                 found = true;
                 break;
             }
+            found = child.markODOObjectInChildren(odoObjectCobolName,
+                    stopChildCobolName);
+            if (found) {
+                break;
+            }
         }
-        if (!found && getParent() != null) {
-            getParent().updateDependency(cobolName);
-        }
+        return found;
     }
 
     /**
