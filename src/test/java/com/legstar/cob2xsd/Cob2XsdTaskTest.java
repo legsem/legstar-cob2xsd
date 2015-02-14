@@ -76,8 +76,8 @@ public class Cob2XsdTaskTest extends AbstractXsdTester {
 
         File xsdFile = new File(GEN_XSD_DIR, _model.getTargetXsdFileName());
         Document result = getXMLSchemaAsDoc(xsdFile);
-        Document expected = getXMLSchemaAsDoc(new File(XSD_SAMPLES_DIR, _model
-                .getTargetXsdFileName().toLowerCase()));
+        Document expected = getXMLSchemaAsDoc(new File(XSD_SAMPLES_DIR,
+                "LSFILEAE.xsd"));
         compare(xsdFile.getName(), expected, result);
     }
 
@@ -111,7 +111,7 @@ public class Cob2XsdTaskTest extends AbstractXsdTester {
 
         Document result = getXMLSchemaAsDoc(targetXsdFile);
         Document expected = getXMLSchemaAsDoc(new File(XSD_SAMPLES_DIR,
-                targetXsdFile.getName()));
+                "LSFILEAE.xsd"));
         compare(targetXsdFile.getName(), expected, result);
     }
 

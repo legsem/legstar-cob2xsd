@@ -70,7 +70,7 @@ public class Cob2XsdIOTest extends AbstractXsdTester {
                     _log.debug("Result:\n"
                             + FileUtils.readFileToString(xsdFile));
                 }
-                File xsdRefFile = new File(XSD_SAMPLES_DIR, name.toLowerCase()
+                File xsdRefFile = new File(XSD_SAMPLES_DIR, cobolFile.getName()
                         + ".xsd");
                 if (CREATE_REFERENCES) {
                     FileUtils.copyFile(xsdFile, xsdRefFile);
