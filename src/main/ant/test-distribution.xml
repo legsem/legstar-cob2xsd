@@ -38,9 +38,12 @@
     -->
     <target name="testExecutable" depends="installDistro">
         <delete file="${xsdSampleFilePath}"/>
-        <exec dir="${test.dir}/${dist.name}" executable="cmd" failonerror="true">
+        <exec dir="${test.dir}/${dist.name}" executable="cmd" osfamily="windows" failonerror="true">
             <arg value="/c"/>
             <arg value="run"/>
+        </exec>
+        <exec dir="${test.dir}/${dist.name}" executable="sh" osfamily="unix" failonerror="true">
+            <arg value="run.sh"/>
         </exec>
         <available file="${xsdSampleFilePath}" property="isFileAvail1"/>
         <fail unless="isFileAvail1" message="Run.bat failed!"/>
