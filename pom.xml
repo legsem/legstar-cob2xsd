@@ -18,7 +18,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <legstarCoreVersion>1.5.8</legstarCoreVersion>
+        <legstarCoreVersion>1.6.0</legstarCoreVersion>
         <antlrVersion>3.2</antlrVersion>
         <antInternalVersion>1.7.0</antInternalVersion> <!-- Used for legstar builds and tests -->
         <antVersion>1.6.5</antVersion>  <!-- Expected to be provided at runtime -->
