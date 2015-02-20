@@ -149,28 +149,16 @@ public class XsdEmitter {
         for (XsdDataItem child : xsdDataItem.getChildren()) {
             XmlSchemaElement xmlSchemaElement = createXmlSchemaElement(child);
             if (xmlSchemaElement != null) {
-                if (xmlSchemaChoice == null) {
-                    if (child.isRedefined()) {
-                        xmlSchemaChoice = new XmlSchemaChoice();
-                        xmlSchemaChoice.getItems().add(xmlSchemaElement);
-                    } else {
-                        xmlSchemaSequence.getItems().add(xmlSchemaElement);
-                    }
+                if (child.isRedefined()) {
+                    xmlSchemaChoice = new XmlSchemaChoice();
+                    xmlSchemaSequence.getItems().add(xmlSchemaChoice);
+                    xmlSchemaChoice.getItems().add(xmlSchemaElement);
+                } else if (child.getRedefines() != null) {
+                    xmlSchemaChoice.getItems().add(xmlSchemaElement);
                 } else {
-                    if (child.getRedefines() != null) {
-                        xmlSchemaChoice.getItems().add(xmlSchemaElement);
-                    } else {
-                        xmlSchemaSequence.getItems().add(xmlSchemaChoice);
-                        xmlSchemaChoice = null;
-                        xmlSchemaSequence.getItems().add(xmlSchemaElement);
-                    }
+                    xmlSchemaSequence.getItems().add(xmlSchemaElement);
                 }
             }
-        }
-
-        if (xmlSchemaChoice != null) {
-            xmlSchemaSequence.getItems().add(xmlSchemaChoice);
-            xmlSchemaChoice = null;
         }
 
         xmlSchemaComplexType.setParticle(xmlSchemaSequence);
