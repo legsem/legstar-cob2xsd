@@ -196,7 +196,7 @@ public abstract class AbstractCobolSourceCleaner {
      * simply replace the extra separators with a whitespace.
      * 
      * @param str a string containing long separators
-     * @return the same string where long sperators have been replaced with
+     * @return the same string where long separators have been replaced with
      *         white spaces
      */
     protected String replaceLongSeparators(String str) {
