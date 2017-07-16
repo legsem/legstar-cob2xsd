@@ -26,7 +26,7 @@ import com.legstar.codegen.models.SourceToXsdCobolModel;
 
 /**
  * This class gathers execution parameters for the COBOL to XML Schema utility.
- * <p/>
+ * <p>
  * The class is also capable of generating a fully configured ANT script to run
  * the ant version of the utility with the current parameter set.
  * 

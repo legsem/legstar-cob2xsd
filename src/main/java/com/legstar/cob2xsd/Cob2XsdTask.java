@@ -106,7 +106,7 @@ public class Cob2XsdTask extends Task {
 
     /**
      * Translates a single COBOL source file.
-     * <p/>
+     * <p>
      * When requested the file base name is appended to the target namespace.
      * 
      * @param cobolFile COBOL source file

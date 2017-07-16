@@ -64,7 +64,7 @@ import com.legstar.cobol.model.CobolDataItem;
  * Implements the COBOL Structure to XML Schema translator. This is the API made
  * available to invoke the COBOL to XML Schema translator from your own java
  * code.
- * <p/>
+ * <p>
  * There are 6 steps involved:
  * <ul>
  * <li>Cleaning the source from non COBOL Structure characters</li>
@@ -75,10 +75,10 @@ import com.legstar.cobol.model.CobolDataItem;
  * <li>Emitting XML Schema from the COBOL model</li>
  * <li>Writing the XML Schema, optionally applying a customization XSLT</li>
  * </ul>
- * <p/>
+ * <p>
  * All options are bundled in {@link Cob2XsdModel} instance that is received at
  * construction time.
- * <p/>
+ * <p>
  * To invoke the translator, you normally call one of:
  * <ul>
  * <li>{@link #translate(String)}</li>
@@ -86,7 +86,7 @@ import com.legstar.cobol.model.CobolDataItem;
  * <li>{@link #translate(File, String, File)}</li>
  * </ul>
  * methods.
- * <p/>
+ * <p>
  * Any error encountered and recovered from is available in
  * {@link #getErrorHistory()}.
  * 
@@ -323,7 +323,7 @@ public class Cob2Xsd {
 
     /**
      * Serialize the XML Schema to a string.
-     * <p/>
+     * <p>
      * If we are provided with an XSLT customization file then we transform the
      * XMLSchema.
      * 
@@ -405,7 +405,7 @@ public class Cob2Xsd {
     /**
      * If data item COBOL name is already used, we add it to the non unique
      * list. This recurse to the item children.
-     * <p/>
+     * <p>
      * We don't add COBOL FILLERs as they are always considered non unique.
      * 
      * @param cobolDataItem a COBOL data item
@@ -434,7 +434,7 @@ public class Cob2Xsd {
 
     /**
      * Create an empty XML Schema.
-     * <p/>
+     * <p>
      * If no targetNamespace, make sure there is no default namespace otherwise
      * our complex types would be considered part of that default namespace
      * (usually XML Schema namespace).
@@ -515,7 +515,7 @@ public class Cob2Xsd {
 
     /**
      * list of errors encountered while translating.
-     * <p/>
+     * <p>
      * Most of these errors are warnings which were recovered from but still
      * denote something that user should know about.
      * 

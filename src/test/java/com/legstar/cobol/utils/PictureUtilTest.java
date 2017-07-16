@@ -188,7 +188,7 @@ public class PictureUtilTest extends TestCase {
      * Turns a picture into a regex and then checks that the test value matches.
      * A special case is when regex returned is null (meaning no restriction) in
      * this case the testValue must be null.
-     * <p/>
+     * <p>
      * Because of the difference between XML Schema regex and Java regex there
      * are some conversions needed before we can actually test.
      * @param picture the COBOL picture clause
