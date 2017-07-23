@@ -27,14 +27,15 @@
     </properties>
 
     <issueManagement>
-        <system>Google Code Issue Tracking</system>
-        <url>http://code.google.com/p/legstar-cob2xsd/issues/list</url>
+        <system>GitHub Issue Tracking</system>
+        <url>https://github.com/legsem/legstar-cob2xsd/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:svn:http://legstar-cob2xsd.googlecode.com/svn/trunk/</connection>
-        <developerConnection>scm:svn:https://legstar-cob2xsd.googlecode.com/svn/trunk/</developerConnection>
-        <url>http://legstar-cob2xsd.googlecode.com/svn/trunk/</url>
+        <connection>scm:git:https://legsem@github.com/legsem/legstar-cob2xsd.git</connection>
+        <developerConnection>scm:git:https://legsem@github.com/legsem/legstar-cob2xsd.git</developerConnection>
+        <url>https://github.com/legsem/legstar-cob2xsd.git</url>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
@@ -340,6 +341,33 @@
                     </execution>
                  </executions>
             </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <configuration>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <shadedClassifierName>shaded</shadedClassifierName>
+                    <artifactSet>
+                        <excludes>
+                            <exclude>org.antlr:antlr</exclude>
+                            <exclude>org.slf4j:slf4j-log4j12</exclude>
+                            <exclude>log4j:log4j:jar:</exclude>
+                        </excludes>
+                    </artifactSet>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            
          </plugins>
    </build>
 
